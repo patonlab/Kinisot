@@ -78,14 +78,19 @@ python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso "7 8"
    TST-KIE @ 393.0 K      1.007258    0.885538    1.063932    1.006138    0.954816    1.001976    0.956703
 ```
 
-Classical and tunneling-corrected KIEs referenced with respect to 13C @ atom number 5 (i.e. divide through by this value):
-13C @ posn 1:	1.011	1.013
-13C @ posn 2: 	1.000	1.000
-17O @ posn 3: 	1.017	1.019
-13C @ posn 4: 	1.028	1.031
-13C @ posn 5: 	1.000	1.000
-13C @ posn 6: 	1.013	1.015
-2H @ posn 7&8: 	0.953	0.955
+Referencing these KIE values with respect to 13C @ atom number 5 (i.e. this functions as an internal standard) is performed  by dividing  by this value (1.001896 or 1.001944):
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| 13C @ posn 1:	| 1.011	| 1.013|
+| 13C @ posn 2: 	| 1.000	| 1.000|
+| 17O @ posn 3: 	| 1.017	| 1.019|
+| 13C @ posn 4: 	| 1.028	| 1.031|
+| 13C @ posn 5: 	| 1.000	| 1.000|
+| 13C @ posn 6: 	| 1.013	| 1.015|
+| 2H @ posn 7&8: 	| 0.953	| 0.955|
+
 These values appear to be indistinguishable (at least up to 3DP) to those produced by Quiver (https://github.com/ekwan/quiver) 
+
 ---
 License: [CC-BY](https://creativecommons.org/licenses/by/3.0/)
