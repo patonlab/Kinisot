@@ -81,16 +81,14 @@ python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso "7 8"
 Referencing these KIE values with respect to <sup>13</sup>C @ atom number 5 (i.e. this isotopomer is the  internal standard) requires division by this value (1.001896 or 1.001944):
 
 | Isotopomer        | KIE           | corr-KIE  |
-| ------------- |:-------------:| -----:|
-| <sup>13</sup>C @ posn 1:	| 1.011	| 1.013|
-| <sup>13</sup>C @ posn 2: 	| 1.000	| 1.000|
-| <sup>17</sup>O @ posn 3: 	| 1.017	| 1.019|
-| <sup>13</sup>C @ posn 4: 	| 1.028	| 1.031|
-| <sup>13</sup>C @ posn 5: 	| 1.000	| 1.000|
-| <sup>13</sup>C @ posn 6: 	| 1.013	| 1.015|
-| <sup>2</sup>H @ posn 7&8: 	| 0.953	| 0.955|
-
-These values appear to be indistinguishable (at least up to 3DP) to those produced by Quiver (https://github.com/ekwan/quiver) 
+|:------------- |:-------------:|:-----:|
+| <sup>13</sup>C @ posn 1	| 1.011	| 1.013|
+| <sup>13</sup>C @ posn 2 	| 1.000	| 1.000|
+| <sup>17</sup>O @ posn 3 	| 1.017	| 1.019|
+| <sup>13</sup>C @ posn 4 	| 1.028	| 1.031|
+| <sup>13</sup>C @ posn 5 	| 1.000	| 1.000|
+| <sup>13</sup>C @ posn 6 	| 1.013	| 1.015|
+| <sup>2</sup>H @ posns 7 & 8 	| 0.953	| 0.955|
 
 ---
 License: [CC-BY](https://creativecommons.org/licenses/by/3.0/)
