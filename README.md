@@ -66,18 +66,17 @@ This was repeated for a series of isotopologues (truncated output):
 ```python
 python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 2
    TST-KIE @ 393.0 K      1.000281    0.999252    1.000204    1.002180    1.001916    1.000077    1.001994
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 3
+   TST-KIE @ 393.0 K      1.007026    1.022302    1.005865    0.983895    1.018846    1.001913    1.020796
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 4
+   TST-KIE @ 393.0 K      1.012716    1.036618    1.001967    0.978989    1.029763    1.003435    1.033300
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 5
+   TST-KIE @ 393.0 K      1.000176    0.999077    1.000681    1.001962    1.001896    1.000048    1.001944
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 6
+   TST-KIE @ 393.0 K      1.008093    1.004484    1.004208    0.997962    1.014802    1.002201    1.017035
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso "7 8"
+   TST-KIE @ 393.0 K      1.007258    0.885538    1.063932    1.006138    0.954816    1.001976    0.956703
 ```
-
-... -iso 3
-TST-KIE @ 393.0 K      1.007026    1.022302    1.005865    0.983895    1.018846    1.001913    1.020796
-... -iso 4
-TST-KIE @ 393.0 K      1.012716    1.036618    1.001967    0.978989    1.029763    1.003435    1.033300
-... -iso 5
-TST-KIE @ 393.0 K      1.000176    0.999077    1.000681    1.001962    1.001896    1.000048    1.001944
-... -iso 6
-TST-KIE @ 393.0 K      1.008093    1.004484    1.004208    0.997962    1.014802    1.002201    1.017035
-... -iso "7 8"
-TST-KIE @ 393.0 K      1.007258    0.885538    1.063932    1.006138    0.954816    1.001976    0.956703
 
 Classical and tunneling-corrected KIEs referenced with respect to 13C @ atom number 5 (i.e. divide through by this value):
 13C @ posn 1:	1.011	1.013
