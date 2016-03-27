@@ -8,20 +8,20 @@ This is a Python version of [Kinisot](http://dx.doi.org/10.5281/zenodo.19272), f
 Also see related discussions on [computing KIE values](http://www.ch.imperial.ac.uk/rzepa/blog/?p=14327)
 
 
-The current version is currently hard-coded to only consider 2D/1H, 13C/12C and 17O/16O isotopic replacements. This can be modified in Hess_to_Freq.py
+The current version is currently hard-coded to only consider <sup>2</sup>D/<sup>1</sup>H, <sup>13</sup>C/<sup>12</sup>C and <sup>17</sup>O/<sup>16</sup>O isotopic replacements. This can be modified in Hess_to_Freq.py
 
 Example 1. Nucleophilic Substitution
 ------
 
 Consider the SN2 identity reaction between fluoromethane and Fluoride. We have previously optimized the structures of GS and TS structures with [Gaussian 09](): the output files must also contain the results from frequency calculations. The temperature defined in Gaussian is unimportant.
 
-Suppose we want to obtain the KIE at 273 Kelvin from deuterating all three H atoms i.e. CD3F vs. CH3F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
+Suppose we want to obtain the KIE at 273 Kelvin from deuterating all three H atoms i.e. CD<sub>3</sub>F vs. CH<sub>3</sub>F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
 
 ```python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -t 273 -iso "2 3 4"```
 
 The following output results:
 
-```   Temperature = 273.0 Kelvin    Frequency scale factor (default) = 1.0```
+```   Temperature = 273.0 Kelvin    Frequency scale factor (default) = 1.0
 
    Structure                                                       Im Freq         ZPE
 o  Examples/CH3F_F_rc: label @ 0                                       N/A    0.039317
@@ -31,6 +31,7 @@ o  Examples/CH3F_F_ts: label @ 2 3 4                            480.596209    0.
 
                             V-ratio   ZPE-ratio         Exc     TR-Prod         KIE        Tunn    corr-KIE
    TST-KIE @ 273.0 K       1.001663    0.789683    1.127764    0.995606    0.888138    1.001003    0.889029
+```
 
 
 Example 2
