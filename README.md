@@ -25,10 +25,10 @@ The following output results:
 
 
 ```python
-Temperature = 273.0 K;    Frequency scale factor (default) = 1.0
+   Temperature = 273.0 K;    Frequency scale factor (default) = 1.0
 
-Structure                                                       Im Freq         ZPE
-Examples/CH3F_F_rc: label @ 0                                       N/A    0.039317
+   Structure                                                       Im Freq         ZPE
+o  Examples/CH3F_F_rc: label @ 0                                       N/A    0.039317
 o  Examples/CH3F_F_ts: label @ 0                                481.395613    0.038712
 o  Examples/CH3F_F_rc: label @ 2 3 4                                   N/A    0.029655
 o  Examples/CH3F_F_ts: label @ 2 3 4                            480.596209    0.028845
