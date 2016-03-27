@@ -17,9 +17,11 @@ Consider the SN2 identity reaction between fluoromethane and Fluoride. We have p
 
 Suppose we want to obtain the KIE at 273 Kelvin from deuterating all three H atoms i.e. CD3F vs. CH3F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
 
-'''python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -t 273 - iso "2 3 4"'''
+```python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -t 273 -iso "2 3 4"```
 
-   Temperature = 273.0 Kelvin    Frequency scale factor (default) = 1.0
+The following output results:
+
+```   Temperature = 273.0 Kelvin    Frequency scale factor (default) = 1.0```
 
    Structure                                                       Im Freq         ZPE
 o  Examples/CH3F_F_rc: label @ 0                                       N/A    0.039317
