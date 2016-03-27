@@ -21,24 +21,21 @@ Suppose we want to obtain the KIE at a temperature of 273K from deuterating all 
 python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -t 273 -iso "2 3 4"
 ```
 
-```python
-s = "Python syntax highlighting"
-print s
-```
-
 The following output results:
 
-```
-\\Temperature = 273.0 K;    Frequency scale factor (default) = 1.0
+
+```python
+Temperature = 273.0 K;    Frequency scale factor (default) = 1.0
+
 Structure                                                       Im Freq         ZPE
-Examples/CH3F_F_rc: label @ 0                                       N/A    0.039317```
-```o  Examples/CH3F_F_ts: label @ 0                                481.395613    0.038712```
-```o  Examples/CH3F_F_rc: label @ 2 3 4                                   N/A    0.029655```
-```o  Examples/CH3F_F_ts: label @ 2 3 4                            480.596209    0.028845```
+Examples/CH3F_F_rc: label @ 0                                       N/A    0.039317
+o  Examples/CH3F_F_ts: label @ 0                                481.395613    0.038712
+o  Examples/CH3F_F_rc: label @ 2 3 4                                   N/A    0.029655
+o  Examples/CH3F_F_ts: label @ 2 3 4                            480.596209    0.028845
 
-```                            V-ratio   ZPE-ratio         Exc     TR-Prod         KIE        Tunn    corr-KIE```
-```   TST-KIE @ 273.0 K       1.001663    0.789683    1.127764    0.995606    0.888138    1.001003    0.889029```
-
+                            V-ratio   ZPE-ratio         Exc     TR-Prod         KIE        Tunn    corr-KIE
+   TST-KIE @ 273.0 K       1.001663    0.789683    1.127764    0.995606    0.888138    1.001003    0.889029
+```
 
 Example 2. Claisen Rearrangement
 ------
