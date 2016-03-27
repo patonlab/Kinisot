@@ -1,3 +1,6 @@
+Kinisot
+------
+
 This is a faithful translation of Kinisot, written by Henry Rzepa in Fortran. This Python version is intended to give identical results, although with greater flexibility in terms of specifying temperature, vibrational scaling factors - and does not require the isotopomers to be calculated separately in e.g. Gaussian. The tunneling correction is an infinite-parabola model. The numerical results seem identical with quiver - https://github.com/ekwan/quiver - which is not unsurprising since the underlying euqations are the same. 
 
 The original Fortran is available: Rzepa, Henry S.., "KINISOT. A basic program to calculate kinetic isotope effects using normal coordinate analysis of transition state and reactants.", 2015. http://dx.doi.org/10.5281/zenodo.19272
@@ -61,4 +64,5 @@ o  Examples/claisen_ts: label @ 1                               479.060524    0.
 	13C @ posn 6: 	1.013	1.015
 	2H @ posn 7&8: 	0.953	0.955
 	These values appear to be indistinguishable (at least up to 3DP) to those produced by Quiver (https://github.com/ekwan/quiver) 
-
+---
+License: CC-BY
