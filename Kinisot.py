@@ -125,8 +125,8 @@ if __name__ == "__main__":
 				if len(sys.argv[i].split(".")) > 1:
 					if sys.argv[i].split(".")[1] == "out" or sys.argv[i].split(".")[1] == "log": files.append(sys.argv[i])
 			
-		if temperature != "none": print "   Temperature =", temperature, "Kelvin",
-		else: print "   Temperature (default) = 298.15K",; temperature = 298.15
+		if temperature != "none": print "   Temperature =", temperature, "K;",
+		else: print "   Temperature (default) = 298.15K;",; temperature = 298.15
 		if freq_scale_factor != "none": print "   Frequency scale factor =", freq_scale_factor
 		else: print "   Frequency scale factor (default) = 1.0"; freq_scale_factor = 1.0
 		
