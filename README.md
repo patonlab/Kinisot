@@ -10,12 +10,14 @@ Also see related discussions on [computing KIE values](http://www.ch.imperial.ac
 
 The current version is currently hard-coded to only consider 2D/1H, 13C/12C and 17O/16O isotopic replacements. This can be modified in Hess_to_Freq.py
 
-Example 1
+Example 1. Nucleophilic Substitution
 ------
 
-SN2 identity reaction of MeF with Fluoride, comparing CD3 with CH3 (these atoms are numbered 2,3 and 4 in both structure files). The temperature is set to 273K, and there is no scaling of force constants. Presently it is assumed that the isotopomer is the next most abundant (i.e. C13, H2, O17).
+Consider the SN2 identity reaction between fluoromethane and Fluoride. We have previously optimized the structures of GS and TS structures with [Gaussian 09](): the output files must also contain the results from frequency calculations. The temperature defined in Gaussian is unimportant.
 
-$ python Kinisot.py Kinisot_example/*out -t 273 - iso "2 3 4"
+Suppose we want to obtain the KIE at 273 Kelvin from deuterating all three H atoms i.e. CD3F vs. CH3F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
+
+'''python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -t 273 - iso "2 3 4"'''
 
    Temperature = 273.0 Kelvin    Frequency scale factor (default) = 1.0
 
