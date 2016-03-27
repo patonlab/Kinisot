@@ -17,7 +17,7 @@ Consider the SN2 identity reaction between fluoromethane and Fluoride. We have p
 
 Suppose we want to obtain the KIE at a temperature of 273K from deuterating all three H atoms i.e. CD<sub>3</sub>F vs. CH<sub>3</sub>F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
 
-```
+```python
 python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -t 273 -iso "2 3 4"
 ```
 
