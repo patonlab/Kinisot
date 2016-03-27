@@ -3,7 +3,7 @@ Kinisot
 
 A Python program to compute kinetic isotope effects from two Gaussian output files (a ground state and transition state)
 
-This is a Python version of [Kinisot](http://dx.doi.org/10.5281/zenodo.19272), from the Fortran version originally written by Henry Rzepa. This version gives identical numerical results as the original, although hopefully with greater flexibility in terms of specifying temperature, [vibrational scaling factors](). Isotopic substitutions can be specified when using the program, such that separate computations with Gaussian are not required. The program diagonalizes the mass-weighted Hessian matricies to obtain the vibrational frequencies and partition function. One difference with the Gaussian program itself is that the lowest six normal modes are not projected out, however, this is also the approach taken by [quiver](https://github.com/ekwan/quiver) which does not seem to have disastrous effects. Numerical results agree to 3DP with those obtained from quiver, which is not unsurprising since the underlying approach is the same. The tunneling correction is an infinite-parabola model.
+This is a Python version of [Kinisot](http://dx.doi.org/10.5281/zenodo.19272), from the Fortran version originally written by Henry Rzepa. This version gives identical numerical results as the original, although hopefully with greater flexibility in terms of specifying temperature, [vibrational scaling factors](http://t1.chem.umn.edu/freqscale/index.html). Isotopic substitutions can be specified when using the program, such that separate computations with Gaussian are not required. The program diagonalizes the mass-weighted Hessian matricies to obtain the vibrational frequencies and partition function. One difference with the Gaussian program itself is that the lowest six normal modes are not projected out, however, this is also the approach taken by [quiver](https://github.com/ekwan/quiver) which does not seem to have disastrous effects. Numerical results agree to 3DP with those obtained from quiver, which is not unsurprising since the underlying approach is the same. The tunneling correction is an infinite-parabola model.
 
 Also see related discussions on [computing KIE values](http://www.ch.imperial.ac.uk/rzepa/blog/?p=14327)
 
@@ -13,7 +13,7 @@ The current version is currently hard-coded to only consider <sup>2</sup>D/<sup>
 Example 1. Nucleophilic Substitution
 ------
 
-Consider the SN2 identity reaction between fluoromethane and Fluoride. We have previously optimized the structures of GS and TS structures with [Gaussian 09](): the output files must also contain the results from frequency calculations. The temperature defined in Gaussian is unimportant.
+Consider the SN2 identity reaction between fluoromethane and Fluoride. We have previously optimized the structures of GS and TS structures with [Gaussian 09](http://www.gaussian.com): the output files must also contain the results from frequency calculations. The temperature defined in Gaussian is unimportant.
 
 Suppose we want to obtain the KIE at a temperature of 273K from deuterating all three H atoms i.e. CD<sub>3</sub>F vs. CH<sub>3</sub>F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
 
@@ -37,26 +37,37 @@ o  Examples/CH3F_F_ts: label @ 2 3 4                            480.596209    0.
    TST-KIE @ 273.0 K       1.001663    0.789683    1.127764    0.995606    0.888138    1.001003    0.889029
 ```
 
+Individual terms within the Bigeleisen-Mayer equation are first specifed: the ratio of imaginary frequencies (V-ratio), zero-point energy differences (ZPE-ratio), entropic differences (Exc) and enthalpic Teller–Redlich differences (TR_Prod). The product of these four terms defines the KIE value. This first value assumes classical nuclei (the Born-Oppenheimer approximation). A quantum mechanical tunnelling correction (Tunn) is computed assuming an infinite parabolic barrier in one-dimension, and multiplication by this factor gives the corrected KIE (corr-KIE). This is unlikely to be accurate and should be used with caution.
+
 Example 2. Claisen Rearrangement
 ------
 
-Claisen rearrangement (comparison with data from quiver for different isotopologues). The temperature is set to 393K and the frequencies are scaled by 0.9614. The first five calculations consider a single atom substitution by its heavier isotope. The last considers substitution of two H-atoms (7 & 8) with deuterium.
+Consider a \[3,3\]-sigmatropic Claisen rearrangement. Here we compute KIE values separately for various isotopic substitutions and compare with data obtained from [quiver](https://github.com/ekwan/quiver) reported by [Eugene Kwan]() to show that there is no inherent different between the two programs (at least in the first 3DP). The temperature is defined as 393K and the frequencies are scaled by a factor of 0.9614. Again there are two Gaussian output files for the GS and TS.
 
-$ python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 1
+The first isotopologue is of atom 1 (carbon):
 
-Temperature = 393.0 Kelvin    Frequency scale factor = 0.9614
+```python
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 1
 
-Structure                                                       Im Freq         ZPE
+   Temperature = 393.0 Kelvin    Frequency scale factor = 0.9614
+
+   Structure                                                       Im Freq         ZPE
 o  Examples/claisen_gs: label @ 0                                      N/A    0.114417
 o  Examples/claisen_ts: label @ 0                               482.835702    0.112582
 o  Examples/claisen_gs: label @ 1                                      N/A    0.114245
 o  Examples/claisen_ts: label @ 1                               479.060524    0.112415
 
-V-ratio   ZPE-ratio         Exc     TR-Prod         KIE        Tunn    corr-KIE
-TST-KIE @ 393.0 K      1.007880    1.003956    1.003422    0.997456    1.012747    1.002143    1.014918
+   V-ratio   ZPE-ratio         Exc     TR-Prod         KIE        Tunn    corr-KIE
+   TST-KIE @ 393.0 K      1.007880    1.003956    1.003422    0.997456    1.012747    1.002143    1.014918
+```
 
-... -iso 2
-TST-KIE @ 393.0 K      1.000281    0.999252    1.000204    1.002180    1.001916    1.000077    1.001994
+This was repeated for a series of isotopologues (truncated output):
+
+```python
+python Kinisot.py Examples/claisen_*out -t 393 -s 0.9614 -iso 2
+   TST-KIE @ 393.0 K      1.000281    0.999252    1.000204    1.002180    1.001916    1.000077    1.001994
+```
+
 ... -iso 3
 TST-KIE @ 393.0 K      1.007026    1.022302    1.005865    0.983895    1.018846    1.001913    1.020796
 ... -iso 4
