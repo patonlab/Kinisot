@@ -90,5 +90,6 @@ Referencing these KIE values with respect to <sup>13</sup>C @ atom number 5 (i.e
 | <sup>13</sup>C @ posn 6 	| 1.013	| 1.015|
 | <sup>2</sup>H @ posns 7 & 8 	| 0.953	| 0.955|
 
+[![DOI](https://zenodo.org/badge/16266/bobbypaton/Kinisot.svg)](https://zenodo.org/badge/latestdoi/16266/bobbypaton/Kinisot)
 ---
 License: [CC-BY](https://creativecommons.org/licenses/by/3.0/)
