@@ -21,10 +21,10 @@ Alternatively `pip install kinisot` will install all classes
 ```python
 Kinisot.py reactant_output ts_output -iso "atom numbers" (-t temperature) (-s scalefactor)  
 ```
-*       The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory. The temperature is unimportant.
-*       The `-iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
-*       The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the Gaussian calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
-*       The `-s` option is a scaling factor for vibrational frequencies. Empirical scaling factors have been determined for several functional/basis set combinations, and these are applied automatically using values from the Truhlar group based on detection of the level of theory and basis set in the output files. The ZPE-scaling factors are selected if available. The default value when no scaling factor is available is 1 (no scale factor). Automated scaling can also be surpressed by `-s 1.0`
+*	The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory. The temperature is unimportant.
+*	The `-iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
+*	The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the Gaussian calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
+*	The `-s` option is a scaling factor for vibrational frequencies. Empirical scaling factors have been determined for several functional/basis set combinations, and these are applied automatically using values from the Truhlar group based on detection of the level of theory and basis set in the output files. The ZPE-scaling factors are selected if available. The default value when no scaling factor is available is 1 (no scale factor).
 
 #### Example 1. Proton Transfer
 Transfer of a proton between two chloride anions; the reactant and TS are both linear. The hydrogen atom is atom number 1 in both files (the numbering needs to be identical). In this example we consider the 2D/1H kie at the default temperature without vibrational scaling.
@@ -50,9 +50,13 @@ The first column (V-ratio) shows imaginary frequencies for the TS and its isotop
 
 The level of theory used for the above calculations is HF/6-31G(d). If a scaling factor is not specified manually, Kinisot tries to match the level/basis set with a database of scaling factors. For the proton transfer example again:  
 
-```bash
+```python
 python Kinisot.py Cl_H_Cl_RCT.out Cl_H_Cl_TS.out -iso "1"
+```
 
+To give:
+
+```bash
   Found vibrational scaling factor 0.909 for RHF/6-31G(d) level of theory 
   REF: I. M. Alecu, J. Zheng, Y. Zhao, and D. G. Truhlar, J. Chem. Theory Comput. 6, 2872-2887 (2010). 
 
@@ -73,7 +77,11 @@ Suppose we want to obtain the KIE at a temperature of 273K from deuterating all 
 
 ```bash
 python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out -iso "2 3 4" -t 273
-  
+```
+
+To give:
+
+```bash  
   Found vibrational scaling factor 0.985 for RB3LYP/Aug-CC-pVTZ level of theory 
   REF: I. M. Alecu, unpublished (2011). 
 
