@@ -21,6 +21,7 @@ Alternatively `pip install kinisot` will install all classes
 ```python
 Kinisot.py reactant_output ts_output -iso <"atom numbers"> (-t temperature) (-s scalefactor)  
 ```
+
 *       The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory. The temperature is unimportant.
 *       The `-iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
 *       The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the Gaussian calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
