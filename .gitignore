@@ -1,2 +1,4 @@
 *.pyc
 Kinisot_output.dat
+dist
+MANIFEST
