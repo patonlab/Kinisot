@@ -36,14 +36,14 @@ python Kinisot.py Cl_H_Cl_RCT.out Cl_H_Cl_TS.out -iso "1" -s 1.0
 The following output is produced:
 
 ```bash
-                                      Temp = 298.15K / Vib. scale factor = 1.0 
-                                      V-ratio         ZPE         EXC        TRPF         KIE     1D-tunn    corr-KIE 
-o Cl_H_Cl_RCT                        --------------------------------------------------------------------------------
-o Cl_H_Cl_TS                           1013.5 
-o Cl_H_Cl_RCT: iso @ 1                          1.113e+01   1.129e+00   1.971e+00 
-o Cl_H_Cl_TS: iso @ 1                   722.0   3.494e+00   1.069e+00   2.765e+00 
-                                     -------------------------------------------------------------------------------- 
-  TST-KIE @ 298.15 K                 1.403746    3.185402    1.056428    0.712742    3.366858    2.156937    7.262101 
+                               Temp = 298.15K / Vib. scale factor = 1.0 
+                               V-ratio         ZPE         EXC        TRPF         KIE     1D-tunn    corr-KIE 
+o Cl_H_Cl_RCT                 --------------------------------------------------------------------------------
+o Cl_H_Cl_TS                    1013.5 
+o Cl_H_Cl_RCT: iso @ 1                   1.113e+01   1.129e+00   1.971e+00 
+o Cl_H_Cl_TS: iso @ 1            722.0   3.494e+00   1.069e+00   2.765e+00 
+                              -------------------------------------------------------------------------------- 
+  TST-KIE @ 298.15 K          1.403746    3.185402    1.056428    0.712742    3.366858    2.156937    7.262101 
 ```
 
 The first column (V-ratio) shows imaginary frequencies for the TS and its isotopomer and their ratio. The next three columns show the terms of the Reduced Isotopic Partition Function Ratios: the zero-point energy differences (ZPE), excitation factors (EXC) and enthalpic Teller–Redlich product factors (TRPF). The product of these four terms defines the KIE value, in this case 3.366858. This assumes classical nuclei (the Born-Oppenheimer approximation). A quantum mechanical tunnelling correction (1D-Tunn) is computed assuming an infinite parabolic barrier in one-dimension, and multiplication gives the corrected KIE (corr-KIE). 
