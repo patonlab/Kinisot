@@ -17,6 +17,9 @@ from glob import glob
 from Hess_to_Freq import *
 from vib_scale_factors import scaling_data, scaling_refs
 
+# version
+__version__ = "1.0.1"
+
 # PHYSICAL CONSTANTS (SI apart from speed of light)
 # These are identical to those used by G09/G16 (http://gaussian.com/constants/)
 PLANCK_CONSTANT = 6.62606957e-34 #m2 kg / s
@@ -160,7 +163,7 @@ if __name__ == "__main__":
    # Write an output file
    log = Logger("Kinisot","dat", "output")
    space = "   "; dash = "--"; dash_line = space * 18 + dash * 40
-   log.Write("\n" + (space * 18) + "KINISOT.py v 1.0.1 " + time.strftime("%Y-%m-%d %H:%M"))
+   log.Write("\n   " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M"))
 
    if len(sys.argv) > 1:
       for i in range(1,len(sys.argv)):
@@ -188,10 +191,10 @@ if __name__ == "__main__":
        for scal in scaling_data:
            if freq_scale_factor == "none":
                if level.upper().find(scal['level'].upper()) > -1 or level.upper().find(scal['level'].replace("-","").upper()) > -1:
-                   log.Write("\n" + (space * 18) + "Found vibrational scaling factor " + str(scal['zpe_fac']) + " for " + level + " level of theory")
+                   log.Write("\n   " + "Found vibrational scaling factor " + str(scal['zpe_fac']) + " for " + level + " level of theory")
                    freq_scale_factor = scal['zpe_fac']
                    ref = scaling_refs[scal['zpe_ref']]
-                   log.Write("\n" + (space * 18) + ref)
+                   log.Write("\n   REF: " + ref)
 
    # If no match could be found then use 1.0 as default
    if freq_scale_factor == "none":
