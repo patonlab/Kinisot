@@ -19,9 +19,8 @@ Alternatively `pip install kinisot` will install all classes
 **Correct Usage**
 
 ```python
-Kinisot.py reactant_output ts_output -iso <"atom numbers"> (-t temperature) (-s scalefactor)  
+Kinisot.py reactant_output ts_output -iso "atom numbers" (-t temperature) (-s scalefactor)  
 ```
-
 *       The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory. The temperature is unimportant.
 *       The `-iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
 *       The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the Gaussian calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
@@ -36,17 +35,15 @@ python Kinisot.py Cl_H_Cl_RCT.out Cl_H_Cl_TS.out -iso "1" -s 1.0
 
 The following output is produced:
 
-```python
-                                                      Temp = 298.15K / Vib. scale factor = 1.0 
-                                                      V-ratio         ZPE         EXC        TRPF         KIE     1D-tunn    corr-KIE 
-                                                      -------------------------------------------------------------------------------- 
-o kinisot/examples/Cl_H_Cl_RCT                     
-o kinisot/examples/Cl_H_Cl_TS                           1013.5 
-o kinisot/examples/Cl_H_Cl_RCT: iso @ 1                          1.113e+01   1.129e+00   1.971e+00 
-o kinisot/examples/Cl_H_Cl_TS: iso @ 1                   722.0   3.494e+00   1.069e+00   2.765e+00 
-                                                      -------------------------------------------------------------------------------- 
-   TST-KIE @ 298.15 K                                 1.403746    3.185402    1.056428    0.712742    3.366858    2.156937    7.262101 
-                                                      --------------------------------------------------------------------------------
+```bash
+                                      Temp = 298.15K / Vib. scale factor = 1.0 
+                                      V-ratio         ZPE         EXC        TRPF         KIE     1D-tunn    corr-KIE 
+o Cl_H_Cl_RCT                        --------------------------------------------------------------------------------
+o Cl_H_Cl_TS                           1013.5 
+o Cl_H_Cl_RCT: iso @ 1                          1.113e+01   1.129e+00   1.971e+00 
+o Cl_H_Cl_TS: iso @ 1                   722.0   3.494e+00   1.069e+00   2.765e+00 
+                                     -------------------------------------------------------------------------------- 
+  TST-KIE @ 298.15 K                 1.403746    3.185402    1.056428    0.712742    3.366858    2.156937    7.262101 
 ```
 
 The first column (V-ratio) shows imaginary frequencies for the TS and its isotopomer and their ratio. The next three columns show the terms of the Reduced Isotopic Partition Function Ratios: the zero-point energy differences (ZPE), excitation factors (EXC) and enthalpic Teller–Redlich product factors (TRPF). The product of these four terms defines the KIE value, in this case 3.366858. This assumes classical nuclei (the Born-Oppenheimer approximation). A quantum mechanical tunnelling correction (1D-Tunn) is computed assuming an infinite parabolic barrier in one-dimension, and multiplication gives the corrected KIE (corr-KIE). 
