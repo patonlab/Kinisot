@@ -162,8 +162,8 @@ if __name__ == "__main__":
    temperature = 298.15; freq_scale_factor = "none"; freq_cutoff = 50.0; label = "none"
    # Write an output file
    log = Logger("Kinisot","dat", "output")
-   space = "   "; dash = "--"; dash_line = space * 18 + dash * 40
-   log.Write("\n   " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M"))
+   space = "   "; dash = "--"; dash_line = space * 17 + " " + dash * 37
+   log.Write("\n  " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M"))
 
    if len(sys.argv) > 1:
       for i in range(1,len(sys.argv)):
@@ -191,19 +191,19 @@ if __name__ == "__main__":
        for scal in scaling_data:
            if freq_scale_factor == "none":
                if level.upper().find(scal['level'].upper()) > -1 or level.upper().find(scal['level'].replace("-","").upper()) > -1:
-                   log.Write("\n   " + "Found vibrational scaling factor " + str(scal['zpe_fac']) + " for " + level + " level of theory")
+                   log.Write("\n  " + "Found vibrational scaling factor " + str(scal['zpe_fac']) + " for " + level + " level of theory")
                    freq_scale_factor = scal['zpe_fac']
                    ref = scaling_refs[scal['zpe_ref']]
-                   log.Write("\n   REF: " + ref)
+                   log.Write("\n  REF: " + ref)
 
    # If no match could be found then use 1.0 as default
    if freq_scale_factor == "none":
        freq_scale_factor = 1.0
        log.Write("\n" + (space * 18) + "Unable to find vibrational scaling factor for " + level + "; using value of 1.0")
 
-   log.Write("\n\n" + (space * 18) + "Temp = " + str(temperature) + "K / Vib. scale factor = " + str(freq_scale_factor))
-   log.Write("\n\n    ".ljust(51) + "  V-ratio".rjust(12) + "  ZPE".rjust(12) + "   EXC".rjust(12) + "   TRPF".rjust(12) + "   KIE".rjust(12) + "   1D-tunn".rjust(12) + "   corr-KIE".rjust(12))
-   log.Write('\n' + dash_line)
+   log.Write("\n\n" + (space * 17) + "  Temp = " + str(temperature) + "K / Vib. scale factor = " + str(freq_scale_factor))
+   log.Write(("\n ").ljust(50))
+   log.Write('{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}'.format("V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"))
 
 # Calculates the RPFR for each for the reactant and its isotopomer and then the transition structure and the same isotopomer
    KIE = []
@@ -217,12 +217,13 @@ if __name__ == "__main__":
       imfreq_fac = KIE[1].im_frequency_wn/KIE[3].im_frequency_wn
    else: log.Fatal("\no  Kinisot requires a transition structure with an imaginary frequencies!")
 
-   log.Write("\no " + files[0].split(".")[0].ljust(48))
-   log.Write("\no " + files[1].split(".")[0].ljust(48) + ' {:11.1f}'.format(KIE[1].im_frequency_wn))
-   log.Write("\no " + (files[0].split(".")[0]+": iso @ "+iso).ljust(48))
-   log.Write('            {:11.3e} {:11.3e} {:11.3e}'.format(np.e ** (KIE[0].ZPE - KIE[2].ZPE), np.e **(KIE[0].EXC - KIE[2].EXC), np.e ** (KIE[1].PF - KIE[3].PF)))
-   log.Write("\no " + (files[1].split(".")[0]+": iso @ "+iso).ljust(48))
-   log.Write('{:11.1f} {:11.3e} {:11.3e} {:11.3e}'.format(KIE[3].im_frequency_wn, np.e ** (KIE[1].ZPE - KIE[3].ZPE), np.e ** (KIE[1].EXC - KIE[3].EXC), np.e ** (KIE[0].PF - KIE[2].PF)))
+   log.Write("\no " + files[0].split(".")[0].ljust(47) + "   " + dash * 37)
+   log.Write("\no " + files[1].split(".")[0].ljust(47))
+   log.Write('{:10.1f}'.format(KIE[1].im_frequency_wn))
+   log.Write("\no " + (files[0].split(".")[0]+": iso @ "+iso).ljust(47))
+   log.Write('           {:10.3e} {:10.3e} {:10.3e}'.format(np.e ** (KIE[0].ZPE - KIE[2].ZPE), np.e **(KIE[0].EXC - KIE[2].EXC), np.e ** (KIE[1].PF - KIE[3].PF)))
+   log.Write("\no " + (files[1].split(".")[0]+": iso @ "+iso).ljust(47))
+   log.Write('{:10.1f} {:10.3e} {:10.3e} {:10.3e}'.format(KIE[3].im_frequency_wn, np.e ** (KIE[1].ZPE - KIE[3].ZPE), np.e ** (KIE[1].EXC - KIE[3].EXC), np.e ** (KIE[0].PF - KIE[2].PF)))
 
    # Application of the Bigeleisen-Mayer equation
    # Interesting: https://en.wikipedia.org/wiki/Maria_Goeppert-Mayer
@@ -242,8 +243,7 @@ if __name__ == "__main__":
 
   # Fancy log.Writing
    log.Write('\n' + dash_line)
-   log.Write(("\n   TST-KIE @ "+str(temperature)+" K").ljust(51),)
-   log.Write('{:11.6f}'.format(imfreq_fac))
-   #log.Write("   %.6f" % (KIE) + "   %.6f" % (parabolic_tunn_corr) + "   %.6f" % (KIE_Tunnel))
-   log.Write('{:11.6f} {:11.6f} {:11.6f} {:11.6f} {:11.6f} {:11.6f}'.format(ZPE, EXC, TRPF, KIE, parabolic_tunn_corr, KIE_Tunnel))
+   log.Write(("\n  KIE @ "+str(temperature)+" K").ljust(50))
+   log.Write('{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}'.format(imfreq_fac, ZPE, EXC, TRPF, KIE, parabolic_tunn_corr, KIE_Tunnel))
    log.Write('\n' + dash_line + '\n')
+   log.Finalize()
