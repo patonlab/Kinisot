@@ -1,4 +1,5 @@
-!(Kinisot Banner)[kinisot_banner.png]
+![Kinisot Banner](kinisot_banner.png)
+
 ======
 
 A Python program to compute kinetic isotope effects from two Gaussian output files, one of which is a ground state and the other a transition state.
