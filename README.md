@@ -102,6 +102,3 @@ o CH3F_F_ts: iso @ 2 3 4          480.5   7.602e+04   1.112e+00   1.453e+01
 ```
 
 The secondary KIE is 0.8906 (or 0.8916 with tunnelling). 
-
----
-License: [CC-BY](https://creativecommons.org/licenses/by/3.0/)
