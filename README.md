@@ -1,6 +1,7 @@
 ![Kinisot Banner](kinisot_banner.png)
 
 [![DOI](https://zenodo.org/badge/16266/bobbypaton/Kinisot.svg)](https://zenodo.org/badge/latestdoi/16266/bobbypaton/Kinisot)
+[![PyPI version](https://badge.fury.io/py/kinisot.svg)](https://badge.fury.io/py/kinisot)
 
 A Python program to compute kinetic isotope effects from two Gaussian output files, one of which is a ground state and the other a transition state. It is developed by [Robert Paton](https://orcid.org/0000-0002-0104-4166) at Colorado State University.
 
