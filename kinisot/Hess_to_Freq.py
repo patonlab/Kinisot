@@ -77,15 +77,15 @@ if __name__ == "__main__":
             if len(sys.argv[i].split(".")) > 1:
                if sys.argv[i].split(".")[1] == "out" or sys.argv[i].split(".")[1] == "log": files.append(sys.argv[i])
 
-      print "   Frequency scale factor =", freq_scale_factor
+      print("   Frequency scale factor =", freq_scale_factor)
 
    else:
-      print "\nWrong number of arguments used. Correct format: Hess_to_Freq.py (-s scalefactor) g09_output_file(s)\n"
+      print("\nWrong number of arguments used. Correct format: Hess_to_Freq.py (-s scalefactor) g09_output_file(s)\n")
       sys.exit()
 
    for file in files:
       mw_hessmat = read_hess(file, 0)
       eigs = np.linalg.eigvalsh(mw_hessmat)
       for eig in eigs:
-         if eig > 0: print eig ** 0.5
-         else: print -1 * -eig ** 0.5
+         if eig > 0: print(eig ** 0.5)
+         else: print(-1 * -eig ** 0.5)
