@@ -212,7 +212,7 @@ if __name__ == "__main__":
          rpfr = calc_rpfr(file, iso, temperature, freq_scale_factor, freq_cutoff)
          KIE.append(rpfr)
 
-   # Check for the presnce of an imaginary frequency in second structure; exit gracefully if not.
+   # Check for the presence of an imaginary frequency in second structure; exit gracefully if not.
    if hasattr(KIE[1], "im_frequency_wn") and hasattr(KIE[3], "im_frequency_wn"):
       imfreq_fac = KIE[1].im_frequency_wn/KIE[3].im_frequency_wn
    else: log.Fatal("\no  Kinisot requires a transition structure with an imaginary frequencies!")

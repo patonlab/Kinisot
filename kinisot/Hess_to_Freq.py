@@ -58,7 +58,7 @@ def read_hess(file, iso):
       for n in range(0,m+1):
          l = l + 1
          Hmn = forces[l]
-         sqrt_Mmn = (mass_list[m/3] * mass_list[n/3]) ** 0.5
+         sqrt_Mmn = (mass_list[m//3] * mass_list[n//3]) ** 0.5
          hess_mat[n,m] = float(Hmn)
          mw_hess_mat[m,n] = ((float(Hmn) / sqrt_Mmn))
          mw_hess_mat[n,m] = ((float(Hmn) / sqrt_Mmn))
