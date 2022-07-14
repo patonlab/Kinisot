@@ -1,15 +1,4 @@
 #!/usr/bin/python
-
-# Comments and/or additions are welcome (send e-mail to:
-# robert.paton@chem.ox.ac.uk
-
-#####################################
-#        vib_scale_factors.py       #
-#####################################
-###  Written by:  Rob Paton #########
-###  Last modified:  Mar 27, 2017 ###
-#####################################
-
 import numpy as np
 
 '''

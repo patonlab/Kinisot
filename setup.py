@@ -1,13 +1,24 @@
-from distutils.core import setup
+from setuptools import setup
+import io
+
+# read the contents of your README file
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
   name = 'kinisot',
-  packages = ['kinisot'], 
-  version = '1.0.1',
-  description = 'Compute Kinetic Isotope Effects from Gaussian09 output',
-  author = 'Robert Paton',
-  author_email = 'robert.paton@chem.ox.ac.uk',
-  url = 'https://github.com/bobbypaton/kinisot', 
-  download_url = 'https://zenodo.org/record/60082/files/Kinisot-1.0.1.zip', 
-  keywords = ['compchem', 'kie', 'gaussian', 'vibrational-scaling-factors', 'frequencies' 'quiver'], 
+  packages = ['kinisot'],
+  version = '2.0.1',
+  description = 'Compute Kinetic Isotope Effects for compchem outputs',
+  author = 'Paton Research Group',
+  author_email = 'patonlab.colostate@edu',
+  url = 'https://github.com/patonlab/kinisot',
+  download_url = 'https://zenodo.org/record/60082/files/Kinisot-1.0.1.zip',
+  keywords = ['compchem', 'kie', 'dft', 'vibrational-scaling-factors', 'kinisot', 'frequencies' 'quiver'],
   classifiers = [],
+  install_requires=['numpy'],
+  python_requires='>=3.0',
+  include_package_data=True,
 )

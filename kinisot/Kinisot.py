@@ -2,26 +2,19 @@
 from __future__ import print_function
 
 # Comments and/or additions are welcome (send e-mail to:
-# robert.paton@chem.ox.ac.uk
+# robert.paton@colostate.edu
 
-#####################################
-#           Kinisot.py              #
-#####################################
-###  Written by:  Rob Paton #########
-###  Last modified:  Mar 27, 2016 ###
-#####################################
-
-import sys, math, time
+import pathlib, sys, math, time
 import numpy as np
 from glob import glob
+from argparse import ArgumentParser
 from Hess_to_Freq import *
 from vib_scale_factors import scaling_data, scaling_refs
 
 # version
-__version__ = "1.0.1"
+__version__ = "2.0.1"
 
 # PHYSICAL CONSTANTS (SI apart from speed of light)
-# These are identical to those used by G09/G16 (http://gaussian.com/constants/)
 PLANCK_CONSTANT = 6.62606957e-34 #m2 kg / s
 BOLTZMANN_CONSTANT = 1.3806488e-23 #m2 kg s-2 K-1
 SPEED_OF_LIGHT = 2.99792458e10 #cm s-1
@@ -126,7 +119,7 @@ def is_linear(file):
 
 class calc_rpfr:
    #Computes the Reduced Isotopic Partition Function Ratio from a structure and a given isotopic substitution
-   def __init__(self, file, isomer, *args):
+   def __init__(self, file, isomer, temperature=298.15, freq_scale_factor=1.0, freq_cutoff=50.0):
       # Frequencies in waveunmbers
       self.frequency_wn = []
 
@@ -156,28 +149,33 @@ class calc_rpfr:
       self.EXC = calc_excitation_factor(self.frequency_wn, temperature, freq_scale_factor)
 
 if __name__ == "__main__":
-   # Takes arguments: g09_output_files and optional temperature and vibrational scaling factor
-   files = []
-   # Default values
-   temperature = 298.15; freq_scale_factor = "none"; freq_cutoff = 50.0; label = "none"
+
+    # Parse Arguments
+   parser = ArgumentParser()
+   parser.add_argument("-t", dest="temperature", action="store", type=float, default=298.15, help="temperature in Kelvin (default 298.15K)")
+   parser.add_argument("-s", dest="freq_scale_factor", action="store", type=float, default=False, help="scale factor for vibrations (default 1)")
+   parser.add_argument("--iso", dest="label", action="store", default=False, help="atom number(s) of interest")
+   parser.add_argument("--cutoff", dest="freq_cutoff", action="store", type=float, default=50.0, help="Frequency cutoff (default = 50 cm-1)")
+   options, args = parser.parse_known_args()
+
    # Write an output file
    log = Logger("Kinisot","dat", "output")
    space = "   "; dash = "--"; dash_line = space * 17 + " " + dash * 37
    log.Write("\n  " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M"))
 
-   if len(sys.argv) > 1:
-      for i in range(1,len(sys.argv)):
-         if sys.argv[i] == "-t": temperature = float(sys.argv[i+1])
-         elif sys.argv[i] == "-s": freq_scale_factor = float(sys.argv[i+1])
-         elif sys.argv[i] == "-iso": label = (sys.argv[i+1])
-         elif sys.argv[i] == "-cutoff": freq_cutoff = float(sys.argv[i+1])
-         else:
-            if len(sys.argv[i].split(".")) > 1:
-               if sys.argv[i].split(".")[1] == "out" or sys.argv[i].split(".")[1] == "log":
-                   for file in glob(sys.argv[i]): files.append(file)
+   # Takes arguments: output_files and optional temperature and vibrational scaling factor
+   files = []
+   for arg in sys.argv:
+       if pathlib.Path(arg).suffix in ['.out', '.log']:
+           for file in glob(arg): files.append(file)
 
-   # Check that 2 g09 files were specific with an isotopic substitution
-   if not len(files) == 2 or label == "none": log.Fatal("\nWrong number of arguments used. Correct format: Kinisot.py 2 x g09_output_files -iso 1 2 3 (-t <temp>) (-s <scalefactor>) (-cutoff <value>)\n")
+   if len(files) != 2:
+      log.Fatal('   Kinisot requires two output files found! Exiting ...')
+      sys.exit()
+
+   if not options.label:
+      log.Fatal('   Kinisot requires at least one atom to be labelled! Exiting ...')
+      sys.exit()
 
    # Check the level of theory matches for the two files and then try to find
    # the relevant vibrational scaling factor
@@ -189,27 +187,28 @@ if __name__ == "__main__":
    else:
        level = l_o_t[0]
        for scal in scaling_data:
-           if freq_scale_factor == "none":
-               if level.upper().find(scal['level'].upper()) > -1 or level.upper().find(scal['level'].replace("-","").upper()) > -1:
+           if not options.freq_scale_factor:
+               if level.upper().find(scal['level'].decode("utf-8") .upper()) > -1 or level.upper().find(scal['level'].decode("utf-8") .replace("-","").upper()) > -1:
                    log.Write("\n  " + "Found vibrational scaling factor " + str(scal['zpe_fac']) + " for " + level + " level of theory")
-                   freq_scale_factor = scal['zpe_fac']
+                   options.freq_scale_factor = scal['zpe_fac']
                    ref = scaling_refs[scal['zpe_ref']]
                    log.Write("\n  REF: " + ref)
 
    # If no match could be found then use 1.0 as default
-   if freq_scale_factor == "none":
-       freq_scale_factor = 1.0
+   if not options.freq_scale_factor:
+       options.freq_scale_factor = 1.00
        log.Write("\n" + (space * 18) + "Unable to find vibrational scaling factor for " + level + "; using value of 1.0")
 
-   log.Write("\n\n" + (space * 17) + "  Temp = " + str(temperature) + "K / Vib. scale factor = " + str(freq_scale_factor))
+   log.Write("\n\n" + (space * 17) + "  Temp = " + str(options.temperature) + "K / Vib. scale factor = " + str(options.freq_scale_factor))
    log.Write(("\n ").ljust(50))
    log.Write('{:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}'.format("V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"))
 
 # Calculates the RPFR for each for the reactant and its isotopomer and then the transition structure and the same isotopomer
+   #options.freq_scale_factor = float(options.freq_scale_factor)
    KIE = []
-   for iso in ["0",label]:
+   for iso in ["0",options.label]:
       for file in files:
-         rpfr = calc_rpfr(file, iso, temperature, freq_scale_factor, freq_cutoff)
+         rpfr = calc_rpfr(file, iso, options.temperature, options.freq_scale_factor, options.freq_cutoff)
          KIE.append(rpfr)
 
    # Check for the presence of an imaginary frequency in second structure; exit gracefully if not.
@@ -234,7 +233,7 @@ if __name__ == "__main__":
 
    # A correction factor for QM-tunneling (Bell infinite parabola)
    # Conversion from wavenumbers to SI energy units; then divide by kT
-   tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / temperature
+   tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / options.temperature
    parabolic_tunn_corr = imfreq_fac * math.sin(0.5 * tofreq * KIE[3].im_frequency_wn) / math.sin(0.5 * tofreq * KIE[1].im_frequency_wn)
 
    # (a) the Bigeleisen-Mayer KIE with classical nuclei and (b) a value corrected to include quantum tunneling effects...
@@ -243,7 +242,7 @@ if __name__ == "__main__":
 
   # Fancy log.Writing
    log.Write('\n' + dash_line)
-   log.Write(("\n  KIE @ "+str(temperature)+" K").ljust(50))
+   log.Write(("\n  KIE @ "+str(options.temperature)+" K").ljust(50))
    log.Write('{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}'.format(imfreq_fac, ZPE, EXC, TRPF, KIE, parabolic_tunn_corr, KIE_Tunnel))
    log.Write('\n' + dash_line + '\n')
    log.Finalize()

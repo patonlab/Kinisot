@@ -1,14 +1,7 @@
 #!/usr/bin/python
 
 # Comments and/or additions are welcome (send e-mail to:
-# robert.paton@chem.ox.ac.uk
-
-#####################################
-#          Hess_to_Freq.py          #
-#####################################
-###  Written by:  Rob Paton #########
-###  Last modified:  Mar 27, 2017 ###
-#####################################
+# robert.paton@colostate.edu
 
 import sys, math
 import numpy as np
@@ -21,7 +14,6 @@ def read_hess(file, iso):
 
    # Read gaussian output
    g09_output = open(file, 'r')
-
    inlines = g09_output.readlines()
 
    mass_list = []
@@ -64,28 +56,3 @@ def read_hess(file, iso):
          mw_hess_mat[n,m] = ((float(Hmn) / sqrt_Mmn))
 
    return mw_hess_mat
-
-if __name__ == "__main__":
-   # Takes arguments: g09_output_files and optional temperature and vibrational scaling factor
-   files = []
-   freq_scale_factor = 1.0
-
-   if len(sys.argv) > 1:
-      for i in range(1,len(sys.argv)):
-         if sys.argv[i] == "-s": freq_scale_factor = float(sys.argv[i+1])
-         else:
-            if len(sys.argv[i].split(".")) > 1:
-               if sys.argv[i].split(".")[1] == "out" or sys.argv[i].split(".")[1] == "log": files.append(sys.argv[i])
-
-      print("   Frequency scale factor =", freq_scale_factor)
-
-   else:
-      print("\nWrong number of arguments used. Correct format: Hess_to_Freq.py (-s scalefactor) g09_output_file(s)\n")
-      sys.exit()
-
-   for file in files:
-      mw_hessmat = read_hess(file, 0)
-      eigs = np.linalg.eigvalsh(mw_hessmat)
-      for eig in eigs:
-         if eig > 0: print(eig ** 0.5)
-         else: print(-1 * -eig ** 0.5)
