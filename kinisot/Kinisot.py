@@ -8,8 +8,8 @@ import pathlib, sys, math, time
 import numpy as np
 from glob import glob
 from argparse import ArgumentParser
-from Hess_to_Freq import *
-from vib_scale_factors import scaling_data, scaling_refs
+from kinisot.Hess_to_Freq import *
+from kinisot.vib_scale_factors import scaling_data, scaling_refs
 
 # version
 __version__ = "2.0.1"
@@ -148,8 +148,8 @@ class calc_rpfr:
       self.ZPE = calc_zpe_factor(self.frequency_wn, temperature, freq_scale_factor)
       self.EXC = calc_excitation_factor(self.frequency_wn, temperature, freq_scale_factor)
 
-if __name__ == "__main__":
 
+def main():
     # Parse Arguments
    parser = ArgumentParser()
    parser.add_argument("-t", dest="temperature", action="store", type=float, default=298.15, help="temperature in Kelvin (default 298.15K)")
@@ -246,3 +246,6 @@ if __name__ == "__main__":
    log.Write('{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}'.format(imfreq_fac, ZPE, EXC, TRPF, KIE, parabolic_tunn_corr, KIE_Tunnel))
    log.Write('\n' + dash_line + '\n')
    log.Finalize()
+
+if __name__ == "__main__":
+   main()
