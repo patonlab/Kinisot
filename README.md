@@ -16,16 +16,16 @@ A video guide to using this software is available at Youtube:
 [![Kinisot Video Guide](http://img.youtube.com/vi/r4x2gmkc0U8/0.jpg)](http://www.youtube.com/watch?v=r4x2gmkc0U8)
 
 #### Installation
-1. Clone the repository https://github.com/bobbypaton/Kinisot.git
-2. Add the directory (/pathto/GoodVibes/goodvibes) containing the python files to the PATH environment variable (optional).
+1. Clone or download the repository https://github.com/bobbypaton/Kinisot.git
+2. Add the location of the directory Kinisot (or Kinisot-master) to your $PYTHONPATH environment variable.
 3. Run the script with your Gaussian output files. It has been tested with Python 2 and 3 on OSX
 
-Alternatively `pip install kinisot` will install all classes
+Alternatively `pip install kinisot` will install automatically and add kinisot to your $PYTHONPATH
 
 **Correct Usage**
 
 ```python
-Kinisot.py reactant_output ts_output -iso "atom numbers" (-t temperature) (-s scalefactor)  
+python -m kinisot reactant_output ts_output -iso "atom numbers" (-t temperature) (-s scalefactor)  
 ```
 *	The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory. The temperature is unimportant.
 *	The `--iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
@@ -33,10 +33,12 @@ Kinisot.py reactant_output ts_output -iso "atom numbers" (-t temperature) (-s sc
 *	The `-s` option is a scaling factor for vibrational frequencies. Empirical scaling factors have been determined for several functional/basis set combinations, and these are applied automatically using values from the Truhlar group based on detection of the level of theory and basis set in the output files. The ZPE-scaling factors are selected if available. The default value when no scaling factor is available is 1 (no scale factor).
 
 #### Example 1. Proton Transfer
+All example files discussed below can be obtained from the kinisot/examples directory.
+
 Transfer of a proton between two chloride anions; the reactant and TS are both linear. The hydrogen atom is atom number 1 in both files (the numbering needs to be identical). In this example we consider the 2D/1H kie at the default temperature without vibrational scaling.
 
 ```python
-python Kinisot.py Cl_H_Cl_RCT.out Cl_H_Cl_TS.out --iso 1 -s 1.0
+python -m kinisot Cl_H_Cl_RCT.out Cl_H_Cl_TS.out --iso 1 -s 1.0
 ```
 
 The following output is produced:
@@ -57,7 +59,7 @@ The first column (V-ratio) shows imaginary frequencies for the TS and its isotop
 The level of theory used for the above calculations is HF/6-31G(d). If a scaling factor is not specified manually, Kinisot tries to match the level/basis set with a database of scaling factors. For the proton transfer example again:  
 
 ```python
-python Kinisot.py Cl_H_Cl_RCT.out Cl_H_Cl_TS.out --iso 1
+python -m kinisot Cl_H_Cl_RCT.out Cl_H_Cl_TS.out --iso 1
 ```
 
 To give:
@@ -82,7 +84,7 @@ The SN2 identity reaction between fluoromethane and fluoride: the output files o
 Suppose we want to obtain the KIE at a temperature of 273K from deuterating all three H atoms i.e. CD<sub>3</sub>F vs. CH<sub>3</sub>F: these atoms are numbered 2,3 and 4 in both structure files. This is performed with the following command:
 
 ```bash
-python Kinisot.py CH3F_F_rc.out CH3F_F_ts.out --iso "2 3 4" -t 273
+python -m kinisot CH3F_F_rc.out CH3F_F_ts.out --iso "2 3 4" -t 273
 ```
 
 To give:

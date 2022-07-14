@@ -1,4 +1,5 @@
 *.pyc
+kinisot.egg-info
 Kinisot_output.dat
 dist
 MANIFEST
