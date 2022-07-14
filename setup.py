@@ -15,7 +15,7 @@ setup(
   author = 'Paton Research Group',
   author_email = 'patonlab.colostate@edu',
   url = 'https://github.com/patonlab/kinisot',
-  download_url = 'https://zenodo.org/record/60082/files/Kinisot-1.0.1.zip',
+  download_url = 'https://github.com/patonlab/Kinisot/archive/refs/tags/v2.0.1.zip',
   keywords = ['compchem', 'kie', 'dft', 'vibrational-scaling-factors', 'kinisot', 'frequencies' 'quiver'],
   classifiers = [],
   install_requires=['numpy'],
