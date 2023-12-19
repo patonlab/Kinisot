@@ -172,16 +172,16 @@ class calc_rpfr:
           self.ZPE += calc_zpe_factor(self.frequency_wn, temperature)
           self.EXC += calc_excitation_factor(self.frequency_wn, temperature)
 
-def compute_isotope_effect(rct, ts, prd, iso, temperature=298.15, freq_scale_factor=1.0, freq_cutoff=50.0):
+def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_factor=1.0, freq_cutoff=50.0):
    # Calculates the RPFR for each species and its isotopomer
    KIE = []
 
-   for iso in [['0'] * len(rct), options.label[0:len(rct)]]:
+   for iso in [['0'] * len(rct), label[0:len(rct)]]:
        rpfr = calc_rpfr(rct, iso, temperature, freq_scale_factor, freq_cutoff)
        KIE.append(rpfr)
 
-   if options.ts != None:
-       for iso in [['0'] * len(ts),options.label[len(rct):]]:
+   if ts != None:
+       for iso in [['0'] * len(ts), label[len(rct):]]:
            rpfr = calc_rpfr(ts, iso, temperature, freq_scale_factor, freq_cutoff)
            KIE.append(rpfr)
 
@@ -190,8 +190,8 @@ def compute_isotope_effect(rct, ts, prd, iso, temperature=298.15, freq_scale_fac
            freq_fac = KIE[2].im_frequency_wn/KIE[3].im_frequency_wn
        else: log.Fatal("\no  Kinisot requires a transition structure with an imaginary frequencies!")
 
-   elif options.prd != None:
-     for iso in [['0'] * len(prd),options.label[len(rct):]]:
+   elif prd != None:
+     for iso in [['0'] * len(prd), label[len(rct):]]:
          rpfr = calc_rpfr(prd, iso, temperature, freq_scale_factor, freq_cutoff)
          KIE.append(rpfr)
      freq_fac = 1.0
@@ -204,7 +204,7 @@ def compute_isotope_effect(rct, ts, prd, iso, temperature=298.15, freq_scale_fac
    # A correction factor for QM-tunneling (Bell infinite parabola)
    # Conversion from wavenumbers to SI energy units; then divide by kT
    tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / temperature
-   if options.ts != None: parabolic_tunn_corr = freq_fac * math.sin(0.5 * tofreq * KIE[3].im_frequency_wn) / math.sin(0.5 * tofreq * KIE[2].im_frequency_wn)
+   if ts != None: parabolic_tunn_corr = freq_fac * math.sin(0.5 * tofreq * KIE[3].im_frequency_wn) / math.sin(0.5 * tofreq * KIE[2].im_frequency_wn)
    else: parabolic_tunn_corr = 1.0
 
    # (a) the Bigeleisen-Mayer KIE with classical nuclei and (b) a value corrected to include quantum tunneling effects...
@@ -257,7 +257,7 @@ def main():
    log.Write(' {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n'.format("V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"))
 
    # Here are the ingredients and final predictions of the isotope effect
-   KIE, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = compute_isotope_effect(options.rct, options.ts, options.prd, options.iso, options.temperature, options.freq_scale_factor=1.0, options.freq_cutoff):)
+   KIE, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = compute_isotope_effect(options.rct, options.ts, options.prd, options.label, options.temperature, options.freq_scale_factor, options.freq_cutoff)
 
    # Fancy log.Writing
    log.Write("\no " + options.rct[0].split(".")[0].ljust(47) + "   " + dash * 37)
