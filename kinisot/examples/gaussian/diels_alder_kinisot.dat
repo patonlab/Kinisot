@@ -1,0 +1,153 @@
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 0
+  Species: diene.out isotopologue: 10
+  Species: DATS.out isotopologue: 19
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 0 / 10                                   1.208e+00  1.011e+00  1.102e+00
+o DATS: iso @ 19                                      428.2  1.214e+00  1.030e+00  1.076e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.000073   0.995775   0.981490   1.023885   1.000760   1.000028   1.000787
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 0
+  Species: diene.out isotopologue: 6
+  Species: DATS.out isotopologue: 15
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 0 / 6                                    1.207e+00  1.011e+00  1.098e+00
+o DATS: iso @ 15                                      424.0  1.205e+00  1.025e+00  1.076e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.009798   1.001688   0.986484   1.020845   1.018631   1.003712   1.022412
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 0
+  Species: diene.out isotopologue: 1
+  Species: DATS.out isotopologue: 10
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 0 / 1                                    1.268e+00  1.011e+00  1.110e+00
+o DATS: iso @ 10                                      428.0  1.269e+00  1.015e+00  1.101e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.000449   0.999119   0.996041   1.008008   1.003583   1.000172   1.003756
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 0
+  Species: diene.out isotopologue: 2
+  Species: DATS.out isotopologue: 11
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 0 / 2                                    1.242e+00  1.014e+00  1.109e+00
+o DATS: iso @ 11                                      428.1  1.249e+00  1.021e+00  1.093e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.000209   0.994482   0.992761   1.014544   1.001851   1.000080   1.001931
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 0
+  Species: diene.out isotopologue: 4
+  Species: DATS.out isotopologue: 13
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 0 / 4                                    1.201e+00  1.013e+00  1.098e+00
+o DATS: iso @ 13                                      424.9  1.201e+00  1.028e+00  1.075e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.007607   1.000009   0.986061   1.021624   1.015057   1.002890   1.017991
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 1
+  Species: diene.out isotopologue: 0
+  Species: DATS.out isotopologue: 1
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 1 / 0                                    1.244e+00  1.011e+00  1.102e+00
+o DATS: iso @ 1                                       424.4  1.239e+00  1.015e+00  1.093e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.008974   1.004699   0.996274   1.008113   1.018132   1.003403   1.021597
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 1
+  Species: diene.out isotopologue: 0
+  Species: DATS.out isotopologue: 2
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 1 / 0                                    1.244e+00  1.011e+00  1.101e+00
+o DATS: iso @ 2                                       423.6  1.236e+00  1.015e+00  1.093e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.010789   1.007035   0.996800   1.006756   1.021497   1.004081   1.025666
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 5
+  Species: diene.out isotopologue: 0
+  Species: DATS.out isotopologue: 7
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 5 / 0                                    1.290e+00  1.009e+00  1.113e+00
+o DATS: iso @ 7                                       428.1  1.297e+00  1.012e+00  1.105e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.000107   0.995021   0.996275   1.006985   0.998345   1.000041   0.998385
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-18 23:49
+  Species: dienophile.out isotopologue: 5
+  Species: diene.out isotopologue: 0
+  Species: DATS.out isotopologue: 5
+
+
+                                                     Temp = 298.15K / Vib. scale factor = 0.963
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o dienophile                                        --------------------------------------------------------------------------
+o DATS                                                428.2
+o dienophile: iso @ 5 / 0                                    1.290e+00  1.009e+00  1.112e+00
+o DATS: iso @ 5                                       428.1  1.293e+00  1.012e+00  1.105e+00
+                                                    --------------------------------------------------------------------------
+  KIE @ 298.15 K                                   1.000097   0.997604   0.996466   1.006177   1.000316   1.000037   1.000353
+                                                    --------------------------------------------------------------------------

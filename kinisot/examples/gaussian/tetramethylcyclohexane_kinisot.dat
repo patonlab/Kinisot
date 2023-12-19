@@ -1,0 +1,32 @@
+
+  KINISOT.py v 2.0.2: 2023-12-19 00:01
+  Species: tetramethylcyclohexane.out isotopologue: 24,25,26
+  Species: tetramethylcyclohexane.out isotopologue: 28,29,30
+
+
+                                                     Temp = 290.0K / Vib. scale factor = 1.0
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o tetramethylcyclohexane                            --------------------------------------------------------------------------
+o tetramethylcyclohexane                         
+o tetramethylcyclohexane: iso @ 24,25,26                     4.321e+04  1.461e+00  2.038e+01
+o tetramethylcyclohexane: iso @ 28,29,30                     4.204e+04  1.424e+00  2.068e+01
+                                                    --------------------------------------------------------------------------
+  KIE @ 290.0 K                                               1.027783   1.025381   0.985373   1.038454   1.000000   1.038454
+                                                    --------------------------------------------------------------------------
+
+  KINISOT.py v 2.0.2: 2023-12-19 00:01
+  Species: tetramethylcyclohexane.out isotopologue: 24,25,26
+  Species: tetramethylcyclohexane.out isotopologue: 28,29,30
+
+
+                                                     Temp = 300.0K / Vib. scale factor = 1.0
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o tetramethylcyclohexane                            --------------------------------------------------------------------------
+o tetramethylcyclohexane                         
+o tetramethylcyclohexane: iso @ 24,25,26                     3.028e+04  1.480e+00  2.038e+01
+o tetramethylcyclohexane: iso @ 28,29,30                     2.948e+04  1.444e+00  2.068e+01
+                                                    --------------------------------------------------------------------------
+  KIE @ 300.0 K                                               1.026845   1.025140   0.985373   1.037262   1.000000   1.037262
+                                                    --------------------------------------------------------------------------
