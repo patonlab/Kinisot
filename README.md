@@ -21,13 +21,6 @@ A video guide to using an older version this software is available at Youtube:
 
 ## Installation
 
-To install **autodE** with [conda](https://anaconda.org/conda-forge/autode):
-```
-conda install autode -c conda-forge
-```
-see the [installation guide](https://duartegroup.github.io/autodE/install.html) for installing from source.
-
-## Installation
 To install **Kinisot** with [conda](https://anaconda.org/conda-forge/kinisot) or [pipy]():
 ```
 conda install kinisot -c conda-forge
