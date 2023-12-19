@@ -172,17 +172,17 @@ class calc_rpfr:
           self.ZPE += calc_zpe_factor(self.frequency_wn, temperature)
           self.EXC += calc_excitation_factor(self.frequency_wn, temperature)
 
-def compute_isotope_effect(options):
+def compute_isotope_effect(rct, ts, prd, iso, temperature=298.15, freq_scale_factor=1.0, freq_cutoff=50.0):
    # Calculates the RPFR for each species and its isotopomer
    KIE = []
 
-   for iso in [['0'] * len(options.rct), options.label[0:len(options.rct)]]:
-       rpfr = calc_rpfr(options.rct, iso, options.temperature, options.freq_scale_factor, options.freq_cutoff)
+   for iso in [['0'] * len(rct), options.label[0:len(rct)]]:
+       rpfr = calc_rpfr(rct, iso, temperature, freq_scale_factor, freq_cutoff)
        KIE.append(rpfr)
 
    if options.ts != None:
-       for iso in [['0'] * len(options.ts),options.label[len(options.rct):]]:
-           rpfr = calc_rpfr(options.ts, iso, options.temperature, options.freq_scale_factor, options.freq_cutoff)
+       for iso in [['0'] * len(ts),options.label[len(rct):]]:
+           rpfr = calc_rpfr(ts, iso, temperature, freq_scale_factor, freq_cutoff)
            KIE.append(rpfr)
 
        # Check for the presence of an imaginary frequency in second structure; exit gracefully if not.
@@ -191,8 +191,8 @@ def compute_isotope_effect(options):
        else: log.Fatal("\no  Kinisot requires a transition structure with an imaginary frequencies!")
 
    elif options.prd != None:
-     for iso in [['0'] * len(options.prd),options.label[len(options.rct):]]:
-         rpfr = calc_rpfr(options.prd, iso, options.temperature, options.freq_scale_factor, options.freq_cutoff)
+     for iso in [['0'] * len(prd),options.label[len(rct):]]:
+         rpfr = calc_rpfr(prd, iso, temperature, freq_scale_factor, freq_cutoff)
          KIE.append(rpfr)
      freq_fac = 1.0
 
@@ -203,7 +203,7 @@ def compute_isotope_effect(options):
 
    # A correction factor for QM-tunneling (Bell infinite parabola)
    # Conversion from wavenumbers to SI energy units; then divide by kT
-   tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / options.temperature
+   tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / temperature
    if options.ts != None: parabolic_tunn_corr = freq_fac * math.sin(0.5 * tofreq * KIE[3].im_frequency_wn) / math.sin(0.5 * tofreq * KIE[2].im_frequency_wn)
    else: parabolic_tunn_corr = 1.0
 
