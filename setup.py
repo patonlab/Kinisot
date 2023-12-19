@@ -19,7 +19,7 @@ setup(
   url = 'https://github.com/patonlab/kinisot',
   download_url = 'https://github.com/patonlab/Kinisot/archive/refs/tags/v2.0.2.zip',
   keywords = ['compchem', 'kie', 'eqe', 'dft', 'vibrational-scaling-factors', 'kinisot', 'frequencies'],
-  classifiers = [],
+  classifiers = [ 'License :: OSI Approved :: MIT License'],
   install_requires=['numpy'],
   python_requires='>=3.0',
   include_package_data=True,

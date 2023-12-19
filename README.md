@@ -1,4 +1,4 @@
-![Kinisot Banner](kinisot_banner.png)
+![Kinisot Banner](https://github.com/patonlab/Kinisot/blob/master/kinisot_banner.png)
 
 [![DOI](https://zenodo.org/badge/54840251.svg)](https://zenodo.org/badge/latestdoi/54840251)
 [![PyPI version](https://badge.fury.io/py/kinisot.svg)](https://badge.fury.io/py/kinisot)
