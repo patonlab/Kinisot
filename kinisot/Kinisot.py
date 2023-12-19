@@ -257,7 +257,7 @@ def main():
    log.Write(' {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n'.format("V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"))
 
    # Here are the ingredients and final predictions of the isotope effect
-   KIE, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = compute_isotope_effect(options)
+   KIE, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = compute_isotope_effect(options.rct, options.ts, options.prd, options.iso, options.temperature, options.freq_scale_factor=1.0, options.freq_cutoff):)
 
    # Fancy log.Writing
    log.Write("\no " + options.rct[0].split(".")[0].ljust(47) + "   " + dash * 37)
