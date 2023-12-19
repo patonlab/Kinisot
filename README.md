@@ -22,9 +22,12 @@ A video guide to using an older version this software is available at Youtube:
 
 ## Installation
 
-To install **Kinisot** with [conda](https://anaconda.org/conda-forge/kinisot) or [pipy]():
+To install **Kinisot** with [conda](https://anaconda.org/conda-forge/kinisot):
 ```
 conda install kinisot -c conda-forge
+```
+To install **Kinisot** with [pypi](https://pypi.org/project/kinisot/):
+```
 pip install kinisot
 ```
 
