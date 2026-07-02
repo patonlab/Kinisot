@@ -137,17 +137,37 @@ and extensible. Golden tests from Phase 0 guarantee numerical invariance.
 
 ## Phase 5 — Feature gaps (v2.3.0, prioritize by user demand)
 
-1. **Isotope table**: replace the three hard-coded `np.isclose` mass swaps
+**Direction (decided 2026-07-02): reuse GoodVibes rather than rewrite.**
+GoodVibes (same lab, `~/Documents/github/GoodVibes`, v4.3.0) already has a
+modernized scaling-factor module (Truhlar **v5** database in JSON, functional
+aliases for cross-program naming, `canonicalize_level()`) and a
+program-agnostic `QCData` container with parsers for Gaussian, ORCA, NWChem,
+xtb, Q-Chem, and ASE. Kinisot should depend on it instead of duplicating.
+
+1. **Scaling factors via GoodVibes**: add `goodvibes` as a dependency; delete
+   `kinisot/vib_scale_factors.py` and Kinisot's `level_of_theory()` in favor
+   of `goodvibes.vib_scale_factors` and `goodvibes.io.level_of_theory`.
+   Behavior change to document: Truhlar v5 supersedes the v3b2 values
+   currently vendored (characterization tests will flag any factor changes).
+2. **Multi-program parsing via GoodVibes**: `QCData` currently carries
+   frequencies/geometry but **not the Cartesian Hessian**, which Kinisot
+   needs for isotopologue re-mass-weighting. Plan: PR to GoodVibes adding
+   `hessian` and `per_atom_masses` fields to `QCData` (the Gaussian parser
+   already reads per-atom masses) with extraction for Gaussian (archive
+   block), ORCA (`.hess` file), and xtb (hessian file); then Kinisot's
+   `read_hess` becomes a thin adapter that mass-reweights `QCData.hessian`.
+   Frequencies-only formats can't support Kinisot and should error clearly.
+   This supersedes the Phase 4 in-repo `parsers/gaussian.py` split — Phase 4
+   should refactor around `QCData` as the interchange type instead.
+3. **Isotope table**: replace the three hard-coded `np.isclose` mass swaps
    with a proper table (¹H→²H/³H, ¹²C→¹³C/¹⁴C, ¹⁴N→¹⁵N, ¹⁶O→¹⁷O/¹⁸O, …) and a
    CLI syntax to choose the target isotope, e.g. `--iso 5:18O,7:2H`
    (keep the current numeric form as a synonym for the default heavy isotope).
-2. Optional trans/rot mode projection (Gaussian-style) as `--project`,
+4. Optional trans/rot mode projection (Gaussian-style) as `--project`,
    complementing the current low-mode-dropping approach.
-3. Other QM codes (ORCA `.hess`, at least) via the Phase 4 parser interface —
-   longstanding ecosystem ask; the parser split makes it a contained change.
-4. `--output` path option and a `--quiet` flag for the logger; machine-readable
+5. `--output` path option and a `--quiet` flag for the logger; machine-readable
    output (`--json`).
-5. Docs: expand README (EQE mode, multi-reactant labels, `'0'` convention,
+6. Docs: expand README (EQE mode, multi-reactant labels, `'0'` convention,
    tunneling model caveats); add CITATION.cff pointing at the Zenodo DOI.
 
 ## Phase 6 — Release hygiene (ongoing)
@@ -162,7 +182,7 @@ and extensible. Golden tests from Phase 0 guarantee numerical invariance.
 ## Suggested sequencing at a glance
 
 | Phase | Deliverable | Release | Risk |
-|-------|-------------|---------|------|
+| ----- | ----------- | ------- | ---- |
 | 0 | Characterization tests + GitHub Actions | — | none |
 | 1 | Six confirmed-bug fixes | v2.0.3 | small documented numerical shift |
 | 2 | Error handling, CLI fixes, test expansion | v2.1.0 | low |
