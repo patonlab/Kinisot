@@ -19,8 +19,9 @@ from conftest import datapath
 REL = 1e-6
 
 # ORCA end-to-end golden: n-pentane TT vs GG conformer EQE, D at atom 6,
-# 298.15 K, unscaled. Pinned from the first Kinisot+GoodVibes computation.
-EQE_PENTANE_TT_GG_D6 = 1.007728058
+# 298.15 K, unscaled. Pinned from the Kinisot+GoodVibes computation with
+# principal-isotope mass normalization.
+EQE_PENTANE_TT_GG_D6 = 1.007730117
 
 
 def run_kie(reactants, ts, prd, iso, temperature, scaling, freq_cutoff=50.0):
@@ -393,6 +394,21 @@ def test_neither_ts_nor_prd_raises():
             1.0,
             50.0,
         )
+
+
+def test_normalize_principal_masses():
+    from kinisot.Hess_to_Freq import normalize_principal_masses
+
+    # ORCA-style abundance-averaged masses map onto principal isotope masses
+    assert normalize_principal_masses([12.011, 1.008, 15.999]) == pytest.approx(
+        [12.00000, 1.00783, 15.99491]
+    )
+    # Gaussian-style principal masses are unchanged
+    assert normalize_principal_masses([12.00000, 1.00783, 15.99491]) == pytest.approx(
+        [12.00000, 1.00783, 15.99491]
+    )
+    # non-substitutable elements keep the program's value
+    assert normalize_principal_masses([35.453, 14.0067]) == [35.453, 14.0067]
 
 
 def test_substitute_isotopes_windows():

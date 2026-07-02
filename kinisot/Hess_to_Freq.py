@@ -13,6 +13,26 @@ from goodvibes.io import parse_hessian, parse_qcdata
 from goodvibes.io import level_of_theory  # noqa: F401 (re-exported for Kinisot.py)
 
 
+def normalize_principal_masses(mass_list):
+    # The Bigeleisen-Mayer equation compares isotopically pure species, so
+    # the light isotopologue must be mass-weighted with principal isotope
+    # masses (1H = 1.00783, 12C = 12.00000, 16O = 15.99491). Gaussian prints
+    # exactly these; ORCA .hess files store abundance-averaged atomic masses
+    # (C = 12.011) instead, which would bias KIEs at the 1e-4 level. Map the
+    # substitutable elements onto the principal masses; other elements keep
+    # the program's value, which cancels almost exactly in the RPFR ratios.
+    normalized = []
+    for mass in mass_list:
+        if 0.9 < mass < 1.5:
+            mass = 1.00783  # 1H
+        elif 11.5 < mass < 12.5:
+            mass = 12.00000  # 12C
+        elif 15.5 < mass < 16.5:
+            mass = 15.99491  # 16O
+        normalized.append(mass)
+    return normalized
+
+
 def substitute_isotopes(mass_list, iso):
     # Swap the requested atoms (1-based numbers in the comma-separated iso
     # string; '0' means no substitution) for their heavier isotopes.
@@ -57,7 +77,9 @@ def read_hess(file, iso):
         raise ValueError("No atomic masses found for " + file)
 
     try:
-        mass_list = substitute_isotopes(hess_data.masses, iso)
+        mass_list = substitute_isotopes(
+            normalize_principal_masses(hess_data.masses), iso
+        )
     except ValueError as e:
         raise ValueError("{} (file {})".format(e, file))
 

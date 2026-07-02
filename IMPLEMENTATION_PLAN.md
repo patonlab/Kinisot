@@ -171,6 +171,19 @@ xtb, Q-Chem, and ASE. Kinisot should depend on it instead of duplicating.
    output (`--json`).
 6. Docs: expand README (EQE mode, multi-reactant labels, `'0'` convention,
    tunneling model caveats); add CITATION.cff pointing at the Zenodo DOI.
+7. **Multiple isotopologues per run**: accept several `--iso` sets in one
+   invocation and report a single table (the RPFRs of the unsubstituted
+   species are recomputed identically for every isotopologue today, so this
+   is also a large speedup for multi-position studies).
+8. **Relative (referenced) KIEs**: an option to divide all computed KIEs by
+   the KIE at a designated internal-standard position, matching how
+   experimental NMR-based KIE measurements are reported.
+9. **Additional tunneling models**: Wigner (trivial from the imaginary
+   frequency) alongside the existing Bell infinite parabola; optionally a
+   barrier-height-based correction (needs reactant/TS energies, which the
+   GoodVibes QCData already carries).
+10. Warn when a primary-hydrogen KIE is computed with the 1-D tunneling
+    correction (the model is least reliable exactly there).
 
 ## Phase 6 — Release hygiene (ongoing)
 

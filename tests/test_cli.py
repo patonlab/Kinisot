@@ -64,7 +64,7 @@ def test_cli_eqe_orca(tmp_path):
         tmp_path,
     )
     assert result.returncode == 0, result.stderr
-    assert "1.007728" in (tmp_path / "Kinisot_output.dat").read_text()
+    assert "1.007730" in (tmp_path / "Kinisot_output.dat").read_text()
 
 
 def test_cli_version(tmp_path):

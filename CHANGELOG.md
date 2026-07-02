@@ -37,6 +37,12 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   `M062X/maug-cc-pV(T+d)Z`). Explicitly supplied `-s` values are unaffected.
 - Linearity is now determined from the point group detected by the QC
   program rather than parsed rotational constants.
+- Light-isotopologue masses are normalized to principal isotope masses
+  (¹H 1.00783, ¹²C 12.00000, ¹⁶O 15.99491) before mass-weighting. Gaussian
+  results are unchanged (Gaussian already prints these); ORCA results shift
+  at the ~1×10⁻⁴ level because ORCA `.hess` files store abundance-averaged
+  masses (C = 12.011), which are not the masses of an isotopically pure
+  light species and biased KIEs accordingly.
 - Requires Python >= 3.9 (matching GoodVibes).
 - **Packaging modernized**: `pyproject.toml` (PEP 621) replaces
   `setup.py`/`setup.cfg`; the version is single-sourced from
