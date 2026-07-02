@@ -7,7 +7,7 @@ import os
 # package), so tests run against the checkout regardless of how the
 # package itself was installed.
 HERE = os.path.dirname(os.path.abspath(__file__))
-EXAMPLES = os.path.normpath(os.path.join(HERE, '..', 'examples'))
+EXAMPLES = os.path.normpath(os.path.join(HERE, "..", "examples"))
 
 
 def datapath(path):
