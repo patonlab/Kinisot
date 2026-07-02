@@ -1,5 +1,7 @@
 # Kinisot Remediation Plan
 
+**Status (2026-07-02):** Phases 0-3 are complete (0-1 on master, released as the v2.0.3 candidate; 2-3 plus the GoodVibes integration on the `feat/goodvibes-integration` branch, PR #3). Phase 4 is partially superseded by the GoodVibes integration; Phases 4-6 remain.
+
 Step-by-step plan addressing the findings in [AUDIT.md](AUDIT.md). Ordered so
 that each phase leaves the repo in a working, releasable state; later phases
 build on earlier ones. Phases 1-3 are the high-value core; 4-6 are
