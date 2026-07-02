@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/54840251.svg)](https://zenodo.org/badge/latestdoi/54840251)
 [![PyPI version](https://badge.fury.io/py/kinisot.svg)](https://badge.fury.io/py/kinisot)
-[![Build Status](https://app.travis-ci.com/patonlab/Kinisot.svg?branch=master)](https://app.travis-ci.com/github/patonlab/Kinisot)
+[![CI](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml/badge.svg)](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml)
 
 ***
 ## Introduction
