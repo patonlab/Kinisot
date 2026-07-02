@@ -80,6 +80,14 @@ def test_isotope_effect(name, reactants, ts, prd, iso, temperature, scaling,
     assert corr_kie_val == pytest.approx(corrKIE, rel=REL)
 
 
+def test_ts_without_imaginary_frequency_raises():
+    # A ground-state file passed as the TS must raise a clear error,
+    # not crash with NameError (bug fixed in v2.0.3)
+    with pytest.raises(ValueError, match="imaginary frequency"):
+        run_kie(['gaussian/dienophile.out'], ['gaussian/diene.out'], None,
+                ['0', '0'], 298.15, 1.0)
+
+
 def test_ts_imaginary_frequency_detected():
     # The uphill TS mode of the Claisen TS at 0.961 scaling, from claisen_kinisot.dat
     rpfrs, *_ = run_kie(['gaussian/claisen_gs.out'], ['gaussian/claisen_ts.out'], None,

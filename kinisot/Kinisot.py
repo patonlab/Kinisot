@@ -177,10 +177,10 @@ def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_f
            rpfr = calc_rpfr(ts, iso, temperature, freq_scale_factor, freq_cutoff)
            KIE.append(rpfr)
 
-       # Check for the presence of an imaginary frequency in second structure; exit gracefully if not.
+       # Check for the presence of an imaginary frequency in second structure
        if hasattr(KIE[2], "im_frequency_wn") and hasattr(KIE[3], "im_frequency_wn"):
            freq_fac = KIE[2].im_frequency_wn/KIE[3].im_frequency_wn
-       else: log.Fatal("\no  Kinisot requires a transition structure with an imaginary frequencies!")
+       else: raise ValueError("Kinisot requires a transition structure with an imaginary frequency!")
 
    elif prd != None:
      for iso in [['0'] * len(prd), label[len(rct):]]:
@@ -249,7 +249,10 @@ def main():
    log.Write(' {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n'.format("V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"))
 
    # Here are the ingredients and final predictions of the isotope effect
-   KIE, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = compute_isotope_effect(options.rct, options.ts, options.prd, options.label, options.temperature, options.freq_scale_factor, options.freq_cutoff)
+   try:
+      KIE, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = compute_isotope_effect(options.rct, options.ts, options.prd, options.label, options.temperature, options.freq_scale_factor, options.freq_cutoff)
+   except ValueError as e:
+      log.Fatal("\no  " + str(e))
 
    # Fancy log.Writing
    log.Write("\no " + options.rct[0].split(".")[0].ljust(47) + "   " + dash * 37)
