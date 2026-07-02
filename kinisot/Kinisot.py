@@ -11,11 +11,13 @@ from argparse import ArgumentParser
 
 # Importing regardless of relative import
 try:
-    from .vib_scale_factors import scaling_data, scaling_refs
     from .Hess_to_Freq import *
 except:
-    from vib_scale_factors import scaling_data, scaling_refs
     from Hess_to_Freq import *
+
+# Vibrational scaling factors come from the Truhlar group database (v5)
+# bundled with GoodVibes
+from goodvibes.vib_scale_factors import scaling_data_dict, canonicalize_level, scaling_refs
 
 # version
 __version__ = "2.0.3"
@@ -63,22 +65,21 @@ class Logger:
 
 def find_scaling_factor(level):
    """
-   Look up the ZPE vibrational scaling factor for a level of theory.
-
-   The level string (as written in the Gaussian archive, e.g. RM062X/MG3S)
-   is matched exactly against the Truhlar database entries after normalizing
-   case and hyphens and stripping Gaussian's R/U/RO spin prefix. Returns
+   Look up the ZPE vibrational scaling factor for a level of theory in the
+   Truhlar group database (v5), via GoodVibes. Level strings are matched
+   exactly after normalization by goodvibes' canonicalize_level (case and
+   cross-program functional aliases); a leading R/U/RO spin prefix, as
+   written in Gaussian archives, is also tolerated. Returns
    (factor, reference) or (None, None) if the level is not in the database.
    """
-   def norm(name):
-      return name.upper().replace("-", "")
-   candidates = {norm(level)}
+   candidates = [level]
    for prefix in ("RO", "R", "U"):
       if level.upper().startswith(prefix):
-         candidates.add(norm(level[len(prefix):]))
-   for scal in scaling_data:
-      if norm(scal['level'].decode("utf-8")) in candidates:
-         return scal['zpe_fac'], scaling_refs[scal['zpe_ref']]
+         candidates.append(level[len(prefix):])
+   for cand in candidates:
+      entry = scaling_data_dict.get(canonicalize_level(cand))
+      if entry is not None:
+         return entry.zpe_fac, scaling_refs[entry.zpe_ref]
    return None, None
 
 def get_frequency_scaling(files, log):

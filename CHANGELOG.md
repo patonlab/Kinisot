@@ -2,6 +2,31 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- **ORCA support**: Kinisot now reads ORCA frequency jobs (pass the `.out`;
+  the companion `.hess` file is found automatically, or pass the `.hess`
+  directly). Isotope substitution recognizes both Gaussian's isotopic masses
+  and ORCA's average atomic masses. New `examples/orca/` n-pentane conformer
+  EQE example and end-to-end tests.
+
+### Changed
+
+- **File parsing and scaling factors are now delegated to
+  [GoodVibes](https://github.com/patonlab/goodvibes)** (new dependency,
+  >= 4.4): the Cartesian Hessian and isotope-aware per-atom masses come from
+  `goodvibes.io.parse_hessian`, level-of-theory detection and linearity come
+  from GoodVibes' program-agnostic parsers, and the vendored Truhlar v3b2
+  scaling-factor table is replaced by the **Truhlar v5 database** bundled
+  with GoodVibes. Auto-detected scaling factors may differ where the v5
+  database revised or renamed entries (e.g. `M06-2X/maug-cc-pVTZ` is now
+  `M062X/maug-cc-pV(T+d)Z`). Explicitly supplied `-s` values are unaffected.
+- Linearity is now determined from the point group detected by the QC
+  program rather than parsed rotational constants.
+- Requires Python >= 3.9 (matching GoodVibes).
+
 ## [2.0.3] - Unreleased
 
 ### Fixed

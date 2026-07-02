@@ -18,6 +18,10 @@ from conftest import datapath
 
 REL = 1e-6
 
+# ORCA end-to-end golden: n-pentane TT vs GG conformer EQE, D at atom 6,
+# 298.15 K, unscaled. Pinned from the first Kinisot+GoodVibes computation.
+EQE_PENTANE_TT_GG_D6 = 1.007728058
+
 
 def run_kie(reactants, ts, prd, iso, temperature, scaling, freq_cutoff=50.0):
     rct = [datapath(p) for p in reactants]
@@ -83,12 +87,12 @@ def test_isotope_effect(name, reactants, ts, prd, iso, temperature, scaling,
 @pytest.mark.parametrize("level, expected", [
     ("RB3LYP/6-31G(d)", 0.977),          # plain lookup, R prefix stripped
     ("RM062X/MG3S", 0.970),              # Gaussian writes M06-2X without hyphen
+    ("M06-2X/MG3S", 0.970),              # hyphenated (ORCA-style) alias
     ("RCAM-B3LYP/ma-TZVP", 0.976),       # matches the CAM-B3LYP entry...
     ("RCAM-B3LYP/6-31G(d)", None),       # ...but must NOT fall back to B3LYP/6-31G(d)
     ("UB3LYP/6-31G(d)", 0.977),          # U prefix stripped
     ("RHF/3-21G", 0.919),
-    ("M06/maug-cc-pVTZ", 0.982),         # exact match, not shadowed by later rows
-    ("RM062X/maug-cc-pVTZ", 0.971),      # row was mislabeled M06/maug-cc-pVTZ before v2.0.3
+    ("M06/maug-cc-pVTZ", 0.982),
     ("B3LYP/STO-3G", None),              # basis set not in database
     ("MADEUP/nonsense", None),
 ], ids=lambda v: str(v))
@@ -103,14 +107,19 @@ def test_find_scaling_factor(level, expected):
 
 def test_is_linear(tmp_path):
     from kinisot.Hess_to_Freq import is_linear
-    # Linear molecule (CO2-like): first rotational constant is zero
-    co2 = tmp_path / "co2.out"
-    co2.write_text(" Rotational constants (GHZ):      0.0000000     11.6919157     11.6919157\n")
+    # Linearity comes from the point group detected by GoodVibes' parsers.
+    # Linear molecule (CO2-like): D*H point group
+    co2 = tmp_path / "co2.log"
+    co2.write_text(" Gaussian 16\n"
+                   " Full point group                 D*H\n"
+                   " Rotational constants (GHZ):      0.0000000     11.6919157     11.6919157\n")
     assert is_linear(str(co2)) == 'linear'
-    # Non-linear prolate symmetric top (CH3Cl-like): all three constants nonzero.
-    # The pre-v2.0.3 string heuristic misclassified these as linear.
-    ch3cl = tmp_path / "ch3cl.out"
-    ch3cl.write_text(" This molecule is a prolate symmetric top.\n"
+    # Non-linear prolate symmetric top (CH3Cl-like, C3V): the pre-v2.0.3
+    # string heuristic misclassified these as linear.
+    ch3cl = tmp_path / "ch3cl.log"
+    ch3cl.write_text(" Gaussian 16\n"
+                     " Full point group                 C3V\n"
+                     " This molecule is a prolate symmetric top.\n"
                      " Rotational constants (GHZ):    152.8000000     13.2900000     13.2900000\n")
     assert is_linear(str(ch3cl)) == 'none'
 
@@ -127,6 +136,32 @@ def test_ts_without_imaginary_frequency_raises():
     with pytest.raises(ValueError, match="imaginary frequency"):
         run_kie(['gaussian/dienophile.out'], ['gaussian/diene.out'], None,
                 ['0', '0'], 298.15, 1.0)
+
+
+def test_orca_eqe_pentane_conformers():
+    # End-to-end ORCA support via GoodVibes parse_hessian: conformational
+    # equilibrium isotope effect for n-pentane TT vs GG, with one methyl H
+    # replaced by D in each. Exercises the ORCA .hess path (companion file
+    # next to the .out) including ORCA's average-atomic-mass convention.
+    result = run_kie(['orca/pentane_TT.out'], None, ['orca/pentane_GG.out'],
+                     ['6', '6'], 298.15, 1.0)
+    (rpfrs, zpe_val, exc_val, trpf_val, kie_val, corr_kie_val,
+     tunn_corr_val, freq_fac) = result
+    # An H/D conformer EQE must be a small effect close to unity
+    assert 0.9 < kie_val < 1.1
+    assert freq_fac == 1.0 and tunn_corr_val == 1.0  # no TS: no tunneling terms
+    assert kie_val == corr_kie_val
+    # Pinned at first computation (Kinisot + GoodVibes parse_hessian)
+    assert kie_val == pytest.approx(EQE_PENTANE_TT_GG_D6, rel=1e-6)
+
+
+def test_orca_hess_direct_path():
+    # Passing the .hess file itself must give identical numbers to the .out
+    via_out = run_kie(['orca/pentane_TT.out'], None, ['orca/pentane_GG.out'],
+                      ['6', '6'], 298.15, 1.0)
+    via_hess = run_kie(['orca/pentane_TT.hess'], None, ['orca/pentane_GG.hess'],
+                       ['6', '6'], 298.15, 1.0)
+    assert via_hess[4] == pytest.approx(via_out[4], rel=1e-12)
 
 
 def test_ts_imaginary_frequency_detected():
