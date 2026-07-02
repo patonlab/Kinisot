@@ -78,14 +78,20 @@ def level_of_theory(file):
    return level+"/"+bs
 
 def is_linear(file):
-   # Check if a molecule is linear or not
-   # This affects the number of rotational d.o.f.
-   # Read gaussian output
+   # Check if a molecule is linear or not, from the rotational constants
+   # in the Gaussian output: a linear molecule has a zero (or absent) first
+   # rotational constant, e.g. "Rotational constants (GHZ): 0.00000 11.69 11.69"
+   # This affects the number of rotational d.o.f. (2 rather than 3)
    symm = 'none'
-   g_output = open(file, 'r')
-   inlines = g_output.readlines()
-
-   for i in range(0,len(inlines)):
-      if inlines[i].strip().find('prolate symmetric top') > -1: symm = 'linear'
-      if inlines[i].strip().find('asymmetric top') > -1: symm = 'none'
+   with open(file, 'r') as g_output:
+      for line in g_output:
+         if line.find('Rotational constants (GHZ):') > -1:
+            constants = []
+            for value in line.split(':')[1].split():
+               try: constants.append(float(value))
+               except ValueError: pass
+            if len(constants) < 3 or min(abs(c) for c in constants) < 1e-4:
+               symm = 'linear'
+            else:
+               symm = 'none'
    return symm

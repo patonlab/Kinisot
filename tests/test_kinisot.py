@@ -101,6 +101,26 @@ def test_find_scaling_factor(level, expected):
         assert ref  # a literature reference is returned alongside
 
 
+def test_is_linear(tmp_path):
+    from kinisot.Hess_to_Freq import is_linear
+    # Linear molecule (CO2-like): first rotational constant is zero
+    co2 = tmp_path / "co2.out"
+    co2.write_text(" Rotational constants (GHZ):      0.0000000     11.6919157     11.6919157\n")
+    assert is_linear(str(co2)) == 'linear'
+    # Non-linear prolate symmetric top (CH3Cl-like): all three constants nonzero.
+    # The pre-v2.0.3 string heuristic misclassified these as linear.
+    ch3cl = tmp_path / "ch3cl.out"
+    ch3cl.write_text(" This molecule is a prolate symmetric top.\n"
+                     " Rotational constants (GHZ):    152.8000000     13.2900000     13.2900000\n")
+    assert is_linear(str(ch3cl)) == 'none'
+
+
+def test_examples_are_nonlinear():
+    from kinisot.Hess_to_Freq import is_linear
+    for f in ['gaussian/claisen_gs.out', 'gaussian/DATS.out', 'gaussian/tetramethylcyclohexane.out']:
+        assert is_linear(datapath(f)) == 'none'
+
+
 def test_ts_without_imaginary_frequency_raises():
     # A ground-state file passed as the TS must raise a clear error,
     # not crash with NameError (bug fixed in v2.0.3)
