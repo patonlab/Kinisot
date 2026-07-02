@@ -170,3 +170,36 @@ def test_ts_imaginary_frequency_detected():
                         ['5', '5'], 393.0, 0.961)
     assert rpfrs[2].im_frequency_wn == pytest.approx(463.9, abs=0.05)
     assert not hasattr(rpfrs[0], "im_frequency_wn")  # ground state has none
+
+
+def test_iso_out_of_range_raises():
+    # The Claisen system has 14 atoms; atom 99 must raise, naming the file
+    with pytest.raises(ValueError, match="out of range.*claisen_gs"):
+        run_kie(['gaussian/claisen_gs.out'], ['gaussian/claisen_ts.out'], None,
+                ['99', '99'], 298.15, 1.0)
+
+
+def test_iso_not_a_number_raises():
+    with pytest.raises(ValueError, match="Invalid atom number"):
+        run_kie(['gaussian/claisen_gs.out'], ['gaussian/claisen_ts.out'], None,
+                ['C5', 'C5'], 298.15, 1.0)
+
+
+def test_neither_ts_nor_prd_raises():
+    with pytest.raises(ValueError, match="TS .*or a product"):
+        Kinisot.compute_isotope_effect([datapath('gaussian/claisen_gs.out')],
+                                       None, None, ['5', '5'], 298.15, 1.0, 50.0)
+
+
+def test_substitute_isotopes_windows():
+    from kinisot.Hess_to_Freq import substitute_isotopes
+    # Gaussian isotopic masses and ORCA average atomic masses both substitute
+    gaussian_masses = [12.00000, 1.00783, 15.99491]
+    orca_masses = [12.011, 1.008, 15.999]
+    for masses in (gaussian_masses, orca_masses):
+        out = substitute_isotopes(masses, '1,2,3')
+        assert out == pytest.approx([13.00335, 2.0141, 16.9991])
+    # '0' leaves everything alone
+    assert substitute_isotopes(orca_masses, '0') == orca_masses
+    # heavier elements are never touched (no isotope defined)
+    assert substitute_isotopes([35.453], '1') == [35.453]
