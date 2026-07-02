@@ -88,6 +88,7 @@ def test_isotope_effect(name, reactants, ts, prd, iso, temperature, scaling,
     ("UB3LYP/6-31G(d)", 0.977),          # U prefix stripped
     ("RHF/3-21G", 0.919),
     ("M06/maug-cc-pVTZ", 0.982),         # exact match, not shadowed by later rows
+    ("RM062X/maug-cc-pVTZ", 0.971),      # row was mislabeled M06/maug-cc-pVTZ before v2.0.3
     ("B3LYP/STO-3G", None),              # basis set not in database
     ("MADEUP/nonsense", None),
 ], ids=lambda v: str(v))
