@@ -61,10 +61,30 @@ class Logger:
    def Finalize(self):
       self.log.close()
 
+def find_scaling_factor(level):
+   """
+   Look up the ZPE vibrational scaling factor for a level of theory.
+
+   The level string (as written in the Gaussian archive, e.g. RM062X/MG3S)
+   is matched exactly against the Truhlar database entries after normalizing
+   case and hyphens and stripping Gaussian's R/U/RO spin prefix. Returns
+   (factor, reference) or (None, None) if the level is not in the database.
+   """
+   def norm(name):
+      return name.upper().replace("-", "")
+   candidates = {norm(level)}
+   for prefix in ("RO", "R", "U"):
+      if level.upper().startswith(prefix):
+         candidates.add(norm(level[len(prefix):]))
+   for scal in scaling_data:
+      if norm(scal['level'].decode("utf-8")) in candidates:
+         return scal['zpe_fac'], scaling_refs[scal['zpe_ref']]
+   return None, None
+
 def get_frequency_scaling(files, log):
    # Check the level of theory matches for all files and then try to find
    # the relevant vibrational scaling factor
-   freq_scale_factor, level = 1.00, "unknown"     
+   freq_scale_factor, level = 1.00, "unknown"
    l_o_t = []
    for file in files:
       l_o_t.append(level_of_theory(file))
@@ -72,17 +92,15 @@ def get_frequency_scaling(files, log):
       log.Writeonlyfile("\nWARNING: found different levels of theory for reactant " + l_o_t[0] + " and TS " + l_o_t[1])
    else:
       level = l_o_t[0]
-      for scal in scaling_data:
-         
-         if level.upper().find(scal['level'].decode("utf-8") .upper()) > -1 or level.upper().find(scal['level'].decode("utf-8") .replace("-","").upper()) > -1:
-            log.Write("\n  " + "Found vibrational scaling factor " + str(scal['zpe_fac']) + " for " + level + " level of theory")
-            freq_scale_factor = scal['zpe_fac']
-            ref = scaling_refs[scal['zpe_ref']]
-            log.Write("\n  REF: " + ref)
-   
+      factor, ref = find_scaling_factor(level)
+      if factor is not None:
+         freq_scale_factor = factor
+         log.Write("\n  " + "Found vibrational scaling factor " + str(freq_scale_factor) + " for " + level + " level of theory")
+         log.Write("\n  REF: " + ref)
+
    if freq_scale_factor == 1.00:
       log.Write("\n  Unable to find vibrational scaling factor for " + level + "; using value of 1.0")
-  
+
    return freq_scale_factor
 
 def calc_product_factor(frequency_wn):

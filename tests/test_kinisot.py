@@ -80,6 +80,26 @@ def test_isotope_effect(name, reactants, ts, prd, iso, temperature, scaling,
     assert corr_kie_val == pytest.approx(corrKIE, rel=REL)
 
 
+@pytest.mark.parametrize("level, expected", [
+    ("RB3LYP/6-31G(d)", 0.977),          # plain lookup, R prefix stripped
+    ("RM062X/MG3S", 0.970),              # Gaussian writes M06-2X without hyphen
+    ("RCAM-B3LYP/ma-TZVP", 0.976),       # matches the CAM-B3LYP entry...
+    ("RCAM-B3LYP/6-31G(d)", None),       # ...but must NOT fall back to B3LYP/6-31G(d)
+    ("UB3LYP/6-31G(d)", 0.977),          # U prefix stripped
+    ("RHF/3-21G", 0.919),
+    ("M06/maug-cc-pVTZ", 0.982),         # exact match, not shadowed by later rows
+    ("B3LYP/STO-3G", None),              # basis set not in database
+    ("MADEUP/nonsense", None),
+], ids=lambda v: str(v))
+def test_find_scaling_factor(level, expected):
+    factor, ref = Kinisot.find_scaling_factor(level)
+    if expected is None:
+        assert factor is None and ref is None
+    else:
+        assert factor == pytest.approx(expected, rel=1e-6)
+        assert ref  # a literature reference is returned alongside
+
+
 def test_ts_without_imaginary_frequency_raises():
     # A ground-state file passed as the TS must raise a clear error,
     # not crash with NameError (bug fixed in v2.0.3)
