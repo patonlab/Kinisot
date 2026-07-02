@@ -18,7 +18,7 @@ except:
     from Hess_to_Freq import *
 
 # version
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 # PHYSICAL CONSTANTS (SI apart from speed of light)
 PLANCK_CONSTANT = 6.62606957e-34 #m2 kg / s
