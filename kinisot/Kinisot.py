@@ -28,14 +28,6 @@ ENERGY_AU = 4.35974434e-18 #J
 BOHR_RADIUS = 5.2917721092e-11 #m
 ATOMIC_MASS_UNIT = 1.660538921e-27 #kg
 
-# PHYSICAL CONSTANTS (SI apart from speed of light)
-PLANCK_CONSTANT = 6.626070e-34 #m2 kg / s
-BOLTZMANN_CONSTANT = 1.380649e-23 #m2 kg s-2 K-1
-SPEED_OF_LIGHT = 2.997925e10 #cm s-1
-ENERGY_AU = 4.359745e-18 #J
-BOHR_RADIUS = 5.291772e-11 #m
-ATOMIC_MASS_UNIT = 1.660468e-27 #kg
-
 # print formatting
 space = "   "; dash = "--"; dash_line = space * 17 + " " + dash * 37
 
