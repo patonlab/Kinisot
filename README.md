@@ -33,12 +33,16 @@ pip install kinisot
 
 ## Usage
 
-```python
-python -m kinisot --rct reactant_output --ts ts_output --iso 1,2,3 (-t temperature) (-s scalefactor)  
 ```
-*	The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory.
-*	The `--iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
-*	The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the Gaussian calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
-*	The `-s` option is a scaling factor for vibrational frequencies. Empirical scaling factors have been determined for several functional/basis set combinations, and these are applied automatically using values from the Truhlar group based on detection of the level of theory and basis set in the output files. The ZPE-scaling factors are selected if available. The default value when no scaling factor is available is 1 (no scale factor).
+kinisot --rct reactant_output --ts ts_output --iso 1,2,3 (-t temperature) (-s scalefactor)
+```
+
+(`python -m kinisot ...` works too.)
+
+*	The two output files contain frequency calculations performed for the reactant and transition state at the same level of theory. Gaussian output files and ORCA outputs (with the `.hess` file next to the `.out`, or the `.hess` passed directly) are supported.
+*	For an equilibrium isotope effect, pass `--prd product_output` instead of `--ts`.
+*	The `--iso` flag is required and specifies comma-separated atom number(s) which are to be substituted for heavier isotopes. With several input files, repeat the flag once per file (`--iso 0` for a file with no substitution); a single `--iso` is applied to reactant and TS/product alike.
+*	The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the underlying calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
+*	The `-s` option is a scaling factor for vibrational frequencies. Empirical ZPE-scaling factors from the [Truhlar group database](https://comp.chem.umn.edu/freqscale/) are applied automatically (via GoodVibes) based on detection of the level of theory and basis set in the output files. The default value when no scaling factor is available is 1 (no scale factor).
 
 See examples/ for more examples

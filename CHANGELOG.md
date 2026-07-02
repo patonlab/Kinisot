@@ -6,6 +6,18 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- `kinisot` console command (alongside `python -m kinisot`) and a
+  `--version` flag.
+- Argument validation before any output file is created: missing or
+  conflicting `--ts`/`--prd`, label/file count mismatches, and unknown
+  flags now exit with a clear argparse error. Out-of-range or non-numeric
+  `--iso` atom numbers raise an error naming the offending file.
+- A warning when a structure has more than one imaginary frequency above
+  the cutoff (higher-order saddle point).
+- Public API re-exported from the package root:
+  `kinisot.compute_isotope_effect`, `kinisot.calc_rpfr`,
+  `kinisot.read_hess`, `kinisot.find_scaling_factor`.
+
 - **ORCA support**: Kinisot now reads ORCA frequency jobs (pass the `.out`;
   the companion `.hess` file is found automatically, or pass the `.hess`
   directly). Isotope substitution recognizes both Gaussian's isotopic masses
@@ -26,6 +38,13 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 - Linearity is now determined from the point group detected by the QC
   program rather than parsed rotational constants.
 - Requires Python >= 3.9 (matching GoodVibes).
+- **Packaging modernized**: `pyproject.toml` (PEP 621) replaces
+  `setup.py`/`setup.cfg`; the version is single-sourced from
+  `kinisot.__version__`. Example files moved from inside the package to
+  `examples/` at the repository root, shrinking the wheel from several MB
+  to ~12 kB. CI gained a ruff lint job and coverage reporting.
+- Very-low-temperature evaluation no longer overflows (ZPE term computed
+  directly in the log domain).
 
 ## [2.0.3] - Unreleased
 
