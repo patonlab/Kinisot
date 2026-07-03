@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kinisot"
+description = "Compute Kinetic and Equilibrium Isotope Effects from quantum chemistry output files"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Paton Research Group", email = "patonlab@colostate.edu" }]
+requires-python = ">=3.9"
+dependencies = ["numpy", "goodvibes>=4.4", "rich>=13.0"]
+keywords = [
+    "compchem",
+    "kie",
+    "eqe",
+    "dft",
+    "vibrational-scaling-factors",
+    "kinisot",
+    "frequencies",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/patonlab/Kinisot"
+Changelog = "https://github.com/patonlab/Kinisot/blob/master/CHANGELOG.md"
+
+[project.scripts]
+kinisot = "kinisot.cli:main"
+
+[tool.setuptools]
+packages = ["kinisot"]
+
+[tool.setuptools.dynamic]
+version = { attr = "kinisot.__version__" }
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.lint]
+# Match GoodVibes: high-signal correctness rules only for now
+select = ["F", "E9"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

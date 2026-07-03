@@ -1,3 +1,5 @@
 include README.md
 include LICENSE.txt
-recursive-include kinisot/examples *
+include CHANGELOG.md
+recursive-include examples *
+recursive-include tests *

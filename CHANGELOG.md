@@ -2,6 +2,101 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Expanded isotope table with explicit selection**: ²D, ³T, ¹³C, ¹⁴C,
+  ¹⁵N, ¹⁷O and ¹⁸O via an `atom:isotope` suffix (`--iso 5:18O,7:2D`);
+  plain atom numbers keep the default heavy isotope of their element,
+  which now includes ¹⁵N for nitrogen. Substituting an element with no
+  isotope data is an error instead of a silent no-op.
+- **Multiple isotopologues per run**: `--iso "C5=5;C4=4;HD=7,8"` computes
+  all of them in one invocation, sharing the unsubstituted RPFRs (N+1
+  instead of 2N diagonalizations per species).
+- **Referenced (relative) isotope effects**: `--ref NAME` divides every
+  other isotope effect by the reference isotopologue's, matching the
+  internal-standard convention of experimental KIE measurements.
+- **Wigner tunneling correction** reported alongside the Bell infinite
+  parabola; a warning flags large KIEs where 1-D tunneling corrections
+  are least reliable.
+- **Skodje-Truhlar tunneling correction** (truncated parabolic barrier):
+  computed automatically from a barrier height assembled from the input
+  files' electronic energies — each isotopologue using its own
+  ZPE-corrected barrier — or set explicitly with `--barrier`. Unlike the
+  Bell infinite parabola it stays finite below the crossover temperature,
+  and it reduces to Bell as the barrier grows large above crossover;
+  below crossover it too is unreliable (the warning now says so).
+- **Crossover-temperature guard for the Bell correction**: below
+  T_c = hνc/2πk the infinite-parabola formula is undefined (its sine
+  ratio previously produced silently meaningless values, e.g. a
+  correction of 0.64 for a −1974 cm⁻¹ H-transfer TS at 298 K); Kinisot
+  now warns and reports the Bell values as nan in that regime.
+- New ORCA HAT (hydrogen-atom transfer) example in `examples/orca/`:
+  broken-symmetry M06-2X-D3/6-31+G**(SMD) ground state + TS with a
+  −1974 cm⁻¹ transition mode, exercising primary/secondary H/D and ³T
+  KIEs in the deep-tunneling regime, and end-to-end ORCA
+  scaling-factor auto-detection.
+- **Structured Python API**: `kinisot.compute_isotope_effect(s)` returns a
+  frozen `IsotopeEffect` dataclass (with `.to_dict()`); the physics lives
+  in `kinisot.thermo`, scaling-factor lookup in `kinisot.scaling`, and the
+  CLI in `kinisot.cli`. The historical `kinisot.Kinisot` tuple/class API
+  still works behind a `DeprecationWarning`.
+- `--output PATH`, `--json PATH` and `-q`/`--quiet` CLI options.
+- **Rich terminal output**: results are rendered as aligned tables (species,
+  isotope effects, RPFR components, referenced values) on the terminal and in
+  the `.dat` file, with library warnings collected and shown once instead of
+  raw Python warnings; undefined values (e.g. Bell below the crossover
+  temperature) display as an em dash. Adds an explicit `rich` dependency
+  (already required transitively via GoodVibes).
+- `CITATION.cff`, a tag-driven PyPI publishing workflow (trusted
+  publishing), and Dependabot updates for GitHub Actions.
+- `kinisot` console command (alongside `python -m kinisot`) and a
+  `--version` flag.
+- Argument validation before any output file is created: missing or
+  conflicting `--ts`/`--prd`, label/file count mismatches, and unknown
+  flags now exit with a clear argparse error. Out-of-range or non-numeric
+  `--iso` atom numbers raise an error naming the offending file.
+- A warning when a structure has more than one imaginary frequency above
+  the cutoff (higher-order saddle point).
+- Public API re-exported from the package root:
+  `kinisot.compute_isotope_effect`, `kinisot.calc_rpfr`,
+  `kinisot.read_hess`, `kinisot.find_scaling_factor`.
+
+- **ORCA support**: Kinisot now reads ORCA frequency jobs (pass the `.out`;
+  the companion `.hess` file is found automatically, or pass the `.hess`
+  directly). Isotope substitution recognizes both Gaussian's isotopic masses
+  and ORCA's average atomic masses. New `examples/orca/` n-pentane conformer
+  EQE example and end-to-end tests.
+
+### Changed
+
+- **File parsing and scaling factors are now delegated to
+  [GoodVibes](https://github.com/patonlab/goodvibes)** (new dependency,
+  >= 4.4): the Cartesian Hessian and isotope-aware per-atom masses come from
+  `goodvibes.io.parse_hessian`, level-of-theory detection and linearity come
+  from GoodVibes' program-agnostic parsers, and the vendored Truhlar v3b2
+  scaling-factor table is replaced by the **Truhlar v5 database** bundled
+  with GoodVibes. Auto-detected scaling factors may differ where the v5
+  database revised or renamed entries (e.g. `M06-2X/maug-cc-pVTZ` is now
+  `M062X/maug-cc-pV(T+d)Z`). Explicitly supplied `-s` values are unaffected.
+- Linearity is now determined from the point group detected by the QC
+  program rather than parsed rotational constants.
+- Light-isotopologue masses are normalized to principal isotope masses
+  (¹H 1.00783, ¹²C 12.00000, ¹⁶O 15.99491) before mass-weighting. Gaussian
+  results are unchanged (Gaussian already prints these); ORCA results shift
+  at the ~1×10⁻⁴ level because ORCA `.hess` files store abundance-averaged
+  masses (C = 12.011), which are not the masses of an isotopically pure
+  light species and biased KIEs accordingly.
+- Requires Python >= 3.9 (matching GoodVibes).
+- **Packaging modernized**: `pyproject.toml` (PEP 621) replaces
+  `setup.py`/`setup.cfg`; the version is single-sourced from
+  `kinisot.__version__`. Example files moved from inside the package to
+  `examples/` at the repository root, shrinking the wheel from several MB
+  to ~12 kB. CI gained a ruff lint job and coverage reporting.
+- Very-low-temperature evaluation no longer overflows (ZPE term computed
+  directly in the log domain).
+
 ## [2.0.3] - Unreleased
 
 ### Fixed

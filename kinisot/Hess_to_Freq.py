@@ -3,95 +3,134 @@
 # Comments and/or additions are welcome (send e-mail to:
 # robert.paton@colostate.edu
 
-import sys, math
 import numpy as np
 
+# File parsing is delegated to GoodVibes (same research group), which reads
+# the Cartesian Hessian and isotope-aware per-atom masses from Gaussian
+# archive blocks and ORCA .hess files, and provides program-agnostic
+# level-of-theory / linearity detection.
+from goodvibes.io import parse_hessian, parse_qcdata
+from goodvibes.io import level_of_theory  # noqa: F401 (re-exported)
+
+from .isotopes import DEFAULT_HEAVY, ELEMENTS, HEAVY_ISOTOPES, element_from_mass
+
+
+def normalize_principal_masses(mass_list):
+    # The Bigeleisen-Mayer equation compares isotopically pure species, so
+    # the light isotopologue must be mass-weighted with principal isotope
+    # masses (1H = 1.00783, 12C = 12.00000, ...). Gaussian prints exactly
+    # these; ORCA .hess files store abundance-averaged atomic masses
+    # (C = 12.011) instead, which would bias KIEs at the 1e-4 level. Map the
+    # substitutable elements onto the principal masses; other elements keep
+    # the program's value, which cancels almost exactly in the RPFR ratios.
+    normalized = []
+    for mass in mass_list:
+        element = element_from_mass(mass)
+        if element is not None:
+            mass = ELEMENTS[element][2]
+        normalized.append(mass)
+    return normalized
+
+
+def substitute_isotopes(mass_list, iso):
+    """Apply the isotopic substitutions in ``iso`` to a list of masses.
+
+    ``iso`` is a comma-separated list of 1-based atom numbers, each with an
+    optional ``:isotope`` suffix, e.g. ``"5"`` (default heavy isotope: 2D,
+    13C, 15N or 17O depending on the element) or ``"5:18O,7:2D"``. ``"0"``
+    means no substitution in this file.
+    """
+    mass_list = list(mass_list)
+    for item in iso.split(","):
+        atom, _, isotope = item.partition(":")
+        try:
+            i = int(atom) - 1
+        except ValueError:
+            raise ValueError(
+                "Invalid atom number {!r} in isotope specification {!r}".format(
+                    atom, iso
+                )
+            )
+        if i == -1:
+            continue
+        if i < -1 or i >= len(mass_list):
+            raise ValueError(
+                "Atom number {} in isotope specification {!r} is out of range: "
+                "the molecule has {} atoms".format(atom, iso, len(mass_list))
+            )
+
+        element = element_from_mass(mass_list[i])
+        if element is None:
+            raise ValueError(
+                "No isotope substitution is defined for atom {} (mass {}); "
+                "substitutable elements: {}".format(
+                    atom, mass_list[i], ", ".join(sorted(ELEMENTS))
+                )
+            )
+
+        if not isotope:
+            isotope = DEFAULT_HEAVY[element]
+        if isotope not in HEAVY_ISOTOPES:
+            raise ValueError(
+                "Unknown isotope {!r} for atom {}; available: {}".format(
+                    isotope, atom, ", ".join(sorted(HEAVY_ISOTOPES))
+                )
+            )
+        iso_element, iso_mass = HEAVY_ISOTOPES[isotope]
+        if iso_element != element:
+            raise ValueError(
+                "Isotope {} cannot replace atom {}, which is {} (mass {})".format(
+                    isotope, atom, element, mass_list[i]
+                )
+            )
+        mass_list[i] = iso_mass
+    return mass_list
+
+
 def read_hess(file, iso):
-   # The force constant matrix is read from g09 ouptut
-   # The matrix values are mass-weighted according to the isotopic masses
-   # Vibrational scaling factors are not applied to matrix elements at this stage:
-   # the resulting frequencies can be scaled after diagonalization
+    # The Cartesian force constant matrix (Hartree/Bohr^2) and per-atom masses
+    # are obtained via GoodVibes; the matrix values are then mass-weighted
+    # according to the isotopic masses.
+    # Vibrational scaling factors are not applied to matrix elements at this
+    # stage: the resulting frequencies can be scaled after diagonalization
+    hess_data = parse_hessian(file)
+    if not hess_data.masses:
+        raise ValueError("No atomic masses found for " + file)
 
-   # Read gaussian output
-   g_output = open(file, 'r')
-   inlines = g_output.readlines()
+    try:
+        mass_list = substitute_isotopes(
+            normalize_principal_masses(hess_data.masses), iso
+        )
+    except ValueError as e:
+        raise ValueError("{} (file {})".format(e, file))
 
-   mass_list = []
-   start_force = None
-   
-   for i in range(0,len(inlines)):
-      if inlines[i].strip().find('and mass') > -1:
-         mass_list.append(float(inlines[i].strip().split()[8]))
+    masses_per_coord = np.repeat(mass_list, 3)
+    return hess_data.hessian / np.sqrt(np.outer(masses_per_coord, masses_per_coord))
 
-      if inlines[i].strip().startswith('NAtoms='):
-         d_o_f = int(inlines[i].strip().split()[1])*3
-
-      if inlines[i].strip().find('NImag') > -1: start_force = i
-
-   if start_force is None:
-      print('Error parsing Gaussian output!'); sys.exit()
-
-# Hessian and mass-weighted Hessian (3N x 3N matrices, N = no. atoms)
-   hess_mat = np.ndarray(shape=(d_o_f,d_o_f))
-   mw_hess_mat = np.ndarray(shape=(d_o_f,d_o_f))
-
-   # Isotopic substitution will consider 1H/2H, 12C/13C and 16O/17O. More can be
-   # added, but it hasn't been necessary so far...
-   isolist = iso.split(',')
-   for i in range(0,len(mass_list)):
-      for atom in isolist:
-         if i == int(atom)-1:
-            if np.isclose(mass_list[i], 1.00783): mass_list[i] = 2.0141 # 1H - 2D
-            if np.isclose(mass_list[i], 12.00000): mass_list[i] = 13.00335 # 12C - 13C
-            if np.isclose(mass_list[i],15.99491): mass_list[i] = 16.9991 # 16O - 17O
-
-   # parse the list of Hessian matrix elements from the end of the Gaussian output
-   longline = ""
-   for i in range(start_force,len(inlines)):
-      longline = longline + inlines[i].rstrip().lstrip()
-   forces = longline.split("NImag")[1].split('\\')[2].split(',')
-   
-   # Mass weight the Hessian
-   n = 0; l = -1
-   for m in range (0, d_o_f):
-      for n in range(0,m+1):
-         l = l + 1
-         Hmn = forces[l]
-         sqrt_Mmn = (mass_list[m//3] * mass_list[n//3]) ** 0.5
-         hess_mat[n,m] = float(Hmn)
-         mw_hess_mat[m,n] = ((float(Hmn) / sqrt_Mmn))
-         mw_hess_mat[n,m] = ((float(Hmn) / sqrt_Mmn))
-
-   return mw_hess_mat
-
-def level_of_theory(file):
-   # Read gaussian output for the level of theory and basis set used
-   g_output = open(file, 'r')
-   inlines = g_output.readlines()
-   level = "none"
-
-   for i in range(0,len(inlines)):
-      if inlines[i].strip().find('\\Freq\\') > -1:
-          if len(inlines[i].strip().split("\\")) > 5:
-              level = (inlines[i].strip().split("\\")[4])
-              bs = (inlines[i].strip().split("\\")[5])
-   return level+"/"+bs
 
 def is_linear(file):
-   # Check if a molecule is linear or not, from the rotational constants
-   # in the Gaussian output: a linear molecule has a zero (or absent) first
-   # rotational constant, e.g. "Rotational constants (GHZ): 0.00000 11.69 11.69"
-   # This affects the number of rotational d.o.f. (2 rather than 3)
-   symm = 'none'
-   with open(file, 'r') as g_output:
-      for line in g_output:
-         if line.find('Rotational constants (GHZ):') > -1:
-            constants = []
-            for value in line.split(':')[1].split():
-               try: constants.append(float(value))
-               except ValueError: pass
-            if len(constants) < 3 or min(abs(c) for c in constants) < 1e-4:
-               symm = 'linear'
-            else:
-               symm = 'none'
-   return symm
+    # Check if a molecule is linear or not, as detected by the QC program
+    # This affects the number of rotational d.o.f.
+    if parse_qcdata(file).linear_mol:
+        return "linear"
+    return "none"
+
+
+def describe_substitutions(mass_list, iso):
+    """Human-readable substitution list for an iso spec.
+
+    E.g. "26" on a hydrogen -> ["H26 → 2D"]; "5:18O,7" -> ["O5 → 18O",
+    "H7 → 2D"]. "0" (no substitution) gives []. Assumes the spec has
+    already been validated by substitute_isotopes.
+    """
+    parts = []
+    for item in iso.split(","):
+        atom, _, isotope = item.partition(":")
+        index = int(atom) - 1
+        if index == -1:
+            continue
+        element = element_from_mass(mass_list[index])
+        if not isotope:
+            isotope = DEFAULT_HEAVY[element]
+        parts.append("{}{} → {}".format(element, atom, isotope))
+    return parts
