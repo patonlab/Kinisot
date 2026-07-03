@@ -398,6 +398,45 @@ def test_neither_ts_nor_prd_raises():
         )
 
 
+def test_orca_hat_kie_deep_tunneling():
+    # HAT reaction (ORCA 6, broken-symmetry M06-2X-D3/6-31+G**, SMD): a real
+    # H-transfer TS with a -1974 cm-1 mode. At 298 K this is below the
+    # parabolic-barrier crossover temperature (~440 K), so the Bell
+    # correction must be reported as nan with a warning, while the
+    # uncorrected and Wigner values stay meaningful.
+    import math
+
+    gs, ts = "orca/hat_gs_freq.out", "orca/hat_ts_freq.out"
+    with pytest.warns(UserWarning, match="crossover"):
+        primary = run_kie([gs], [ts], None, ["26", "26"], 298.15, 0.968)
+    # atom 26 is the transferring hydrogen (dominant imaginary-mode motion)
+    assert primary.kie == pytest.approx(3.188807180, rel=REL)
+    assert primary.kie_wigner == pytest.approx(4.462413355, rel=REL)
+    assert primary.v_ratio == pytest.approx(1.255796899, rel=REL)
+    assert math.isnan(primary.bell_correction) and math.isnan(primary.kie_bell)
+
+    with pytest.warns(UserWarning, match="crossover"):
+        secondary = run_kie([gs], [ts], None, ["24", "24"], 298.15, 0.968)
+    assert secondary.kie == pytest.approx(1.037177643, rel=REL)
+
+    # tritium at the same position: larger effect than D (Swain-Schaad ordering)
+    with pytest.warns(UserWarning, match="crossover"):
+        tritium = run_kie([gs], [ts], None, ["26:3T", "26:3T"], 298.15, 0.968)
+    assert tritium.kie == pytest.approx(5.114888230, rel=REL)
+    assert tritium.kie > primary.kie
+
+
+def test_orca_auto_scaling_detection():
+    # Level-of-theory detection + Truhlar lookup through the ORCA path,
+    # including the 6-31+G** == 6-31+G(d,p) spelling normalization
+    factor, level, ref, warning = kinisot.get_frequency_scaling(
+        [datapath("orca/hat_gs_freq.out"), datapath("orca/hat_ts_freq.out")]
+    )
+    assert factor == pytest.approx(0.968, rel=1e-6)
+    assert warning is None
+    assert ref  # a literature reference comes with the factor
+
+
 def test_multi_isotopologue_matches_single():
     # compute_isotope_effects shares the light-species RPFRs; results must be
     # identical to one-at-a-time calls

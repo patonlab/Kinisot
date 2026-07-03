@@ -173,7 +173,30 @@ def _assemble(rpfrs, is_kie, temperature, freq_scale_factor):
         tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / temperature
         u_light = tofreq * rpfrs[2].im_frequency_wn
         u_heavy = tofreq * rpfrs[3].im_frequency_wn
-        bell_correction = v_ratio * math.sin(0.5 * u_heavy) / math.sin(0.5 * u_light)
+        # The parabolic-barrier formula diverges at u/2 = pi and is undefined
+        # beyond it, i.e. below the crossover temperature T_c = h*nu*c/(2*pi*k).
+        # Reporting sin-ratio values there would be silently meaningless.
+        if 0.5 * u_light >= math.pi:
+            crossover = (
+                SPEED_OF_LIGHT
+                * PLANCK_CONSTANT
+                * rpfrs[2].im_frequency_wn
+                / (2.0 * math.pi * BOLTZMANN_CONSTANT)
+            )
+            warnings.warn(
+                "temperature {:.2f} K is at or below the parabolic-barrier "
+                "crossover temperature ({:.0f} K) for the {:.0f}i cm-1 "
+                "transition mode: the Bell infinite-parabola correction is "
+                "undefined (reported as nan) and the Wigner correction is "
+                "unreliable in this deep-tunneling regime".format(
+                    temperature, crossover, rpfrs[2].im_frequency_wn
+                )
+            )
+            bell_correction = float("nan")
+        else:
+            bell_correction = (
+                v_ratio * math.sin(0.5 * u_heavy) / math.sin(0.5 * u_light)
+            )
         wigner_correction = (1.0 + u_light**2 / 24.0) / (1.0 + u_heavy**2 / 24.0)
     else:
         bell_correction = 1.0

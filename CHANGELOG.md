@@ -20,6 +20,16 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 - **Wigner tunneling correction** reported alongside the Bell infinite
   parabola; a warning flags large KIEs where 1-D tunneling corrections
   are least reliable.
+- **Crossover-temperature guard for the Bell correction**: below
+  T_c = hνc/2πk the infinite-parabola formula is undefined (its sine
+  ratio previously produced silently meaningless values, e.g. a
+  correction of 0.64 for a −1974 cm⁻¹ H-transfer TS at 298 K); Kinisot
+  now warns and reports the Bell values as nan in that regime.
+- New ORCA HAT (hydrogen-atom transfer) example in `examples/orca/`:
+  broken-symmetry M06-2X-D3/6-31+G**(SMD) ground state + TS with a
+  −1974 cm⁻¹ transition mode, exercising primary/secondary H/D and ³T
+  KIEs in the deep-tunneling regime, and end-to-end ORCA
+  scaling-factor auto-detection.
 - **Structured Python API**: `kinisot.compute_isotope_effect(s)` returns a
   frozen `IsotopeEffect` dataclass (with `.to_dict()`); the physics lives
   in `kinisot.thermo`, scaling-factor lookup in `kinisot.scaling`, and the
