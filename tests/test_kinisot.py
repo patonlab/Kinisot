@@ -13,7 +13,8 @@ relative; the shipped .dat files still agree to their printed 6 decimals.
 """
 
 import pytest
-from kinisot import Kinisot
+
+import kinisot
 from conftest import datapath
 
 REL = 1e-6
@@ -28,7 +29,7 @@ def run_kie(reactants, ts, prd, iso, temperature, scaling, freq_cutoff=50.0):
     rct = [datapath(p) for p in reactants]
     ts = [datapath(p) for p in ts] if ts else None
     prd = [datapath(p) for p in prd] if prd else None
-    return Kinisot.compute_isotope_effect(
+    return kinisot.compute_isotope_effect(
         rct, ts, prd, iso, temperature, scaling, freq_cutoff
     )
 
@@ -209,23 +210,14 @@ def test_isotope_effect(
     tunn,
     corrKIE,
 ):
-    (
-        rpfrs,
-        zpe_val,
-        exc_val,
-        trpf_val,
-        kie_val,
-        corr_kie_val,
-        tunn_corr_val,
-        freq_fac,
-    ) = run_kie(reactants, ts, prd, iso, temperature, scaling)
-    assert freq_fac == pytest.approx(vratio, rel=REL)
-    assert zpe_val == pytest.approx(ZPE, rel=REL)
-    assert exc_val == pytest.approx(EXC, rel=REL)
-    assert trpf_val == pytest.approx(TRPF, rel=REL)
-    assert kie_val == pytest.approx(KIE, rel=REL)
-    assert tunn_corr_val == pytest.approx(tunn, rel=REL)
-    assert corr_kie_val == pytest.approx(corrKIE, rel=REL)
+    r = run_kie(reactants, ts, prd, iso, temperature, scaling)
+    assert r.v_ratio == pytest.approx(vratio, rel=REL)
+    assert r.zpe == pytest.approx(ZPE, rel=REL)
+    assert r.exc == pytest.approx(EXC, rel=REL)
+    assert r.trpf == pytest.approx(TRPF, rel=REL)
+    assert r.kie == pytest.approx(KIE, rel=REL)
+    assert r.bell_correction == pytest.approx(tunn, rel=REL)
+    assert r.kie_bell == pytest.approx(corrKIE, rel=REL)
 
 
 @pytest.mark.parametrize(
@@ -245,7 +237,7 @@ def test_isotope_effect(
     ids=lambda v: str(v),
 )
 def test_find_scaling_factor(level, expected):
-    factor, ref = Kinisot.find_scaling_factor(level)
+    factor, ref = kinisot.find_scaling_factor(level)
     if expected is None:
         assert factor is None and ref is None
     else:
@@ -307,25 +299,17 @@ def test_orca_eqe_pentane_conformers():
     # equilibrium isotope effect for n-pentane TT vs GG, with one methyl H
     # replaced by D in each. Exercises the ORCA .hess path (companion file
     # next to the .out) including ORCA's average-atomic-mass convention.
-    result = run_kie(
+    r = run_kie(
         ["orca/pentane_TT.out"], None, ["orca/pentane_GG.out"], ["6", "6"], 298.15, 1.0
     )
-    (
-        rpfrs,
-        zpe_val,
-        exc_val,
-        trpf_val,
-        kie_val,
-        corr_kie_val,
-        tunn_corr_val,
-        freq_fac,
-    ) = result
     # An H/D conformer EQE must be a small effect close to unity
-    assert 0.9 < kie_val < 1.1
-    assert freq_fac == 1.0 and tunn_corr_val == 1.0  # no TS: no tunneling terms
-    assert kie_val == corr_kie_val
+    assert 0.9 < r.kie < 1.1
+    assert r.is_eqe
+    assert r.v_ratio == 1.0 and r.bell_correction == 1.0  # no TS: no tunneling terms
+    assert r.wigner_correction == 1.0
+    assert r.kie == r.kie_bell == r.kie_wigner
     # Pinned at first computation (Kinisot + GoodVibes parse_hessian)
-    assert kie_val == pytest.approx(EQE_PENTANE_TT_GG_D6, rel=1e-6)
+    assert r.kie == pytest.approx(EQE_PENTANE_TT_GG_D6, rel=1e-6)
 
 
 def test_orca_hess_direct_path():
@@ -341,12 +325,12 @@ def test_orca_hess_direct_path():
         298.15,
         1.0,
     )
-    assert via_hess[4] == pytest.approx(via_out[4], rel=1e-12)
+    assert via_hess.kie == pytest.approx(via_out.kie, rel=1e-12)
 
 
 def test_ts_imaginary_frequency_detected():
     # The uphill TS mode of the Claisen TS at 0.961 scaling, from claisen_kinisot.dat
-    rpfrs, *_ = run_kie(
+    r = run_kie(
         ["gaussian/claisen_gs.out"],
         ["gaussian/claisen_ts.out"],
         None,
@@ -354,8 +338,23 @@ def test_ts_imaginary_frequency_detected():
         393.0,
         0.961,
     )
-    assert rpfrs[2].im_frequency_wn == pytest.approx(463.9, abs=0.05)
-    assert not hasattr(rpfrs[0], "im_frequency_wn")  # ground state has none
+    assert r.rpfrs[2].im_frequency_wn == pytest.approx(463.9, abs=0.05)
+    assert r.rpfrs[0].im_frequency_wn is None  # ground state has none
+
+
+def test_wigner_between_uncorrected_and_bell():
+    # For a normal KIE the Wigner correction is smaller than Bell's
+    # infinite parabola but still > 1
+    r = run_kie(
+        ["gaussian/claisen_gs.out"],
+        ["gaussian/claisen_ts.out"],
+        None,
+        ["4", "4"],
+        393.0,
+        0.961,
+    )
+    assert 1.0 < r.wigner_correction < r.bell_correction
+    assert r.kie < r.kie_wigner < r.kie_bell
 
 
 def test_iso_out_of_range_raises():
@@ -385,7 +384,7 @@ def test_iso_not_a_number_raises():
 
 def test_neither_ts_nor_prd_raises():
     with pytest.raises(ValueError, match="TS .*or a product"):
-        Kinisot.compute_isotope_effect(
+        kinisot.compute_isotope_effect(
             [datapath("gaussian/claisen_gs.out")],
             None,
             None,
@@ -394,6 +393,66 @@ def test_neither_ts_nor_prd_raises():
             1.0,
             50.0,
         )
+
+
+def test_multi_isotopologue_matches_single():
+    # compute_isotope_effects shares the light-species RPFRs; results must be
+    # identical to one-at-a-time calls
+    rct = [datapath("gaussian/claisen_gs.out")]
+    ts = [datapath("gaussian/claisen_ts.out")]
+    labels = [["5", "5"], ["4", "4"], ["7,8", "7,8"]]
+    together = kinisot.compute_isotope_effects(rct, ts, None, labels, 393.0, 0.961)
+    for label, effect in zip(labels, together):
+        single = kinisot.compute_isotope_effect(rct, ts, None, label, 393.0, 0.961)
+        assert effect.kie == pytest.approx(single.kie, rel=1e-12)
+        assert effect.kie_bell == pytest.approx(single.kie_bell, rel=1e-12)
+
+
+def test_explicit_isotope_syntax():
+    # 5:13C is the same as the default 5; 5:14C differs; 3:2D is rejected (atom 3 is C)
+    rct = [datapath("gaussian/claisen_gs.out")]
+    ts = [datapath("gaussian/claisen_ts.out")]
+    default = kinisot.compute_isotope_effect(rct, ts, None, ["5", "5"], 393.0, 0.961)
+    explicit = kinisot.compute_isotope_effect(
+        rct, ts, None, ["5:13C", "5:13C"], 393.0, 0.961
+    )
+    assert explicit.kie == pytest.approx(default.kie, rel=1e-12)
+    c14 = kinisot.compute_isotope_effect(
+        rct, ts, None, ["5:14C", "5:14C"], 393.0, 0.961
+    )
+    assert c14.kie != pytest.approx(default.kie, rel=1e-9)
+    with pytest.raises(ValueError, match="cannot replace"):
+        kinisot.compute_isotope_effect(rct, ts, None, ["5:2D", "5:2D"], 393.0, 0.961)
+    with pytest.raises(ValueError, match="Unknown isotope"):
+        kinisot.compute_isotope_effect(rct, ts, None, ["5:99X", "5:99X"], 393.0, 0.961)
+
+
+def test_legacy_kinisot_module_shim():
+    # The historical kinisot.Kinisot tuple API still works, with a DeprecationWarning
+    from kinisot import Kinisot
+
+    args = (
+        [datapath("gaussian/claisen_gs.out")],
+        [datapath("gaussian/claisen_ts.out")],
+        None,
+        ["5", "5"],
+        393.0,
+        0.961,
+        50.0,
+    )
+    new = kinisot.compute_isotope_effect(*args)
+    with pytest.warns(DeprecationWarning):
+        legacy = Kinisot.compute_isotope_effect(*args)
+    rpfrs, zpe, exc, trpf, kie, kie_bell, bell, v_ratio = legacy
+    assert kie == pytest.approx(new.kie, rel=1e-12)
+    assert kie_bell == pytest.approx(new.kie_bell, rel=1e-12)
+    assert v_ratio == pytest.approx(new.v_ratio, rel=1e-12)
+    # the legacy calc_rpfr class only has im_frequency_wn when a mode was found
+    with pytest.warns(DeprecationWarning):
+        gs_rpfr = Kinisot.calc_rpfr(
+            [datapath("gaussian/claisen_gs.out")], ["0"], 393.0, 0.961
+        )
+    assert not hasattr(gs_rpfr, "im_frequency_wn")
 
 
 def test_normalize_principal_masses():
@@ -407,8 +466,10 @@ def test_normalize_principal_masses():
     assert normalize_principal_masses([12.00000, 1.00783, 15.99491]) == pytest.approx(
         [12.00000, 1.00783, 15.99491]
     )
-    # non-substitutable elements keep the program's value
-    assert normalize_principal_masses([35.453, 14.0067]) == [35.453, 14.0067]
+    # nitrogen normalizes too; elements without isotope data keep the program's value
+    assert normalize_principal_masses([35.453, 14.0067]) == pytest.approx(
+        [35.453, 14.00307]
+    )
 
 
 def test_substitute_isotopes_windows():
@@ -422,5 +483,8 @@ def test_substitute_isotopes_windows():
         assert out == pytest.approx([13.00335, 2.0141, 16.9991])
     # '0' leaves everything alone
     assert substitute_isotopes(orca_masses, "0") == orca_masses
-    # heavier elements are never touched (no isotope defined)
-    assert substitute_isotopes([35.453], "1") == [35.453]
+    # nitrogen now substitutes to 15N by default
+    assert substitute_isotopes([14.00307], "1") == pytest.approx([15.00011])
+    # elements without isotope data raise instead of being silently skipped
+    with pytest.raises(ValueError, match="No isotope substitution"):
+        substitute_isotopes([35.453], "1")

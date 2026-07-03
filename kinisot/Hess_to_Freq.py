@@ -10,38 +10,39 @@ import numpy as np
 # archive blocks and ORCA .hess files, and provides program-agnostic
 # level-of-theory / linearity detection.
 from goodvibes.io import parse_hessian, parse_qcdata
-from goodvibes.io import level_of_theory  # noqa: F401 (re-exported for Kinisot.py)
+from goodvibes.io import level_of_theory  # noqa: F401 (re-exported)
+
+from .isotopes import DEFAULT_HEAVY, ELEMENTS, HEAVY_ISOTOPES, element_from_mass
 
 
 def normalize_principal_masses(mass_list):
     # The Bigeleisen-Mayer equation compares isotopically pure species, so
     # the light isotopologue must be mass-weighted with principal isotope
-    # masses (1H = 1.00783, 12C = 12.00000, 16O = 15.99491). Gaussian prints
-    # exactly these; ORCA .hess files store abundance-averaged atomic masses
+    # masses (1H = 1.00783, 12C = 12.00000, ...). Gaussian prints exactly
+    # these; ORCA .hess files store abundance-averaged atomic masses
     # (C = 12.011) instead, which would bias KIEs at the 1e-4 level. Map the
     # substitutable elements onto the principal masses; other elements keep
     # the program's value, which cancels almost exactly in the RPFR ratios.
     normalized = []
     for mass in mass_list:
-        if 0.9 < mass < 1.5:
-            mass = 1.00783  # 1H
-        elif 11.5 < mass < 12.5:
-            mass = 12.00000  # 12C
-        elif 15.5 < mass < 16.5:
-            mass = 15.99491  # 16O
+        element = element_from_mass(mass)
+        if element is not None:
+            mass = ELEMENTS[element][2]
         normalized.append(mass)
     return normalized
 
 
 def substitute_isotopes(mass_list, iso):
-    # Swap the requested atoms (1-based numbers in the comma-separated iso
-    # string; '0' means no substitution) for their heavier isotopes.
-    # Substitution considers 1H/2H, 12C/13C and 16O/17O. Elements are
-    # identified by a mass window so that both Gaussian's isotopic masses
-    # (12.00000) and ORCA's average atomic masses (12.011) are recognized.
-    # More can be added, but it hasn't been necessary so far...
+    """Apply the isotopic substitutions in ``iso`` to a list of masses.
+
+    ``iso`` is a comma-separated list of 1-based atom numbers, each with an
+    optional ``:isotope`` suffix, e.g. ``"5"`` (default heavy isotope: 2D,
+    13C, 15N or 17O depending on the element) or ``"5:18O,7:2D"``. ``"0"``
+    means no substitution in this file.
+    """
     mass_list = list(mass_list)
-    for atom in iso.split(","):
+    for item in iso.split(","):
+        atom, _, isotope = item.partition(":")
         try:
             i = int(atom) - 1
         except ValueError:
@@ -57,12 +58,32 @@ def substitute_isotopes(mass_list, iso):
                 "Atom number {} in isotope specification {!r} is out of range: "
                 "the molecule has {} atoms".format(atom, iso, len(mass_list))
             )
-        if 0.9 < mass_list[i] < 1.5:
-            mass_list[i] = 2.0141  # 1H - 2D
-        if 11.5 < mass_list[i] < 12.5:
-            mass_list[i] = 13.00335  # 12C - 13C
-        if 15.5 < mass_list[i] < 16.5:
-            mass_list[i] = 16.9991  # 16O - 17O
+
+        element = element_from_mass(mass_list[i])
+        if element is None:
+            raise ValueError(
+                "No isotope substitution is defined for atom {} (mass {}); "
+                "substitutable elements: {}".format(
+                    atom, mass_list[i], ", ".join(sorted(ELEMENTS))
+                )
+            )
+
+        if not isotope:
+            isotope = DEFAULT_HEAVY[element]
+        if isotope not in HEAVY_ISOTOPES:
+            raise ValueError(
+                "Unknown isotope {!r} for atom {}; available: {}".format(
+                    isotope, atom, ", ".join(sorted(HEAVY_ISOTOPES))
+                )
+            )
+        iso_element, iso_mass = HEAVY_ISOTOPES[isotope]
+        if iso_element != element:
+            raise ValueError(
+                "Isotope {} cannot replace atom {}, which is {} (mass {})".format(
+                    isotope, atom, element, mass_list[i]
+                )
+            )
+        mass_list[i] = iso_mass
     return mass_list
 
 
