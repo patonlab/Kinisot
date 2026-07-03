@@ -58,6 +58,31 @@ def log_excitation_factor(frequency_wn, temperature):
     return float(np.log(-np.expm1(-u)).sum())
 
 
+def skodje_truhlar_kappa(im_frequency_wn, temperature, barrier_j):
+    """Skodje-Truhlar tunneling transmission coefficient for a truncated
+    parabolic barrier (R. T. Skodje and D. G. Truhlar, J. Phys. Chem. 1981,
+    85, 624-628), assuming an exothermic reaction.
+
+    im_frequency_wn is the magnitude of the transition mode in cm-1 (already
+    scaled), barrier_j the barrier height in Joules per molecule. Unlike the
+    Bell infinite parabola, this remains defined below the crossover
+    temperature: the finite barrier height caps the tunneling depth.
+    """
+    alpha = 2.0 * math.pi / (PLANCK_CONSTANT * SPEED_OF_LIGHT * im_frequency_wn)
+    beta = 1.0 / (BOLTZMANN_CONSTANT * temperature)
+    if abs(1.0 - beta / alpha) < 1e-10:
+        # continuous limit at the crossover temperature
+        return beta * barrier_j
+    if beta < alpha:
+        # above the crossover temperature; -> Bell as barrier -> infinity
+        u_half = beta * math.pi / alpha
+        return u_half / math.sin(u_half) - (beta / (alpha - beta)) * math.exp(
+            (beta - alpha) * barrier_j
+        )
+    # below the crossover temperature: ground-state-dominated tunneling
+    return (beta / (beta - alpha)) * math.expm1((beta - alpha) * barrier_j)
+
+
 @dataclass
 class RPFR:
     """Log-domain RPFR ingredients for one species (accumulated over its files)."""
@@ -129,6 +154,10 @@ class IsotopeEffect:
     temperature: float
     freq_scale_factor: float
     is_eqe: bool
+    # Skodje-Truhlar correction (needs a barrier height; None when unavailable)
+    st_correction: Optional[float] = None
+    kie_st: Optional[float] = None
+    barrier_light_j: Optional[float] = None
 
     def to_dict(self):
         return {
@@ -141,15 +170,21 @@ class IsotopeEffect:
             "v_ratio": self.v_ratio,
             "wigner_correction": self.wigner_correction,
             "bell_correction": self.bell_correction,
+            "kie_skodje_truhlar": self.kie_st,
+            "skodje_truhlar_correction": self.st_correction,
             "temperature": self.temperature,
             "freq_scale_factor": self.freq_scale_factor,
             "is_eqe": self.is_eqe,
         }
 
 
-def _assemble(rpfrs, is_kie, temperature, freq_scale_factor):
+def _assemble(rpfrs, is_kie, temperature, freq_scale_factor, electronic_barrier=None):
     """Build an IsotopeEffect from the four RPFRs
-    (rct-light, rct-heavy, ts/prd-light, ts/prd-heavy)."""
+    (rct-light, rct-heavy, ts/prd-light, ts/prd-heavy).
+
+    electronic_barrier (Hartree, optional) enables the Skodje-Truhlar
+    correction; each isotopologue uses its own ZPE-corrected barrier,
+    assembled from the electronic barrier and the RPFR ZPE sums."""
     if is_kie:
         if rpfrs[2].im_frequency_wn is None or rpfrs[3].im_frequency_wn is None:
             raise ValueError(
@@ -187,8 +222,9 @@ def _assemble(rpfrs, is_kie, temperature, freq_scale_factor):
                 "temperature {:.2f} K is at or below the parabolic-barrier "
                 "crossover temperature ({:.0f} K) for the {:.0f}i cm-1 "
                 "transition mode: the Bell infinite-parabola correction is "
-                "undefined (reported as nan) and the Wigner correction is "
-                "unreliable in this deep-tunneling regime".format(
+                "undefined (reported as nan); the Wigner and Skodje-Truhlar "
+                "corrections stay finite but are unreliable in this "
+                "deep-tunneling regime".format(
                     temperature, crossover, rpfrs[2].im_frequency_wn
                 )
             )
@@ -201,6 +237,33 @@ def _assemble(rpfrs, is_kie, temperature, freq_scale_factor):
     else:
         bell_correction = 1.0
         wigner_correction = 1.0
+
+    # Skodje-Truhlar: truncated-parabola tunneling using per-isotopologue
+    # ZPE-corrected barriers (RPFR.ZPE is the dimensionless 0.5*sum(hv/kT))
+    st_correction = None
+    kie_st = None
+    barrier_light_j = None
+    if is_kie and electronic_barrier is not None:
+        kt = BOLTZMANN_CONSTANT * temperature
+        elec_j = electronic_barrier * ENERGY_AU
+        barrier_light_j = elec_j + (rpfrs[2].ZPE - rpfrs[0].ZPE) * kt
+        barrier_heavy_j = elec_j + (rpfrs[3].ZPE - rpfrs[1].ZPE) * kt
+        if barrier_light_j <= 0 or barrier_heavy_j <= 0:
+            warnings.warn(
+                "non-positive ZPE-corrected barrier ({:.1f} kJ/mol); "
+                "skipping the Skodje-Truhlar correction".format(
+                    barrier_light_j * 6.02214076e20
+                )
+            )
+        else:
+            kappa_light = skodje_truhlar_kappa(
+                rpfrs[2].im_frequency_wn, temperature, barrier_light_j
+            )
+            kappa_heavy = skodje_truhlar_kappa(
+                rpfrs[3].im_frequency_wn, temperature, barrier_heavy_j
+            )
+            st_correction = kappa_light / kappa_heavy
+            kie_st = kie * st_correction
 
     return IsotopeEffect(
         zpe=zpe,
@@ -216,6 +279,9 @@ def _assemble(rpfrs, is_kie, temperature, freq_scale_factor):
         temperature=temperature,
         freq_scale_factor=freq_scale_factor,
         is_eqe=not is_kie,
+        st_correction=st_correction,
+        kie_st=kie_st,
+        barrier_light_j=barrier_light_j,
     )
 
 
@@ -227,6 +293,7 @@ def compute_isotope_effects(
     temperature=298.15,
     freq_scale_factor=1.0,
     freq_cutoff=50.0,
+    electronic_barrier=None,
 ):
     """Compute isotope effects for several isotopologues in one pass.
 
@@ -264,6 +331,7 @@ def compute_isotope_effects(
                 is_kie,
                 temperature,
                 freq_scale_factor,
+                electronic_barrier,
             )
         )
     return effects
@@ -277,6 +345,7 @@ def compute_isotope_effect(
     temperature=298.15,
     freq_scale_factor=1.0,
     freq_cutoff=50.0,
+    electronic_barrier=None,
 ):
     """Compute the isotope effect for one isotopologue.
 
@@ -285,5 +354,12 @@ def compute_isotope_effect(
     IsotopeEffect.
     """
     return compute_isotope_effects(
-        rct, ts, prd, [label], temperature, freq_scale_factor, freq_cutoff
+        rct,
+        ts,
+        prd,
+        [label],
+        temperature,
+        freq_scale_factor,
+        freq_cutoff,
+        electronic_barrier,
     )[0]

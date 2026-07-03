@@ -12,7 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from . import __version__
-from .Hess_to_Freq import describe_substitutions, parse_hessian
+from .Hess_to_Freq import describe_substitutions, parse_hessian, parse_qcdata
 from .scaling import get_frequency_scaling
 from .thermo import compute_isotope_effects
 
@@ -182,7 +182,8 @@ def results_table(names, effects, is_kie, temperature, scale):
     )
     table.add_column("Isotopologue", style="bold")
     if is_kie:
-        for col in (
+        have_st = any(e.st_correction is not None for e in effects)
+        columns = [
             "V-ratio",
             "ZPE",
             "EXC",
@@ -192,10 +193,13 @@ def results_table(names, effects, is_kie, temperature, scale):
             "KIE×κW",
             "κ Bell",
             "KIE×κB",
-        ):
+        ]
+        if have_st:
+            columns += ["κ S-T", "KIE×κST"]
+        for col in columns:
             table.add_column(col, justify="right")
         for name, e in zip(names, effects):
-            table.add_row(
+            row = [
                 name,
                 _num(e.v_ratio),
                 _num(e.zpe),
@@ -206,7 +210,10 @@ def results_table(names, effects, is_kie, temperature, scale):
                 _num(e.kie_wigner),
                 _num(e.bell_correction),
                 _num(e.kie_bell),
-            )
+            ]
+            if have_st:
+                row += [_num(e.st_correction), _num(e.kie_st)]
+            table.add_row(*row)
     else:
         for col in ("ZPE", "EXC", "TRPF", "EQE"):
             table.add_column(col, justify="right")
@@ -313,6 +320,17 @@ def main():
         help="isotopologue name to which all other isotope effects are referenced "
         "(divided), matching the internal-standard convention of experimental "
         "KIE measurements",
+    )
+    parser.add_argument(
+        "--barrier",
+        dest="barrier",
+        action="store",
+        type=float,
+        default=None,
+        help="electronic barrier height in Hartree for the Skodje-Truhlar "
+        "tunneling correction (default: computed from the SCF energies in "
+        "the input files; each isotopologue then uses its ZPE-corrected "
+        "barrier). Assumes an exothermic reaction.",
     )
     parser.add_argument(
         "--cutoff",
@@ -425,6 +443,31 @@ def main():
                 )
             options.freq_scale_factor = factor
 
+        # Barrier height for the Skodje-Truhlar correction: explicit flag, or
+        # assembled from the electronic energies parsed out of the input files
+        barrier = options.barrier
+        if is_kie and barrier is None:
+            energies = [parse_qcdata(f).scf_energy for f in files]
+            if all(isinstance(e, float) for e in energies):
+                barrier = sum(energies[len(options.rct) :]) - sum(
+                    energies[: len(options.rct)]
+                )
+        if is_kie and barrier is not None:
+            if barrier > 0:
+                log.print(
+                    "Electronic barrier [bold]{:.2f} kcal/mol[/bold] "
+                    "for the Skodje-Truhlar correction "
+                    "(ZPE-corrected per isotopologue)".format(barrier * 627.5095)
+                )
+                log.print()
+            else:
+                log.warn(
+                    "electronic barrier from file energies is not positive "
+                    "({:.2f} kcal/mol); skipping the Skodje-Truhlar "
+                    "correction".format(barrier * 627.5095)
+                )
+                barrier = None
+
         # Compute all isotopologues, collecting library warnings for tidy display
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
@@ -437,6 +480,7 @@ def main():
                     options.temperature,
                     options.freq_scale_factor,
                     options.freq_cutoff,
+                    electronic_barrier=barrier,
                 )
             except (ValueError, FileNotFoundError) as e:
                 log.fatal("ERROR: " + str(e))

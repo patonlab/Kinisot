@@ -1,6 +1,6 @@
 # Kinisot Remediation Plan
 
-**Status (2026-07-02):** Phases 0-6 are complete. Phases 0-1 are on master (v2.0.3 candidate); Phases 2-6 plus the GoodVibes integration are on the `feat/goodvibes-integration` branch (PR #3, releases as v2.1.0 once GoodVibes 4.4 is on PyPI). Remaining Phase 5 nice-to-haves: optional trans/rot projection (`--project`) and a barrier-height tunneling model.
+**Status (2026-07-02):** Phases 0-6 are complete. Phases 0-1 are on master (v2.0.3 candidate); Phases 2-6 plus the GoodVibes integration are on the `feat/goodvibes-integration` branch (PR #3, releases as v2.1.0 once GoodVibes 4.4 is on PyPI). Remaining Phase 5 nice-to-have: optional trans/rot projection (`--project`). The barrier-height (Skodje-Truhlar) tunneling model is now implemented.
 
 Step-by-step plan addressing the findings in [AUDIT.md](AUDIT.md). Ordered so
 that each phase leaves the repo in a working, releasable state; later phases

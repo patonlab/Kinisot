@@ -426,6 +426,53 @@ def test_orca_hat_kie_deep_tunneling():
     assert tritium.kie > primary.kie
 
 
+def test_skodje_truhlar_reduces_to_bell():
+    # Above the crossover temperature, S-T -> Bell as the barrier -> infinity.
+    # The Claisen TS (464i cm-1, T_c ~ 106 K) is well above crossover at 393 K.
+    from kinisot.thermo import (
+        skodje_truhlar_kappa,
+        PLANCK_CONSTANT,
+        SPEED_OF_LIGHT,
+        BOLTZMANN_CONSTANT,
+    )
+    import math
+
+    im_light, im_heavy, T = 464.0, 462.0, 393.0
+
+    def bell_kappa(nu, temperature):
+        u = PLANCK_CONSTANT * nu * SPEED_OF_LIGHT / (BOLTZMANN_CONSTANT * temperature)
+        return (0.5 * u) / math.sin(0.5 * u)
+
+    huge_barrier = 1.0e-18  # J, ~150 kcal/mol: effectively infinite
+    st_ratio = skodje_truhlar_kappa(im_light, T, huge_barrier) / skodje_truhlar_kappa(
+        im_heavy, T, huge_barrier
+    )
+    bell_ratio = bell_kappa(im_light, T) / bell_kappa(im_heavy, T)
+    assert st_ratio == pytest.approx(bell_ratio, rel=1e-6)
+
+
+def test_skodje_truhlar_hat_kie():
+    # HAT primary D KIE with the Skodje-Truhlar correction, barrier from the
+    # ORCA SCF energies (ZPE-corrected per isotopologue). Below crossover, so
+    # a warning is expected; the value is pinned for regression only.
+    from goodvibes.io import parse_qcdata
+
+    gs, ts = datapath("orca/hat_gs_freq.out"), datapath("orca/hat_ts_freq.out")
+    barrier = parse_qcdata(ts).scf_energy - parse_qcdata(gs).scf_energy
+    with pytest.warns(UserWarning, match="crossover"):
+        r = kinisot.compute_isotope_effect(
+            [gs], [ts], None, ["26", "26"], 298.15, 0.968, electronic_barrier=barrier
+        )
+    assert r.st_correction == pytest.approx(11.852082, rel=1e-5)
+    assert r.kie_st == pytest.approx(37.794005, rel=1e-5)
+    # without a barrier, no S-T is computed
+    with pytest.warns(UserWarning, match="crossover"):
+        no_barrier = kinisot.compute_isotope_effect(
+            [gs], [ts], None, ["26", "26"], 298.15, 0.968
+        )
+    assert no_barrier.st_correction is None and no_barrier.kie_st is None
+
+
 def test_orca_auto_scaling_detection():
     # Level-of-theory detection + Truhlar lookup through the ORCA path,
     # including the 6-31+G** == 6-31+G(d,p) spelling normalization

@@ -20,6 +20,13 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 - **Wigner tunneling correction** reported alongside the Bell infinite
   parabola; a warning flags large KIEs where 1-D tunneling corrections
   are least reliable.
+- **Skodje-Truhlar tunneling correction** (truncated parabolic barrier):
+  computed automatically from a barrier height assembled from the input
+  files' electronic energies — each isotopologue using its own
+  ZPE-corrected barrier — or set explicitly with `--barrier`. Unlike the
+  Bell infinite parabola it stays finite below the crossover temperature,
+  and it reduces to Bell as the barrier grows large above crossover;
+  below crossover it too is unreliable (the warning now says so).
 - **Crossover-temperature guard for the Bell correction**: below
   T_c = hνc/2πk the infinite-parabola formula is undefined (its sine
   ratio previously produced silently meaningless values, e.g. a
