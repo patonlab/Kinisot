@@ -379,6 +379,7 @@ def main():
                 __version__, time.strftime("%Y-%m-%d %H:%M")
             )
         )
+        log.print()
 
         # if not specified try to automatically determine the vibrational scaling factor
         if options.freq_scale_factor is None:
@@ -415,7 +416,9 @@ def main():
             except (ValueError, FileNotFoundError) as e:
                 log.fatal("ERROR: " + str(e))
 
+        log.print()
         log.print(species_table(options.rct, other, is_kie, effects))
+        log.print()
         for message in dict.fromkeys(str(w.message) for w in caught):
             log.warn(message)
 
