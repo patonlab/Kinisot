@@ -116,7 +116,9 @@ def parse_isotopologues(label_flags, error):
                 item = spec.strip()
             specs.append(item)
         if name is None:
-            name = " / ".join(specs)
+            # identical substitutions in every file collapse to one label
+            unique = [s for s in dict.fromkeys(specs) if s != "0"]
+            name = " / ".join(unique) if unique else " / ".join(specs)
         isotopologues.append((name, specs))
     return isotopologues
 
@@ -439,8 +441,9 @@ def main():
         for name, effect in zip(names, effects):
             if is_kie and (effect.kie > 1.5 or effect.kie < 0.67):
                 log.warn(
-                    "{} is a large isotope effect; 1-D tunneling corrections "
-                    "are least reliable for primary H/D KIEs".format(name)
+                    "the KIE for isotopologue '{}' is large ({:.2f}); 1-D "
+                    "tunneling corrections are least reliable for primary "
+                    "H/D KIEs".format(name, effect.kie)
                 )
 
         if options.json_path:
