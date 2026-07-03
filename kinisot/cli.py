@@ -1,27 +1,27 @@
-"""Command-line interface: argument parsing and .dat/terminal output."""
+"""Command-line interface: argument parsing and terminal/.dat output."""
 
 import json
+import math
 import sys
 import time
+import warnings
 from argparse import ArgumentParser
+
+from rich import box
+from rich.console import Console
+from rich.table import Table
 
 from . import __version__
 from .scaling import get_frequency_scaling
 from .thermo import compute_isotope_effects
 
-# print formatting
-space = "   "
-dash = "--"
-dash_line = space * 17 + " " + dash * 47
 
-
-# Enables output to terminal and to text file
+# Legacy plain-text logger, kept for the kinisot.Kinisot compatibility shim
 class Logger:
     def __init__(self, path, quiet=False):
         self.log = open(path, "w")
         self.quiet = quiet
 
-    # Usable as a context manager so the log file is always closed
     def __enter__(self):
         return self
 
@@ -29,27 +29,57 @@ class Logger:
         self.Finalize()
         return False
 
-    # Write a message to the terminal (unless quiet) and to the log
     def Write(self, message):
         if not self.quiet:
             print(message, end="")
         self.log.write(message)
 
-    # Write a message only to the log and not to the terminal
     def Writeonlyfile(self, message):
         self.log.write("\n" + message + "\n")
 
-    # Write a fatal error, finalize and terminate the program
     def Fatal(self, message):
         print(message + "\n")
         self.log.write(message + "\n")
         self.Finalize()
         sys.exit(1)
 
-    # Finalize the log file
     def Finalize(self):
         if not self.log.closed:
             self.log.close()
+
+
+class RichLogger:
+    """Renders every message/table to the terminal and to the .dat file."""
+
+    def __init__(self, path, quiet=False):
+        self._handle = open(path, "w")
+        self.terminal = Console(quiet=quiet, highlight=False)
+        self.file = Console(file=self._handle, width=150, highlight=False)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+        return False
+
+    def print(self, *args, **kwargs):
+        self.terminal.print(*args, **kwargs)
+        self.file.print(*args, **kwargs)
+
+    def warn(self, message):
+        self.print("[yellow]WARNING:[/yellow] " + message)
+
+    def fatal(self, message):
+        # always reaches the terminal, even in quiet mode
+        print(message)
+        self.file.print(message)
+        self.close()
+        sys.exit(1)
+
+    def close(self):
+        if not self._handle.closed:
+            self._handle.close()
 
 
 def parse_isotopologues(label_flags, error):
@@ -90,83 +120,133 @@ def parse_isotopologues(label_flags, error):
     return isotopologues
 
 
-def _stem(path):
-    return path.split(".")[0]
+def _short(path):
+    return path.rsplit("/", 1)[-1]
 
 
-def write_detail_block(log, rct, other, is_kie, specs, effect):
-    """The classic per-isotopologue block of the .dat output."""
-    r = effect.rpfrs
-    log.Write("\no " + _stem(rct[0]).ljust(47) + "   " + dash * 47)
-    log.Write("\no " + _stem(other[0]).ljust(47))
-    if is_kie:
-        log.Write("{:10.1f}".format(r[2].im_frequency_wn))
-    log.Write(
-        "\no "
-        + (_stem(rct[0]) + ": iso @ " + " / ".join(specs[0 : len(rct)])).ljust(47)
-    )
-    import math
+def _num(value, digits=6):
+    if value is None or (isinstance(value, float) and math.isnan(value)):
+        return "[dim]—[/dim]"
+    return "{:.{}f}".format(value, digits)
 
-    log.Write(
-        "           {:10.3e} {:10.3e} {:10.3e}".format(
-            math.exp(r[0].ZPE - r[1].ZPE),
-            math.exp(r[0].EXC - r[1].EXC),
-            math.exp(r[2].PF - r[3].PF),
+
+def species_table(rct, other, is_kie, effects):
+    table = Table(box=box.SIMPLE, title=None, show_edge=False)
+    table.add_column("Role", style="bold")
+    table.add_column("File")
+    table.add_column("ν‡ / cm⁻¹", justify="right")
+    light = effects[0].rpfrs
+    for f in rct:
+        table.add_row("Reactant", _short(f), "")
+    for f in other:
+        table.add_row(
+            "TS" if is_kie else "Product",
+            _short(f),
+            "{:.1f}i".format(light[2].im_frequency_wn) if is_kie else "",
         )
+    return table
+
+
+def results_table(names, effects, is_kie, temperature, scale):
+    kind = "Kinetic" if is_kie else "Equilibrium"
+    table = Table(
+        title="{} isotope effects @ {} K (vib. scale factor {})".format(
+            kind, temperature, scale
+        ),
+        box=box.SIMPLE_HEAVY,
     )
-    log.Write(
-        "\no "
-        + (_stem(other[0]) + ": iso @ " + " / ".join(specs[len(rct) :])).ljust(47)
-    )
+    table.add_column("Isotopologue", style="bold")
     if is_kie:
-        log.Write(
-            "{:10.1f} {:10.3e} {:10.3e} {:10.3e}".format(
-                r[3].im_frequency_wn,
-                math.exp(r[2].ZPE - r[3].ZPE),
-                math.exp(r[2].EXC - r[3].EXC),
-                math.exp(r[0].PF - r[1].PF),
+        for col in (
+            "V-ratio",
+            "ZPE",
+            "EXC",
+            "TRPF",
+            "KIE",
+            "κ Wigner",
+            "KIE×κW",
+            "κ Bell",
+            "KIE×κB",
+        ):
+            table.add_column(col, justify="right")
+        for name, e in zip(names, effects):
+            table.add_row(
+                name,
+                _num(e.v_ratio),
+                _num(e.zpe),
+                _num(e.exc),
+                _num(e.trpf),
+                "[bold]{}[/bold]".format(_num(e.kie)),
+                _num(e.wigner_correction),
+                _num(e.kie_wigner),
+                _num(e.bell_correction),
+                _num(e.kie_bell),
             )
-        )
     else:
-        log.Write(
-            "{:21.3e} {:10.3e} {:10.3e}".format(
-                math.exp(r[2].ZPE - r[3].ZPE),
-                math.exp(r[2].EXC - r[3].EXC),
-                math.exp(r[0].PF - r[1].PF),
+        for col in ("ZPE", "EXC", "TRPF", "EQE"):
+            table.add_column(col, justify="right")
+        for name, e in zip(names, effects):
+            table.add_row(
+                name,
+                _num(e.zpe),
+                _num(e.exc),
+                _num(e.trpf),
+                "[bold]{}[/bold]".format(_num(e.kie)),
             )
-        )
+    return table
 
-    log.Write("\n" + dash_line)
-    kind = "KIE" if is_kie else "EQE"
-    log.Write(("\n  {} @ {} K".format(kind, effect.temperature)).ljust(50))
-    if is_kie:
-        log.Write(
-            "{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
-                effect.v_ratio,
-                effect.zpe,
-                effect.exc,
-                effect.trpf,
-                effect.kie,
-                effect.bell_correction,
-                effect.kie_bell,
-                effect.wigner_correction,
-                effect.kie_wigner,
-            )
+
+def components_table(names, effects, is_kie):
+    """Per-species Bigeleisen-Mayer ingredients (light/heavy RPFR ratios)."""
+    table = Table(
+        title="RPFR components (light/heavy ratios per species)", box=box.SIMPLE
+    )
+    table.add_column("Isotopologue", style="bold")
+    table.add_column("Species")
+    for col in ("ZPE ratio", "EXC ratio", "PF ratio"):
+        table.add_column(col, justify="right")
+    for name, e in zip(names, effects):
+        r = e.rpfrs
+        table.add_row(
+            name,
+            "reactant(s)",
+            "{:.3e}".format(math.exp(r[0].ZPE - r[1].ZPE)),
+            "{:.3e}".format(math.exp(r[0].EXC - r[1].EXC)),
+            "{:.3e}".format(math.exp(r[1].PF - r[0].PF)),
         )
-    else:
-        log.Write(
-            "{:21.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
-                effect.zpe,
-                effect.exc,
-                effect.trpf,
-                effect.kie,
-                effect.bell_correction,
-                effect.kie_bell,
-                effect.wigner_correction,
-                effect.kie_wigner,
-            )
+        table.add_row(
+            "",
+            "TS" if is_kie else "product(s)",
+            "{:.3e}".format(math.exp(r[2].ZPE - r[3].ZPE)),
+            "{:.3e}".format(math.exp(r[2].EXC - r[3].EXC)),
+            "{:.3e}".format(math.exp(r[3].PF - r[2].PF)),
         )
-    log.Write("\n" + dash_line + "\n")
+    return table
+
+
+def referenced_table(names, effects, reference):
+    ref_effect = effects[names.index(reference)]
+    table = Table(
+        title="Isotope effects referenced to {} "
+        "(reference row shows its absolute value)".format(reference),
+        box=box.SIMPLE_HEAVY,
+    )
+    table.add_column("Isotopologue", style="bold")
+    for col in ("KIE", "KIE×κW", "KIE×κB"):
+        table.add_column(col, justify="right")
+    rows = {}
+    for name, e in zip(names, effects):
+        if name == reference:
+            row = (e.kie, e.kie_wigner, e.kie_bell)
+        else:
+            row = (
+                e.kie / ref_effect.kie,
+                e.kie_wigner / ref_effect.kie_wigner,
+                e.kie_bell / ref_effect.kie_bell,
+            )
+        rows[name] = row
+        table.add_row(name, *[_num(v) for v in row])
+    return table, rows
 
 
 def main():
@@ -293,117 +373,70 @@ def main():
             )
         )
 
-    with Logger(options.output, quiet=options.quiet) as log:
-        # Write an output file
-        log.Write(
-            "\n  "
-            + "KINISOT.py v "
-            + __version__
-            + ": "
-            + time.strftime("%Y-%m-%d %H:%M")
-            + "\n"
-        )
-
-        for i, species in enumerate(files):
-            log.Write(
-                "\n  Species: {} isotopologue(s): {}".format(species, options.label[i])
+    with RichLogger(options.output, quiet=options.quiet) as log:
+        log.print(
+            "[bold]KINISOT[/bold] v {}  ·  {}".format(
+                __version__, time.strftime("%Y-%m-%d %H:%M")
             )
-        log.Write("\n")
+        )
 
         # if not specified try to automatically determine the vibrational scaling factor
         if options.freq_scale_factor is None:
             factor, level, ref, warning = get_frequency_scaling(files)
             if warning is not None:
-                log.Writeonlyfile("\nWARNING: " + warning)
+                log.warn(warning)
             if ref is not None:
-                log.Write(
-                    "\n  Found vibrational scaling factor {} for {} level of theory".format(
-                        factor, level
-                    )
+                log.print(
+                    "Vibrational scaling factor [bold]{}[/bold] for {} "
+                    "level of theory".format(factor, level)
                 )
-                log.Write("\n  REF: " + ref)
+                log.print("[dim]REF: {}[/dim]".format(ref))
             else:
-                log.Write(
-                    "\n  Unable to find vibrational scaling factor for {}; using value of 1.0".format(
+                log.print(
+                    "No vibrational scaling factor found for {}; using 1.0".format(
                         level
                     )
                 )
             options.freq_scale_factor = factor
 
-        log.Write(
-            "\n\n"
-            + (space * 17)
-            + "  Temp = "
-            + str(options.temperature)
-            + "K / Vib. scale factor = "
-            + str(options.freq_scale_factor)
-        )
-        log.Write(("\n  ").ljust(50))
-        log.Write(
-            " {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n".format(
-                "V-ratio",
-                "ZPE",
-                "EXC",
-                "TRPF",
-                "KIE",
-                "1D-tunn",
-                "corr-KIE",
-                "Wigner",
-                "W-KIE",
+        # Compute all isotopologues, collecting library warnings for tidy display
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            try:
+                effects = compute_isotope_effects(
+                    options.rct,
+                    options.ts,
+                    options.prd,
+                    [specs for _name, specs in isotopologues],
+                    options.temperature,
+                    options.freq_scale_factor,
+                    options.freq_cutoff,
+                )
+            except (ValueError, FileNotFoundError) as e:
+                log.fatal("ERROR: " + str(e))
+
+        log.print(species_table(options.rct, other, is_kie, effects))
+        for message in dict.fromkeys(str(w.message) for w in caught):
+            log.warn(message)
+
+        log.print(
+            results_table(
+                names, effects, is_kie, options.temperature, options.freq_scale_factor
             )
         )
+        log.print(components_table(names, effects, is_kie))
 
-        # Here are the ingredients and final predictions of the isotope effects
-        try:
-            effects = compute_isotope_effects(
-                options.rct,
-                options.ts,
-                options.prd,
-                [specs for _name, specs in isotopologues],
-                options.temperature,
-                options.freq_scale_factor,
-                options.freq_cutoff,
-            )
-        except (ValueError, FileNotFoundError) as e:
-            log.Fatal("\no  " + str(e))
-
-        for (name, specs), effect in zip(isotopologues, effects):
-            if len(effects) > 1:
-                log.Write("\n  Isotopologue: " + name)
-            write_detail_block(log, options.rct, other, is_kie, specs, effect)
-
-        # Summary of referenced (relative) isotope effects
         referenced = {}
         if options.reference is not None:
-            ref_effect = effects[names.index(options.reference)]
-            log.Write(
-                "\n  Isotope effects referenced to {} (reference row shows its absolute value)\n".format(
-                    options.reference
-                )
-            )
-            log.Write(
-                "  {:20} {:>10} {:>10} {:>10}\n".format(
-                    "Isotopologue", "KIE", "corr-KIE", "W-KIE"
-                )
-            )
-            for name, effect in zip(names, effects):
-                if name == options.reference:
-                    row = (effect.kie, effect.kie_bell, effect.kie_wigner)
-                else:
-                    row = (
-                        effect.kie / ref_effect.kie,
-                        effect.kie_bell / ref_effect.kie_bell,
-                        effect.kie_wigner / ref_effect.kie_wigner,
-                    )
-                referenced[name] = row
-                log.Write("  {:20} {:10.6f} {:10.6f} {:10.6f}\n".format(name, *row))
+            table, referenced = referenced_table(names, effects, options.reference)
+            log.print(table)
 
         # The 1-D tunneling models are least reliable for primary H/D effects
         for name, effect in zip(names, effects):
             if is_kie and (effect.kie > 1.5 or effect.kie < 0.67):
-                log.Write(
-                    "\n  WARNING: {} is a large isotope effect; 1-D tunneling "
-                    "corrections are least reliable for primary H/D KIEs\n".format(name)
+                log.warn(
+                    "{} is a large isotope effect; 1-D tunneling corrections "
+                    "are least reliable for primary H/D KIEs".format(name)
                 )
 
         if options.json_path:
@@ -423,8 +456,8 @@ def main():
                         **(
                             {
                                 "referenced_kie": referenced[name][0],
-                                "referenced_kie_bell": referenced[name][1],
-                                "referenced_kie_wigner": referenced[name][2],
+                                "referenced_kie_bell": referenced[name][2],
+                                "referenced_kie_wigner": referenced[name][1],
                             }
                             if name in referenced and name != options.reference
                             else {}
@@ -435,7 +468,7 @@ def main():
             }
             with open(options.json_path, "w") as f:
                 json.dump(payload, f, indent=2)
-            log.Write("\n  JSON results written to " + options.json_path + "\n")
+            log.print("[dim]JSON results written to {}[/dim]".format(options.json_path))
 
 
 if __name__ == "__main__":

@@ -36,6 +36,12 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   CLI in `kinisot.cli`. The historical `kinisot.Kinisot` tuple/class API
   still works behind a `DeprecationWarning`.
 - `--output PATH`, `--json PATH` and `-q`/`--quiet` CLI options.
+- **Rich terminal output**: results are rendered as aligned tables (species,
+  isotope effects, RPFR components, referenced values) on the terminal and in
+  the `.dat` file, with library warnings collected and shown once instead of
+  raw Python warnings; undefined values (e.g. Bell below the crossover
+  temperature) display as an em dash. Adds an explicit `rich` dependency
+  (already required transitively via GoodVibes).
 - `CITATION.cff`, a tag-driven PyPI publishing workflow (trusted
   publishing), and Dependabot updates for GitHub Actions.
 - `kinisot` console command (alongside `python -m kinisot`) and a

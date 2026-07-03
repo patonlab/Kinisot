@@ -9,7 +9,7 @@ readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Paton Research Group", email = "patonlab@colostate.edu" }]
 requires-python = ">=3.9"
-dependencies = ["numpy", "goodvibes>=4.4"]
+dependencies = ["numpy", "goodvibes>=4.4", "rich>=13.0"]
 keywords = [
     "compchem",
     "kie",
