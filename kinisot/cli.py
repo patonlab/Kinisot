@@ -69,6 +69,7 @@ class RichLogger:
 
     def warn(self, message):
         self.print("[yellow]WARNING:[/yellow] " + message)
+        self.print()
 
     def fatal(self, message):
         # always reaches the terminal, even in quiet mode
