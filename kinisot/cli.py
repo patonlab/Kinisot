@@ -12,6 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from . import __version__
+from .Hess_to_Freq import describe_substitutions, parse_hessian
 from .scaling import get_frequency_scaling
 from .thermo import compute_isotope_effects
 
@@ -147,6 +148,27 @@ def species_table(rct, other, is_kie, effects):
             _short(f),
             "{:.1f}i".format(light[2].im_frequency_wn) if is_kie else "",
         )
+    return table
+
+
+def substitutions_table(isotopologues, files):
+    """One row per isotopologue explaining what is being substituted."""
+    masses = {f: parse_hessian(f).masses for f in files}
+    table = Table(box=box.SIMPLE, show_edge=False)
+    table.add_column("Isotopologue", style="bold")
+    table.add_column("Substitutions")
+    for name, specs in isotopologues:
+        descs = [
+            ", ".join(describe_substitutions(masses[f], spec)) or "none"
+            for f, spec in zip(files, specs)
+        ]
+        if len(set(descs)) == 1:
+            text = descs[0]
+        else:
+            text = "; ".join(
+                "{}: {}".format(_short(f), d) for f, d in zip(files, descs)
+            )
+        table.add_row(name, text)
     return table
 
 
@@ -421,6 +443,8 @@ def main():
 
         log.print()
         log.print(species_table(options.rct, other, is_kie, effects))
+        log.print()
+        log.print(substitutions_table(isotopologues, files))
         log.print()
         for message in dict.fromkeys(str(w.message) for w in caught):
             log.warn(message)

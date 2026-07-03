@@ -114,3 +114,23 @@ def is_linear(file):
     if parse_qcdata(file).linear_mol:
         return "linear"
     return "none"
+
+
+def describe_substitutions(mass_list, iso):
+    """Human-readable substitution list for an iso spec.
+
+    E.g. "26" on a hydrogen -> ["H26 → 2D"]; "5:18O,7" -> ["O5 → 18O",
+    "H7 → 2D"]. "0" (no substitution) gives []. Assumes the spec has
+    already been validated by substitute_isotopes.
+    """
+    parts = []
+    for item in iso.split(","):
+        atom, _, isotope = item.partition(":")
+        index = int(atom) - 1
+        if index == -1:
+            continue
+        element = element_from_mass(mass_list[index])
+        if not isotope:
+            isotope = DEFAULT_HEAVY[element]
+        parts.append("{}{} → {}".format(element, atom, isotope))
+    return parts
