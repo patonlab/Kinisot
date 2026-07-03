@@ -6,6 +6,28 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- **Expanded isotope table with explicit selection**: ²D, ³T, ¹³C, ¹⁴C,
+  ¹⁵N, ¹⁷O and ¹⁸O via an `atom:isotope` suffix (`--iso 5:18O,7:2D`);
+  plain atom numbers keep the default heavy isotope of their element,
+  which now includes ¹⁵N for nitrogen. Substituting an element with no
+  isotope data is an error instead of a silent no-op.
+- **Multiple isotopologues per run**: `--iso "C5=5;C4=4;HD=7,8"` computes
+  all of them in one invocation, sharing the unsubstituted RPFRs (N+1
+  instead of 2N diagonalizations per species).
+- **Referenced (relative) isotope effects**: `--ref NAME` divides every
+  other isotope effect by the reference isotopologue's, matching the
+  internal-standard convention of experimental KIE measurements.
+- **Wigner tunneling correction** reported alongside the Bell infinite
+  parabola; a warning flags large KIEs where 1-D tunneling corrections
+  are least reliable.
+- **Structured Python API**: `kinisot.compute_isotope_effect(s)` returns a
+  frozen `IsotopeEffect` dataclass (with `.to_dict()`); the physics lives
+  in `kinisot.thermo`, scaling-factor lookup in `kinisot.scaling`, and the
+  CLI in `kinisot.cli`. The historical `kinisot.Kinisot` tuple/class API
+  still works behind a `DeprecationWarning`.
+- `--output PATH`, `--json PATH` and `-q`/`--quiet` CLI options.
+- `CITATION.cff`, a tag-driven PyPI publishing workflow (trusted
+  publishing), and Dependabot updates for GitHub Actions.
 - `kinisot` console command (alongside `python -m kinisot`) and a
   `--version` flag.
 - Argument validation before any output file is created: missing or

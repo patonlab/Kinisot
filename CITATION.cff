@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use Kinisot, please cite it via the Zenodo DOI below."
+title: "Kinisot: compute kinetic and equilibrium isotope effects from quantum chemistry output files"
+authors:
+  - family-names: Paton
+    given-names: Robert S.
+    orcid: "https://orcid.org/0000-0002-0104-4166"
+    affiliation: "Colorado State University"
+repository-code: "https://github.com/patonlab/Kinisot"
+license: MIT
+doi: 10.5281/zenodo.10403662
+keywords:
+  - kinetic isotope effects
+  - equilibrium isotope effects
+  - Bigeleisen-Mayer
+  - computational chemistry

@@ -32,7 +32,7 @@ Homepage = "https://github.com/patonlab/Kinisot"
 Changelog = "https://github.com/patonlab/Kinisot/blob/master/CHANGELOG.md"
 
 [project.scripts]
-kinisot = "kinisot.Kinisot:main"
+kinisot = "kinisot.cli:main"
 
 [tool.setuptools]
 packages = ["kinisot"]

@@ -41,8 +41,20 @@ kinisot --rct reactant_output --ts ts_output --iso 1,2,3 (-t temperature) (-s sc
 
 *	The two output files contain frequency calculations performed for the reactant and transition state at the same level of theory. Gaussian output files and ORCA outputs (with the `.hess` file next to the `.out`, or the `.hess` passed directly) are supported.
 *	For an equilibrium isotope effect, pass `--prd product_output` instead of `--ts`.
-*	The `--iso` flag is required and specifies comma-separated atom number(s) which are to be substituted for heavier isotopes. With several input files, repeat the flag once per file (`--iso 0` for a file with no substitution); a single `--iso` is applied to reactant and TS/product alike.
+*	The `--iso` flag is required and specifies comma-separated atom number(s) which are to be substituted for heavier isotopes. Plain atom numbers get the default heavy isotope of their element (²D, ¹³C, ¹⁵N, ¹⁷O); an explicit isotope can be chosen with a suffix, e.g. `--iso 5:18O,7:2D` (available: 2D, 3T, 13C, 14C, 15N, 17O, 18O). With several input files, repeat the flag once per file (`--iso 0` for a file with no substitution); a single `--iso` is applied to reactant and TS/product alike.
+*	Several isotopologues can be computed in one run by separating them with `;` and (optionally) naming them: `--iso "C5=5;C4=4;HD=7,8"`. Adding `--ref C5` divides all other isotope effects by the one at C5, matching the internal-standard referencing of experimental KIE measurements.
 *	The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the underlying calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
 *	The `-s` option is a scaling factor for vibrational frequencies. Empirical ZPE-scaling factors from the [Truhlar group database](https://comp.chem.umn.edu/freqscale/) are applied automatically (via GoodVibes) based on detection of the level of theory and basis set in the output files. The default value when no scaling factor is available is 1 (no scale factor).
+*	Both the Bell infinite-parabola and Wigner one-dimensional tunneling corrections are reported alongside the uncorrected isotope effect.
+*	`--output PATH` sets the `.dat` file location, `--json PATH` additionally writes machine-readable results, and `-q`/`--quiet` suppresses terminal printing.
+
+Programmatic use returns structured results:
+
+```python
+import kinisot
+effect = kinisot.compute_isotope_effect(["gs.out"], ["ts.out"], None, ["5", "5"],
+                                        temperature=393, freq_scale_factor=0.9614)
+effect.kie, effect.kie_wigner, effect.kie_bell
+```
 
 See examples/ for more examples
