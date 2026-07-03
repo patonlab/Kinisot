@@ -231,6 +231,9 @@ def test_isotope_effect(
         ("UB3LYP/6-31G(d)", 0.977),  # U prefix stripped
         ("RHF/3-21G", 0.919),
         ("M06/maug-cc-pVTZ", 0.982),
+        ("RM062X/6-31+G**", 0.968),  # Pople star shorthand == 6-31+G(d,p)
+        ("B3LYP/6-31G*", 0.977),  # single star == (d)
+        ("M06-2X/def2-TZVP", 0.971),  # ORCA hyphenated basis == def2TZVP
         ("B3LYP/STO-3G", None),  # basis set not in database
         ("MADEUP/nonsense", None),
     ],
