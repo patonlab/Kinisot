@@ -1,3 +1,4 @@
+# Update version and sha256 from the PyPI release when submitting to conda-forge.
 {% set name = "kinisot" %}
 {% set version = "2.0.2" %}
 
@@ -12,19 +13,25 @@ source:
 build:
   number: 0
   noarch: python
-  script: "{{ PYTHON }} -m pip install . -vv"
+  script: "{{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+  entry_points:
+    - kinisot = kinisot.cli:main
 
 requirements:
   host:
     - pip
-    - python >=3.5
+    - python >=3.9
+    - setuptools >=64
   run:
-    - numpy
-    - python >=3.5
+    - numpy >=1.22
+    - goodvibes >=4.4
+    - python >=3.9
 
 test:
   imports:
     - kinisot
+  commands:
+    - kinisot --version
 
 about:
   home: "https://github.com/patonlab/kinisot"

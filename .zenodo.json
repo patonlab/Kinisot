@@ -1,0 +1,14 @@
+{
+  "title": "Kinisot: kinetic and equilibrium isotope effects from computed Hessians",
+  "description": "Kinisot computes kinetic and equilibrium isotope effects from Gaussian, ORCA or ASE (machine-learned potential) Hessians with the Bigeleisen-Mayer equation and one-dimensional tunnelling corrections.",
+  "creators": [
+    {"name": "Paton, Robert S.", "affiliation": "Colorado State University"}
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": ["kinetic isotope effect", "equilibrium isotope effect", "Bigeleisen-Mayer", "computational chemistry", "Gaussian", "ORCA", "ASE"],
+  "related_identifiers": [
+    {"identifier": "https://github.com/patonlab/Kinisot", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}

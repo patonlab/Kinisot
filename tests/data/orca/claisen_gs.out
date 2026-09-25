@@ -1,0 +1,20 @@
+
+                                 *****************
+                                 * O   R   C   A *
+                                 *****************
+
+================================================================================
+                                       INPUT FILE
+================================================================================
+NAME = claisen_gs.inp
+|  1> ! B3LYP 6-31G(d) Opt Freq
+|  2> * xyz 0 1
+|  3> *
+|  4> ****END OF INPUT****
+
+Synthetic ORCA-style output for the Kinisot test suite (see README.md): the
+$hessian block of claisen_gs.hess is the Gaussian B3LYP/6-31G(d) Hessian of the
+Claisen example written in ORCA's layout, so that the ORCA reader can be
+tested against the Gaussian golden values.
+
+                              ****ORCA TERMINATED NORMALLY****

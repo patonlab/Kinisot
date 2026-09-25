@@ -3,3 +3,10 @@ kinisot.egg-info
 Kinisot_output.dat
 dist
 MANIFEST
+.coverage
+htmlcov/
+.pytest_cache/
+__pycache__/
+build/
+*.egg-info/
+benchmarks/report.json

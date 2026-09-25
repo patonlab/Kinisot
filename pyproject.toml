@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kinisot"
+dynamic = ["version"]
+description = "Kinetic and equilibrium isotope effects from computed Hessians"
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+authors = [{name = "Paton Research Group", email = "patonlab@colostate.edu"}]
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.22", "goodvibes>=4.4"]
+keywords = ["compchem", "kie", "eqe", "dft", "vibrational-scaling-factors", "kinisot", "frequencies", "isotope-effects"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+[project.urls]
+Homepage = "https://github.com/patonlab/Kinisot"
+Documentation = "https://github.com/patonlab/Kinisot/tree/master/docs"
+Changelog = "https://github.com/patonlab/Kinisot/blob/master/CHANGELOG.md"
+Issues = "https://github.com/patonlab/Kinisot/issues"
+
+[project.scripts]
+kinisot = "kinisot.cli:main"
+
+[project.optional-dependencies]
+ase = ["ase>=3.23"]
+test = ["pytest", "pytest-cov"]
+lint = ["ruff"]
+
+[tool.setuptools.packages.find]
+include = ["kinisot*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "kinisot.__version__"}
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+extend-exclude = ["tests/data", "*.md"]  # Markdown snippets are documentation, not code to reflow
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E741"]
+
+[tool.ruff.lint.per-file-ignores]
+"kinisot/__init__.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "error:kinisot\\.Kinisot\\..*is deprecated:DeprecationWarning",
+    "ignore:Setting the shape on a NumPy array:DeprecationWarning",
+]

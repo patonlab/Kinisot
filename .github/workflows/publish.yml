@@ -1,0 +1,110 @@
+name: Publish to PyPI
+
+# Publishes a release to PyPI when a version tag (v2.1.0, v2.1.1, ...) is pushed.
+# Uses PyPI "trusted publishing" (OpenID Connect; configured for owner
+# "patonlab", repository "Kinisot", workflow "publish.yml", environment "pypi"),
+# so no API token is stored in the repository. To release: bump __version__ in
+# kinisot/__init__.py, update CHANGELOG.md and CITATION.cff, then
+#   git tag v<version> && git push origin v<version>
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# The tag also creates a GitHub Release, which the connected Zenodo account
+# archives with a DOI, with the matching CHANGELOG section as release notes.
+
+jobs:
+  build:
+    name: Build sdist and wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check that the tag matches kinisot.__version__
+        if: github.ref_type == 'tag'
+        run: |
+          version=$(python -c "import re; print(re.search(r'__version__ = \"([^\"]+)\"', open('kinisot/__init__.py').read()).group(1))")
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$tag" ]; then
+            echo "kinisot.__version__ is $version but the tag is $tag" >&2
+            exit 1
+          fi
+
+      - name: Run the tests
+        run: |
+          python -m pip install ".[test,ase]"
+          pytest tests/ -q
+
+      - name: Build
+        run: |
+          python -m pip install build
+          python -m build
+
+      - name: Check the wheel is small (no test data)
+        run: |
+          size=$(stat -c %s dist/*.whl)
+          echo "wheel size: $size bytes"
+          test "$size" -lt 200000
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Upload to PyPI
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/kinisot/
+    permissions:
+      id-token: write   # required for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  release:
+    name: GitHub Release
+    needs: publish
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Extract the CHANGELOG section for this version
+        run: |
+          python - "${GITHUB_REF_NAME#v}" > notes.md <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          match = re.search(r"^## \[%s\].*?$(.*?)(?=^## \[|\Z)" % re.escape(version), text, re.M | re.S)
+          print(match.group(1).strip() if match else "See CHANGELOG.md.")
+          PY
+          cat notes.md
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Kinisot $GITHUB_REF_NAME" --notes-file notes.md

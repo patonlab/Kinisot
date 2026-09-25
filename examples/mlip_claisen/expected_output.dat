@@ -1,0 +1,44 @@
+
+  KINISOT.py v 2.5.0.dev0: 2026-09-25 15:23
+  Species: claisen_gs.hessian.json isotopologue: 4
+  Species: claisen_ts.hessian.json isotopologue: 4
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  463.9
+o claisen_gs.hessian: iso @ 4                                1.183e+00  1.022e+00  9.093e-01
+o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+00  9.288e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.012716   1.036594   1.001970   0.978989   1.029742   1.003157   1.032993
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs.hessian (iso @ 4): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 22.9
+  claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
+
+  KINISOT.py v 2.5.0.dev0: 2026-09-25 15:23
+  Species: claisen_gs.hessian.json isotopologue: 4
+  Species: claisen_ts.hessian.json isotopologue: 4
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961 / external modes projected
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  463.9
+o claisen_gs.hessian: iso @ 4                                1.183e+00  1.021e+00  9.093e-01
+o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+00  9.288e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.012716   1.036593   1.001955   0.979004   1.029742   1.003157   1.032993
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 4): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
