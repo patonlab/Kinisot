@@ -5,7 +5,7 @@
 ```
 git clone https://github.com/patonlab/Kinisot
 cd Kinisot
-pip install -e ".[test,lint]"
+pip install -e ".[test,lint,ase]"
 ```
 
 ## Check your change

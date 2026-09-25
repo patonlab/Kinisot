@@ -53,8 +53,16 @@ bare oxygen index.
 
 **Should I use `--project`?** For Gaussian and ORCA analytic Hessians on
 converged geometries it makes no practical difference (below 10⁻⁶ in the
-KIE). Use it for finite-difference Hessians or any file whose "discarded"
+KIE). It is on by default for Hessians from ASE calculators, whose
+finite-difference residuals need it; use it for any file whose "discarded"
 modes are not all within a few tens of cm⁻¹ of zero.
+
+**Can I use a machine-learned potential?** Yes: optimize the reactant and
+locate the transition structure with the potential, then
+`kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc mace_mp:medium`. See
+`examples/mlip_claisen/`. There is no scaling factor for a potential, and
+its accuracy for the curvature at the transition structure decides the
+KIE, so compare against a DFT reference where you can.
 
 **Can I use several conformers?** Not in one run. Compute the KIE for
 each reactant/TS conformer pair and Boltzmann-average the rate constants,

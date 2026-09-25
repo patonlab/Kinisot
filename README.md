@@ -5,7 +5,8 @@
 [![CI](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml/badge.svg)](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml)
 
 **Kinisot** computes kinetic (KIE) and equilibrium (EQE) isotope effects
-from Gaussian or ORCA frequency calculations. Give it the output files of a
+from Gaussian or ORCA frequency calculations, or from Hessians computed with
+any ASE calculator, machine-learned potentials included. Give it the output files of a
 reactant and a transition structure (or a product), say which atoms carry
 the heavy isotope, and it re-mass-weights the Hessians, diagonalizes them,
 and evaluates the Bigeleisen–Mayer equation with a Bell tunnelling
@@ -80,7 +81,7 @@ The equations behind every column are in [docs/theory.md](docs/theory.md).
 ```
 kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso ATOMS ...]
         [-t K] [-s FACTOR] [--imag-cutoff CM-1] [--tunneling MODEL] [--barrier KCAL] [--project]
-        [--reference ATOMS] [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
+        [--reference ATOMS] [--calc SPEC] [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
 ```
 
 `python -m kinisot` is equivalent to `kinisot`.
@@ -102,7 +103,8 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) (version 5, via GoodVibes) for the level of theory detected in the files, or 1.0 with a message if it is not listed. `--scale-type harm` or `fund` picks the harmonic or fundamental factor instead. |
 | `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
 | `--tunneling` | `bell` (default), `wigner`, `skodje` (Skodje–Truhlar, needs the barrier: `--barrier KCAL` or the electronic energies in the files) or `none`. |
-| `--project` | project translations and rotations out of the Hessian (Eckart) instead of discarding the six lowest modes; recommended for finite-difference Hessians. |
+| `--project` | project translations and rotations out of the Hessian (Eckart) instead of discarding the six lowest modes. On by default for `--calc`/ASE inputs, off for Gaussian and ORCA (`--no-project` forces it off). |
+| `--calc SPEC`, `--delta` | compute the Hessians of geometry inputs with an ASE calculator (`mace_mp:medium`, `emt`, `module:callable`, ...); finite-difference step in Å. |
 | `--reference ATOMS` | a second isotopologue; the KIE is also reported divided by its KIE (natural-abundance NMR style). |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
 | `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
@@ -130,7 +132,7 @@ one.
 | --- | --- | --- |
 | Gaussian 09/16 | supported | a normally terminated `freq` job: atom masses and the force constants in the archive entry (`opt freq` jobs are fine) |
 | ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
-| ASE / machine-learned potentials | planned (Phase 8) | `VibrationsData` files, or Hessians computed with any ASE calculator |
+| ASE / machine-learned potentials | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (MACE, ORB, SevenNet, AIMNet2, any ASE calculator); the Hessian is computed and cached next to the geometry, external modes are projected out |
 
 Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
 
@@ -171,8 +173,8 @@ gs, ts = parse_gaussian("claisen_gs.out"), parse_gaussian("claisen_ts.out")   # 
 ```
 
 `compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0,
-imag_cutoff=50.0, tunneling="bell", scale_type="zpe", project=False,
-barrier=None, reference=None)` takes Gaussian or ORCA file paths or `HessianInput`
+imag_cutoff=50.0, tunneling="bell", scale_type="zpe", project=None,
+barrier=None, reference=None, calculator=None)` takes Gaussian or ORCA file paths or `HessianInput`
 objects (one or a list per side), `scale=None` for automatic Truhlar
 lookup, and `tunneling` in `"bell"`, `"wigner"`, `"none"`. It returns a
 frozen `IsotopeEffect` whose `reactant` and `other` (transition structure
@@ -189,10 +191,12 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
 
 ## Examples and documentation
 
-- [examples/](examples/README.md): the Claisen rearrangement (¹³C, ¹⁷O
-  and ²H KIEs), a Diels–Alder reaction with one or two reactant files, and a
-  conformational EQE, each with the commands, the expected numbers and the
-  literature background.
+- [examples/](examples/README.md): the Claisen rearrangement (¹³C, ¹⁸O/¹⁷O
+  and ²H KIEs, projection, reference isotopologue, tunnelling models,
+  temperature scans), a Diels–Alder reaction with one or two reactant files,
+  the same KIE from ORCA and from ASE inputs (with the machine-learned
+  potential workflow), and a conformational EQE, each with the commands, the
+  expected numbers and the literature background.
 - [docs/theory.md](docs/theory.md), [docs/file_formats.md](docs/file_formats.md),
   [docs/faq.md](docs/faq.md), [docs/comparison.md](docs/comparison.md)
   (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).

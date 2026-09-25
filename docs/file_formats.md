@@ -58,6 +58,42 @@ projects out translations and rotations, Kinisot does not, hence the
 tolerance). The warning means the Hessian and the masses do not belong
 together (wrong file pairing, edited output, unit problem).
 
+## ASE and machine-learned potentials (supported, `pip install kinisot[ase]`)
+
+Two forms of input:
+
+1. **A `VibrationsData` JSON file**: `ase.vibrations.VibrationsData.todict()`
+   encoded with `ase.io.jsonio` (geometry in Å, Hessian in eV/Å²).
+   `kinisot.save_hessian_json()` writes it (from any HessianInput, e.g. to
+   convert a Gaussian Hessian) and `--calc` writes it as its cache. The
+   electronic energy (eV) may be stored under `atoms.info["energy"]` for the
+   Skodje–Truhlar barrier, and `atoms.info["level_of_theory"]` for scaling.
+2. **A geometry file plus `--calc`** (or `calculator=` in the API): anything
+   `ase.io.read` accepts. The Hessian is computed by central finite
+   differences (`--delta`, default 0.01 Å) or with the calculator's
+   `get_hessian` when it has one, and cached as `<name>.hessian.json` next
+   to the geometry (reused while the geometry is unchanged and the `--calc`
+   specification matches). The geometry must be a stationary point of that
+   calculator.
+
+Masses come from Kinisot's isotope table (ASE's standard atomic weights
+only identify elements). Projection of the external modes is on by default
+for these inputs, no scaling factor is applied unless `-s` is given, and
+imaginary modes below the cutoff are treated as real vibrations of the same
+magnitude with a warning. Calculator names: `emt` (ASE's test potential),
+`mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb`, `sevennet`,
+`aimnet2`, or `module.path:callable`; each package must be installed
+separately.
+
+## Frequency self-check
+
+For every unsubstituted species whose file lists the program's vibrational
+frequencies, Kinisot compares them with the ones it obtains from the
+Hessian and warns when they differ by more than 1 cm⁻¹ (the program
+projects out translations and rotations, Kinisot does not, hence the
+tolerance). The warning means the Hessian and the masses do not belong
+together (wrong file pairing, edited output, unit problem).
+
 ## ASE and machine-learned potentials (planned, Phase 8)
 
 `ase.vibrations.VibrationsData` objects (JSON) and Hessians computed inside

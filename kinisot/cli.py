@@ -205,8 +205,8 @@ def append_csv(path, result):
 def build_parser():
     parser = ArgumentParser(
         prog="kinisot",
-        description="Kinetic (--ts) and equilibrium (--prd) isotope effects from Gaussian or ORCA frequency "
-        "calculations, using the Bigeleisen-Mayer equation and a Bell tunnelling correction.",
+        description="Kinetic (--ts) and equilibrium (--prd) isotope effects from Gaussian, ORCA or ASE "
+        "(machine-learned potential) Hessians, using the Bigeleisen-Mayer equation and a Bell tunnelling correction.",
         epilog="Example: kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 5 -t 393 -s 0.961",
     )
     parser.add_argument(
@@ -215,7 +215,8 @@ def build_parser():
         action="append",
         required=True,
         metavar="FILE",
-        help="reactant frequency output (Gaussian .log/.out, or ORCA .out/.hess); repeat for bimolecular reactions",
+        help="reactant frequency output (Gaussian .log/.out, ORCA .out/.hess, VibrationsData .json, or a geometry "
+        "with --calc); repeat for bimolecular reactions",
     )
     parser.add_argument(
         "--ts", dest="ts", action="append", metavar="FILE", help="transition structure frequency output (KIE)"
@@ -285,11 +286,27 @@ def build_parser():
         "--project",
         dest="project",
         action="store_true",
-        default=False,
+        default=None,
         help="project translations and rotations out of the Hessian before diagonalizing (uses the geometry) "
-        "instead of discarding the 5/6 lowest modes",
+        "instead of discarding the 5/6 lowest modes; the default is on for --calc/ASE inputs and off otherwise",
     )
     parser.add_argument("--no-project", dest="project", action="store_false", help=SUPPRESS)
+    parser.add_argument(
+        "--calc",
+        dest="calc",
+        metavar="SPEC",
+        help="compute the Hessian of geometry inputs (xyz, extxyz, ... anything ASE reads) with this ASE calculator: "
+        "emt, mace_mp[:model], mace_off[:model], mace_omol, orb, sevennet, aimnet2, or module.path:callable. The "
+        "Hessian is cached next to the geometry as <name>.hessian.json (needs pip install kinisot[ase])",
+    )
+    parser.add_argument(
+        "--delta",
+        dest="delta",
+        type=float,
+        default=0.01,
+        metavar="ANGSTROM",
+        help="finite-difference step for --calc Hessians (default 0.01)",
+    )
     parser.add_argument(
         "--reference",
         dest="reference",
@@ -385,6 +402,8 @@ def main(argv=None):
                             project=options.project,
                             barrier=options.barrier,
                             reference=reference,
+                            calculator=options.calc,
+                            delta=options.delta,
                         )
                     )
             for message in results[0].scaling.messages:

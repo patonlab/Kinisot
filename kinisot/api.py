@@ -314,6 +314,16 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out,
         imaginary_modes = remaining[remaining < -imag_cutoff]
         imaginary = -float(remaining[0]) if len(imaginary_modes) else None
         kept = remaining[1:] if imaginary is not None else remaining
+        small = kept[(kept < 0) & (kept > -imag_cutoff)]
+        if len(small):
+            message = (
+                "%s: %d imaginary mode(s) below the %.1f cm-1 cutoff (%s) after projection; treated as real "
+                "vibrations of the same magnitude. Tighten the geometry or the Hessian if they are not noise."
+                % (data.source, len(small), imag_cutoff, ", ".join("%.1fi" % -f for f in small))
+            )
+            warnings_out.append(message)
+            warnings.warn(message, KinisotWarning, stacklevel=4)
+            kept = np.sort(np.where((kept < 0) & (kept > -imag_cutoff), -kept, kept))
         extra_discarded = np.array([])
     else:
         # 5 or 6 external modes are removed (linear / non-linear molecule), plus one
@@ -450,9 +460,11 @@ def compute_kie(
     imag_cutoff=50.0,
     tunneling="bell",
     scale_type="zpe",
-    project=False,
+    project=None,
     barrier=None,
     reference=None,
+    calculator=None,
+    delta=0.01,
 ):
     """Compute a kinetic (``ts``) or equilibrium (``prd``) isotope effect.
 
@@ -476,13 +488,18 @@ def compute_kie(
         (default), 'harm' or 'fund'.
     project : project translations and rotations out of the Hessian before
         diagonalizing (needs geometries) instead of discarding the 5/6
-        lowest modes.
+        lowest modes. None (default) means on for inputs from the ASE backend
+        (finite-difference Hessians) and off for Gaussian and ORCA.
     barrier : barrier height in kcal/mol for the Skodje-Truhlar correction;
         by default the electronic energies read from the files
         (E(TS) - sum E(reactants)).
     reference : isotope label(s) of a second isotopologue; the result's
         ``reference`` holds its IsotopeEffect and ``kie_relative`` /
         ``kie_tunnel_relative`` the ratios.
+    calculator : a ``--calc`` specification (e.g. 'mace_mp:medium', 'emt',
+        'module:callable') or an ASE calculator object, used to compute the
+        Hessian of inputs that are geometry files; ``delta`` is the
+        finite-difference step in Angstrom.
 
     Returns
     -------
@@ -508,11 +525,14 @@ def compute_kie(
 
     kind = "KIE" if ts is not None else "EQE"
     side_name = "transition structure" if kind == "KIE" else "product"
-    reactants = [load_hessian(x) for x in _as_list(rct)]
-    others = [load_hessian(x) for x in _as_list(ts if kind == "KIE" else prd)]
+    reactants = [load_hessian(x, calculator, delta) for x in _as_list(rct)]
+    others = [load_hessian(x, calculator, delta) for x in _as_list(ts if kind == "KIE" else prd)]
     if not reactants or not others:
         raise KinisotInputError("at least one reactant and one %s file are required" % side_name)
     labels = normalize_labels(iso, len(reactants), len(others))
+    if project is None:
+        project = any(str(d.program).lower().startswith("ase") for d in reactants + others)
+    project = bool(project)
     scaling = choose_scaling_factor(reactants + others, scale, scale_type)
 
     collected = []
@@ -572,7 +592,7 @@ def compute_kie(
         reference_result = compute_kie(
             reactants, others if kind == "KIE" else None, others if kind == "EQE" else None, iso=reference,
             temperature=temperature, scale=scaling.factor, imag_cutoff=imag_cutoff, tunneling=tunneling,
-            scale_type=scale_type, project=project, barrier=barrier,
+            scale_type=scale_type, project=project, barrier=barrier, calculator=calculator, delta=delta,
         )  # fmt: skip
 
     return IsotopeEffect(

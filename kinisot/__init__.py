@@ -11,10 +11,11 @@ Python::
     result.kie_tunnel, result.zpe, result.exc, result.trpf, result.to_dict()
 """
 
-__version__ = "2.4.0.dev0"
+__version__ = "2.5.0.dev0"
 
 from .api import IsotopeEffect, IsotopologueResult, SideResult, SpeciesResult, compute_kie
 from .backends import load_hessian
+from .backends.ase import build_calculator, hessian_for_geometry, hessian_from_calculator, save_hessian_json
 from .backends.gaussian import parse_gaussian
 from .exceptions import KinisotError, KinisotInputError, KinisotParseError, KinisotWarning
 from .hessian import HessianInput, mass_weight
@@ -34,6 +35,10 @@ __all__ = [
     "HessianInput",
     "load_hessian",
     "parse_gaussian",
+    "hessian_from_calculator",
+    "hessian_for_geometry",
+    "save_hessian_json",
+    "build_calculator",
     "substitute",
     "Substitution",
     "isotope_mass",

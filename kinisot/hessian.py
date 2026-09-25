@@ -69,6 +69,7 @@ class HessianInput:
         object.__setattr__(self, "masses", masses)
         object.__setattr__(self, "atomic_numbers", atomic_numbers)
         object.__setattr__(self, "positions", positions)
+        object.__setattr__(self, "linear", bool(self.linear))
         if self.program_frequencies is not None:
             object.__setattr__(self, "program_frequencies", tuple(float(f) for f in self.program_frequencies))
 
@@ -114,4 +115,4 @@ def linear_from_geometry(positions, masses, tolerance=1e-4):
             [[y * y + z * z, -x * y, -x * z], [-x * y, x * x + z * z, -y * z], [-x * z, -y * z, x * x + y * y]]
         )
     moments = np.linalg.eigvalsh(inertia)
-    return moments[0] < tolerance * max(moments[-1], 1e-300)
+    return bool(moments[0] < tolerance * max(moments[-1], 1e-300))

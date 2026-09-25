@@ -32,7 +32,7 @@ def example_commands():
     for line in script.splitlines():
         line = line.strip()
         if line.startswith("cd "):
-            directory = "orca" if "orca" in line else "gaussian"
+            directory = "orca" if "orca" in line else "ase" if "ase" in line else "gaussian"
         elif line.startswith("run ") and '"$atoms"' not in line:
             case, args = line.split(None, 1)[1].split(None, 1)
             commands.append((case, directory, args))
@@ -43,7 +43,7 @@ COMMANDS = example_commands()
 
 
 def test_all_example_commands_found():
-    assert len(COMMANDS) == 26
+    assert len(COMMANDS) == 28
     assert sum(1 for case, _, _ in COMMANDS if case == "claisen") == 12
 
 

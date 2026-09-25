@@ -2,6 +2,29 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.5.0] - Unreleased
+
+Phase 8 of the [implementation plan](IMPLEMENTATION_PLAN.md): ASE and
+machine-learned potentials.
+
+### Added
+
+- **ASE backend** (`pip install kinisot[ase]`): Hessians from
+  `VibrationsData` JSON files, or computed from a geometry with any ASE
+  calculator (`--calc mace_mp:medium`, `emt`, `orb`, `sevennet`, `aimnet2`,
+  `module:callable`; `--delta` for the finite-difference step, analytic
+  `get_hessian` used when available) and cached next to the geometry as
+  `<name>.hessian.json`. `kinisot.hessian_from_calculator`,
+  `hessian_for_geometry`, `save_hessian_json`, `build_calculator` in the API;
+  `compute_kie(..., calculator=)`.
+- Projection of external modes is now **on by default for ASE inputs** and
+  off for Gaussian/ORCA (`project=None` means "decide by backend";
+  `--project`/`--no-project` override). With projection, imaginary modes
+  below the cutoff are treated as real vibrations of the same magnitude,
+  with a warning.
+- `examples/mlip_claisen/` and ASE JSON fixtures (`tests/data/ase/`); the
+  Claisen KIE from the JSON form matches the Gaussian path to 10⁻¹⁰.
+
 ## [2.4.0] - Unreleased
 
 Phase 7 of the [implementation plan](IMPLEMENTATION_PLAN.md): isotopes,

@@ -41,7 +41,7 @@ jobs:
 
       - name: Run the tests
         run: |
-          python -m pip install ".[test]"
+          python -m pip install ".[test,ase]"
           pytest tests/ -q
 
       - name: Build

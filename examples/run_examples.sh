@@ -54,6 +54,12 @@ run orca_claisen --rct claisen_gs.out --ts claisen_ts.hess --iso 5 -t 393 -s 0.9
 run orca_claisen --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 393
 cd "$DATA"
 
+# The Claisen KIE from Hessians in ASE VibrationsData JSON form (tests/data/ase), without and with projection.
+cd "$HERE/../tests/data/ase"
+run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393 -s 0.961
+run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393 -s 0.961 --project
+cd "$DATA"
+
 # Equilibrium isotope effect: CD3 axial versus equatorial in 1,1,3,3-tetramethylcyclohexane,
 # from one frequency calculation with the deuteriums placed on either methyl group. Unscaled.
 run eqe_cyclohexane --rct tetramethylcyclohexane.out --prd tetramethylcyclohexane.out --iso 24,25,26 --iso 28,29,30 -s 1 -t 290

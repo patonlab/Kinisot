@@ -32,6 +32,7 @@ Issues = "https://github.com/patonlab/Kinisot/issues"
 kinisot = "kinisot.cli:main"
 
 [project.optional-dependencies]
+ase = ["ase>=3.23"]
 test = ["pytest", "pytest-cov"]
 lint = ["ruff"]
 
