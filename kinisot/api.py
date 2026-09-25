@@ -324,7 +324,6 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out,
             warnings_out.append(message)
             warnings.warn(message, KinisotWarning, stacklevel=4)
             kept = np.sort(np.where((kept < 0) & (kept > -imag_cutoff), -kept, kept))
-        extra_discarded = np.array([])
     else:
         # 5 or 6 external modes are removed (linear / non-linear molecule), plus one
         # reaction-coordinate mode when it is imaginary beyond the cutoff
@@ -333,7 +332,6 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out,
         n_drop = n_external + (1 if imaginary is not None else 0)
         discarded = freqs[(1 if imaginary is not None else 0) : n_drop]
         kept = freqs[n_drop:]
-        extra_discarded = np.array([])
     if len(imaginary_modes) > 1:
         message = (
             "%s has %d imaginary frequencies beyond the %.1f cm-1 cutoff (%s); only the largest is "
@@ -357,7 +355,6 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out,
             "is not a stationary point Kinisot can use"
             % (data.source, int(np.sum(kept <= 0)), n_external, ", ".join("%.1f" % f for f in kept[kept <= 0]))
         )
-    del extra_discarded
 
     if not applied and data.program_frequencies is not None:
         # Self-check for the unsubstituted species: Kinisot must reproduce the program's frequencies

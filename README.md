@@ -28,7 +28,7 @@ This computes the ¹³C KIE at carbon 1 of allyl vinyl ether for its Claisen
 rearrangement at 393 K, with B3LYP/6-31G(d) frequencies scaled by 0.961:
 
 ```
-  KINISOT.py v 2.1.0: 2026-09-25 12:45
+  KINISOT.py v 2.5.0: 2026-09-25 12:45
   Species: claisen_gs.out isotopologue: 1
   Species: claisen_ts.out isotopologue: 1
 

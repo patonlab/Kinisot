@@ -4,6 +4,10 @@
 **Version reviewed:** 2.0.3 (branch head 826faa1, all Phase 0–1 fixes applied)
 **Companions:** [AUDIT.md](AUDIT.md) (2026-07-02 code audit) and
 [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) (revised alongside this review).
+**Status note (later on 2026-09-25):** the recommendations below have since been
+implemented through Phase 8 of the plan; the plan records what was delivered,
+the deviations, and what still needs a maintainer. This review is kept as the
+record of the evidence behind those decisions.
 
 ## 1. Summary
 
