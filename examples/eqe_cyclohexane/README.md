@@ -25,7 +25,7 @@ kinisot --rct tetramethylcyclohexane.out --prd tetramethylcyclohexane.out --iso 
 
 ```
                                   ZPE        EXC       TRPF        EQE    1D-tunn   corr-EQE
-EQE @ 290.0 K                1.027782   1.025381   0.985373   1.038454   1.000000   1.038454
+EQE @ 290.0 K                1.027783   1.025381   0.985373   1.038454   1.000000   1.038454
 EQE @ 300.0 K                1.026844   1.025140   0.985373   1.037262   1.000000   1.037262
 ```
 

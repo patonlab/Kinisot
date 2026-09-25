@@ -77,7 +77,7 @@ def test_multiple_reactant_files(run):
     assert rc == 0
     out = read(tmp_path)
     assert "dienophile + diene: iso @ 0 / 6" in out
-    assert "1.018631" in out and "1.022411" in out
+    assert "1.018631" in out and "1.022412" in out
 
 
 def test_results_append_unless_overwrite(run):

@@ -24,20 +24,34 @@ Hartree energy, Bohr radius, atomic mass unit and speed of light (CODATA
 2018 values in `kinisot/thermo.py`). The scaling factor multiplies every ν,
 including the imaginary one.
 
-**External modes.** Translations and rotations are not projected out.
-The eigenvalues are sorted and the six lowest (five for a linear molecule)
-are discarded; if the lowest mode is imaginary beyond the cutoff
-(default 50 cm⁻¹) it is the reaction coordinate and the six (five) next
-lowest are discarded instead. On tightly converged geometries the discarded
-modes are within a few cm⁻¹ of zero (Gaussian's "Low frequencies" line, see
-`tests/test_frequencies.py`); Kinisot prints them so that a genuine
-low-frequency vibration that has slipped below a rotational residual can be
-spotted. Eckart projection is planned (implementation plan, Phase 7).
+**External modes.** By default translations and rotations are not
+projected out: the eigenvalues are sorted and the six lowest (five for a
+linear molecule) are discarded; if the lowest mode is imaginary beyond the
+cutoff (default 50 cm⁻¹) it is the reaction coordinate and the six (five)
+next lowest are discarded instead. On tightly converged geometries the
+discarded modes are within a few cm⁻¹ of zero (Gaussian's "Low
+frequencies" line, see `tests/test_frequencies.py`); Kinisot prints them so
+that a genuine low-frequency vibration that has slipped below a rotational
+residual can be spotted.
 
-**Masses.** The light isotopologue uses the program's masses (pure
-most-abundant isotopes in Gaussian: ¹H 1.00783, ¹²C 12.00000, ¹⁶O
-15.99491). Substitution replaces them with ²H 2.0141, ¹³C 13.00335 and
-¹⁷O 16.9991 (`kinisot/isotopes.py`).
+With `--project` (`project=True`) the six (five) external directions are
+built in mass-weighted Cartesians from the geometry (translations
+√m_i e_k, rotations √m_i e_k × (r_i − r_com)), orthonormalized, and
+projected out: H'' = (1 − QQᵀ) H' (1 − QQᵀ). The external eigenvalues are
+then zero to numerical precision and are removed by magnitude; the
+reaction coordinate is the most negative remaining eigenvalue. On the
+bundled Gaussian examples the two treatments agree to 4 × 10⁻⁷ in the KIE
+and the projected frequencies match Gaussian's printed ones to 0.01 cm⁻¹;
+projection matters for Hessians with sizeable translational/rotational
+residuals (finite differences, machine-learned potentials).
+
+**Masses.** Both isotopologues are built from the isotope table in
+`kinisot/isotope_data.py` (AME 2020 masses via the `periodictable`
+package): the light one from the most abundant isotope of every element
+(¹H 1.0078250, ¹²C 12, ¹⁶O 15.9949146, the convention Gaussian uses) and
+the heavy one with the requested atoms replaced (²H 2.0141018, ¹³C
+13.0033548, ¹⁸O 17.9991596, ...). The masses reported by the program are
+used only to check that no isotope was substituted in its input.
 
 ## 2. Bigeleisen–Mayer reduced partition function ratios
 
@@ -104,9 +118,30 @@ The formula diverges as u‡ → 2π (T → h c |ν‡| / 2π k, the crossover
 temperature) and is meaningless below it: for a 1000i cm⁻¹ mode that is
 229 K. Above that limit it reproduces the Wigner correction 1 + u‡²/24 to
 first order; `--tunneling wigner` uses that expansion and `--tunneling none`
-turns the correction off. Kinisot prints both the uncorrected and the
+turns the correction off.
+
+**Skodje–Truhlar** (`--tunneling skodje`) adds the barrier height V to the
+parabolic model (Skodje, Truhlar, J. Phys. Chem. 1981, 85, 624). With
+α = 2π / (h ν‡) and β = 1 / (k T):
+
+    β ≤ α:  κ = (βπ/α) / sin(βπ/α) − β / (α − β) · exp[(β − α) V]
+    β > α:  κ = β / (β − α) · [exp((β − α) V) − 1]
+
+and the correction is κ_L / κ_H. V is the electronic barrier measured from
+the higher of reactant and product (for a KIE Kinisot uses E(TS) − ΣE(R)
+from the energies in the files, or `--barrier` in kcal/mol). For large V
+the first branch reduces to Bell; the second branch stays finite below the
+crossover temperature. Kinisot prints both the uncorrected and the
 corrected KIE; report the one that matches the model used in the work you
 compare with.
+
+## 4a. Reference isotopologue
+
+Natural-abundance NMR experiments report KIEs relative to a position
+assumed to have no isotope effect. `--reference ATOMS` computes that
+isotopologue too and reports KIE / KIE_ref (`kie_relative`,
+`kie_tunnel_relative`), so computed and measured numbers are on the same
+footing.
 
 ## 5. Scaling factors
 

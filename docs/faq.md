@@ -44,11 +44,17 @@ database for the detected level of theory, or 1.0 if it is not listed.
 Give `-s` to override. Only ZPE, EXC and the tunnelling correction depend
 on it; the V-ratio and TRPF are ratios of frequencies and cancel it.
 
-**Why ¹⁷O rather than ¹⁸O?** Historical: the oxygen substitution has
-always been ¹⁷O in Kinisot (the isotope measured by ¹⁷O NMR in the Claisen
-example). Phase 7 of the implementation plan adds an explicit isotope
-syntax (`--iso 5:18O`) and changes the bare-index default to ¹⁸O with a
-warning.
+**Which isotope does a bare atom number mean?** The usual heavy label:
+²H, ¹³C, ¹⁵N, ¹⁸O, ³⁴S, ³⁷Cl, ⁸¹Br, ²⁹Si. Anything else is asked for
+explicitly (`--iso 3:17O`, `7:D`, `7:T`, `5:14C`, or a mass `5:13.5`).
+Kinisot ≤ 2.3 substituted ¹⁷O for oxygen (the isotope measured by ¹⁷O NMR
+in the Claisen study); 2.4 uses ¹⁸O and prints a note once when it sees a
+bare oxygen index.
+
+**Should I use `--project`?** For Gaussian and ORCA analytic Hessians on
+converged geometries it makes no practical difference (below 10⁻⁶ in the
+KIE). Use it for finite-difference Hessians or any file whose "discarded"
+modes are not all within a few tens of cm⁻¹ of zero.
 
 **Can I use several conformers?** Not in one run. Compute the KIE for
 each reactant/TS conformer pair and Boltzmann-average the rate constants,

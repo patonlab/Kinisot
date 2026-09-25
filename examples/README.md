@@ -7,7 +7,7 @@ frequency outputs the examples read live in `../tests/data/gaussian/`.
 
 | Example | Reaction | Effect | Files |
 | --- | --- | --- | --- |
-| [claisen](claisen/README.md) | Claisen rearrangement of allyl vinyl ether | ¹³C and ²H KIEs at 393 K | `claisen_gs.out`, `claisen_ts.out` |
+| [claisen](claisen/README.md) | Claisen rearrangement of allyl vinyl ether | ¹³C, ¹⁸O/¹⁷O and ²H KIEs at 393 K; projection, reference isotopologue, Skodje–Truhlar, temperature scan | `claisen_gs.out`, `claisen_ts.out` |
 | [diels_alder](diels_alder/README.md) | Diels–Alder reaction of isoprene with maleic anhydride | ¹³C and ²H KIEs at 298 K; one versus two reactant files | `dienophile.out`, `diene.out`, `DATS_rct.out`, `DATS.out` |
 | [orca_claisen](orca_claisen/README.md) | the Claisen KIE from ORCA `.out`/`.hess` files, scaling factor detected from the `!` line | ¹³C KIE at 393 K | `tests/data/orca/*` |
 | [eqe_cyclohexane](eqe_cyclohexane/README.md) | CD₃ axial/equatorial preference in 1,1,3,3-tetramethylcyclohexane | equilibrium isotope effect at 290 and 300 K | `tetramethylcyclohexane.out` |

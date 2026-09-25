@@ -22,8 +22,11 @@ from .backends import load_hessian
 from .exceptions import KinisotInputError, KinisotWarning
 from .hessian import mass_weight
 from .isotopes import substitute
+from .projection import project_external_modes
 from .scaling import ScalingChoice, choose_scaling_factor
 from .thermo import (
+    HARTREE_TO_KCAL_PER_MOL,
+    TUNNELING_MODELS,
     harmonic_frequencies,
     log_excitation_factor,
     log_product_factor,
@@ -54,6 +57,7 @@ class SpeciesResult:
     log_pf: float
     log_zpe: float
     log_exc: float
+    projected: bool = False  # external modes projected out before diagonalization
 
     @property
     def name(self):
@@ -69,6 +73,7 @@ class SpeciesResult:
             "discarded_modes": list(self.discarded),
             "imaginary_frequency": self.imaginary,
             "linear": self.linear,
+            "projected": self.projected,
             "log_product_factor": self.log_pf,
             "log_zpe_factor": self.log_zpe,
             "log_excitation_factor": self.log_exc,
@@ -188,6 +193,18 @@ class IsotopeEffect:
     kie_tunnel: float
     warnings: Tuple[str, ...] = field(default_factory=tuple)
     version: str = __version__
+    project: bool = False
+    barrier: Optional[float] = None  # kcal/mol, used by the Skodje-Truhlar correction
+    reference: Optional["IsotopeEffect"] = None  # a second isotopologue the KIE is divided by
+
+    @property
+    def kie_relative(self):
+        """KIE divided by the reference isotopologue's KIE (None without a reference)."""
+        return self.kie / self.reference.kie if self.reference is not None else None
+
+    @property
+    def kie_tunnel_relative(self):
+        return self.kie_tunnel / self.reference.kie_tunnel if self.reference is not None else None
 
     @property
     def scale_factor(self):
@@ -217,6 +234,8 @@ class IsotopeEffect:
             "level_of_theory": self.scaling.level,
             "imag_cutoff": self.imag_cutoff,
             "tunneling": self.tunneling,
+            "barrier_kcal": self.barrier,
+            "project": self.project,
             "imag_ratio": self.imag_ratio,
             "zpe": self.zpe,
             "exc": self.exc,
@@ -227,6 +246,9 @@ class IsotopeEffect:
             "reactant": self.reactant.to_dict(),
             "transition_structure" if self.kind == "KIE" else "product": self.other.to_dict(),
             "warnings": list(self.warnings),
+            "reference": self.reference.to_dict() if self.reference is not None else None,
+            "kie_relative": self.kie_relative,
+            "kie_tunnel_relative": self.kie_tunnel_relative,
         }
 
     def to_json(self, indent=2):
@@ -241,7 +263,9 @@ class IsotopeEffect:
             "labels": ";".join(self.reactant.heavy.labels + self.other.heavy.labels),
             "temperature": self.temperature,
             "scale_factor": self.scaling.factor,
+            "project": self.project,
             "tunneling": self.tunneling,
+            "barrier_kcal": self.barrier,
             "imag_light": self.other.light.imaginary,
             "imag_heavy": self.other.heavy.imaginary,
             "imag_ratio": self.imag_ratio,
@@ -251,40 +275,89 @@ class IsotopeEffect:
             "kie": self.kie,
             "tunnel_corr": self.tunnel_corr,
             "kie_tunnel": self.kie_tunnel,
+            "reference_labels": ";".join(self.reference.reactant.heavy.labels + self.reference.other.heavy.labels)
+            if self.reference is not None
+            else "",
+            "kie_relative": self.kie_relative,
+            "kie_tunnel_relative": self.kie_tunnel_relative,
         }
 
 
-def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out):
+def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out, project=False):
     """Diagonalize one HessianInput for one isotope label."""
-    masses, applied = substitute(data, label)
-    freqs = harmonic_frequencies(mass_weight(data.hessian, masses)) * scale
-
-    # 5 or 6 external modes are removed (linear / non-linear molecule), plus one
-    # reaction-coordinate mode when it is imaginary beyond the cutoff
-    n_external = 5 if data.linear else 6
-    imaginary_modes = freqs[freqs < -imag_cutoff]
-    imaginary = None
-    if len(imaginary_modes):
-        imaginary = -float(freqs[0])
-        n_external += 1
-        if len(imaginary_modes) > 1:
-            message = (
-                "%s has %d imaginary frequencies beyond the %.1f cm-1 cutoff (%s); only the largest is "
-                "treated as the reaction coordinate and the others are discarded with the external modes, "
-                "which leaves one low-frequency external mode in the vibrational product. Check the structure."
-                % (data.source, len(imaginary_modes), imag_cutoff, ", ".join("%.1fi" % -f for f in imaginary_modes))
-            )
+    notes = []
+    masses, applied = substitute(data, label, notes)
+    for message in notes:
+        if message not in warnings_out:
             warnings_out.append(message)
             warnings.warn(message, KinisotWarning, stacklevel=4)
-    discarded = freqs[(1 if imaginary is not None else 0) : n_external]
-    kept = freqs[n_external:]
+
+    mw_hessian = mass_weight(data.hessian, masses)
+    if project:
+        if data.positions is None:
+            raise KinisotInputError(
+                "%s: projecting the external modes needs the geometry, which this input does not carry" % data.source
+            )
+        mw_hessian, n_external = project_external_modes(mw_hessian, data.positions, masses)
+        freqs = harmonic_frequencies(mw_hessian) * scale
+        # the external modes are now ~0: remove them by magnitude, keep the rest in order
+        order = np.argsort(np.abs(freqs))
+        discarded = np.sort(freqs[order[:n_external]])
+        remaining = np.sort(freqs[order[n_external:]])
+    else:
+        freqs = harmonic_frequencies(mw_hessian) * scale
+        n_external = 5 if data.linear else 6
+        discarded = None
+        remaining = None
+
+    if project:
+        imaginary_modes = remaining[remaining < -imag_cutoff]
+        imaginary = -float(remaining[0]) if len(imaginary_modes) else None
+        kept = remaining[1:] if imaginary is not None else remaining
+        extra_discarded = np.array([])
+    else:
+        # 5 or 6 external modes are removed (linear / non-linear molecule), plus one
+        # reaction-coordinate mode when it is imaginary beyond the cutoff
+        imaginary_modes = freqs[freqs < -imag_cutoff]
+        imaginary = -float(freqs[0]) if len(imaginary_modes) else None
+        n_drop = n_external + (1 if imaginary is not None else 0)
+        discarded = freqs[(1 if imaginary is not None else 0) : n_drop]
+        kept = freqs[n_drop:]
+        extra_discarded = np.array([])
+    if len(imaginary_modes) > 1:
+        message = (
+            "%s has %d imaginary frequencies beyond the %.1f cm-1 cutoff (%s); only the largest is "
+            "treated as the reaction coordinate and the others %s. Check the structure."
+            % (
+                data.source,
+                len(imaginary_modes),
+                imag_cutoff,
+                ", ".join("%.1fi" % -f for f in imaginary_modes),
+                "stay in the vibrational product as negative frequencies, which is an error below"
+                if project
+                else "are discarded with the external modes, which leaves one low-frequency external mode in the "
+                "vibrational product",
+            )
+        )
+        warnings_out.append(message)
+        warnings.warn(message, KinisotWarning, stacklevel=4)
+    if np.any(kept <= 0):
+        raise KinisotInputError(
+            "%s: %d non-positive frequencies remain after removing %d external modes (%s); the structure "
+            "is not a stationary point Kinisot can use"
+            % (data.source, int(np.sum(kept <= 0)), n_external, ", ".join("%.1f" % f for f in kept[kept <= 0]))
+        )
+    del extra_discarded
+
     if not applied and data.program_frequencies is not None:
         # Self-check for the unsubstituted species: Kinisot must reproduce the program's frequencies
         # (which are projected, hence the 1 cm-1 tolerance). Catches unit and mass-convention mistakes.
-        # Drop the 5/6 modes closest to zero regardless of the cutoff, so the check is cutoff independent.
-        n_base = 5 if data.linear else 6
-        mine = np.sort(freqs[np.argsort(np.abs(freqs))[n_base:]]) / scale
         theirs = np.sort(np.asarray(data.program_frequencies, dtype=float))
+        if project:
+            mine = np.sort(remaining) / scale
+        else:
+            # Drop the 5/6 modes closest to zero regardless of the cutoff, so the check is cutoff independent.
+            mine = np.sort(freqs[np.argsort(np.abs(freqs))[n_external:]]) / scale
         largest = float(np.abs(mine - theirs).max()) if len(mine) == len(theirs) else float("nan")
         if len(mine) != len(theirs) or largest > 1.0:
             message = (
@@ -294,12 +367,6 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out)
             )
             warnings_out.append(message)
             warnings.warn(message, KinisotWarning, stacklevel=4)
-    if np.any(kept <= 0):
-        raise KinisotInputError(
-            "%s: %d non-positive frequencies remain after removing %d external modes (%s); the structure "
-            "is not a stationary point Kinisot can use"
-            % (data.source, int(np.sum(kept <= 0)), n_external, ", ".join("%.1f" % f for f in kept[kept <= 0]))
-        )
     return SpeciesResult(
         source=str(data.source),
         label=str(label),
@@ -312,13 +379,14 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out)
         log_pf=log_product_factor(kept),
         log_zpe=log_zpe_factor(kept, temperature),
         log_exc=log_excitation_factor(kept, temperature),
+        projected=project,
     )
 
 
-def evaluate_isotopologue(inputs, labels, temperature, scale, imag_cutoff, warnings_out):
+def evaluate_isotopologue(inputs, labels, temperature, scale, imag_cutoff, warnings_out, project=False):
     """Evaluate one isotopologue of one side (one label per input)."""
     species = tuple(
-        evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out)
+        evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out, project)
         for data, label in zip(inputs, labels)
     )
     with_imaginary = [s for s in species if s.imaginary is not None]
@@ -382,6 +450,9 @@ def compute_kie(
     imag_cutoff=50.0,
     tunneling="bell",
     scale_type="zpe",
+    project=False,
+    barrier=None,
+    reference=None,
 ):
     """Compute a kinetic (``ts``) or equilibrium (``prd``) isotope effect.
 
@@ -400,9 +471,18 @@ def compute_kie(
         for the detected level of theory (1.0 if not found).
     imag_cutoff : float, cm-1
         A mode below -imag_cutoff is the reaction coordinate.
-    tunneling : 'bell' (default), 'wigner' or 'none'.
+    tunneling : 'bell' (default), 'wigner', 'skodje' (Skodje-Truhlar) or 'none'.
     scale_type : which Truhlar factor to use when ``scale`` is None: 'zpe'
         (default), 'harm' or 'fund'.
+    project : project translations and rotations out of the Hessian before
+        diagonalizing (needs geometries) instead of discarding the 5/6
+        lowest modes.
+    barrier : barrier height in kcal/mol for the Skodje-Truhlar correction;
+        by default the electronic energies read from the files
+        (E(TS) - sum E(reactants)).
+    reference : isotope label(s) of a second isotopologue; the result's
+        ``reference`` holds its IsotopeEffect and ``kie_relative`` /
+        ``kie_tunnel_relative`` the ratios.
 
     Returns
     -------
@@ -421,8 +501,10 @@ def compute_kie(
         raise KinisotInputError("temperature must be positive (got %s K)" % temperature)
     if scale is not None and scale <= 0:
         raise KinisotInputError("the vibrational scaling factor must be positive (got %s)" % scale)
-    if tunneling not in ("none", "bell", "wigner"):
-        raise KinisotInputError("unknown tunnelling model %r (choose from none, bell, wigner)" % (tunneling,))
+    if tunneling not in TUNNELING_MODELS:
+        raise KinisotInputError(
+            "unknown tunnelling model %r (choose from %s)" % (tunneling, ", ".join(TUNNELING_MODELS))
+        )
 
     kind = "KIE" if ts is not None else "EQE"
     side_name = "transition structure" if kind == "KIE" else "product"
@@ -436,12 +518,14 @@ def compute_kie(
     collected = []
     n = len(reactants)
     reactant = SideResult(
-        evaluate_isotopologue(reactants, ["0"] * n, temperature, scaling.factor, imag_cutoff, collected),
-        evaluate_isotopologue(reactants, labels[:n], temperature, scaling.factor, imag_cutoff, collected),
+        evaluate_isotopologue(reactants, ["0"] * n, temperature, scaling.factor, imag_cutoff, collected, project),
+        evaluate_isotopologue(reactants, labels[:n], temperature, scaling.factor, imag_cutoff, collected, project),
     )
     other = SideResult(
-        evaluate_isotopologue(others, ["0"] * len(others), temperature, scaling.factor, imag_cutoff, collected),
-        evaluate_isotopologue(others, labels[n:], temperature, scaling.factor, imag_cutoff, collected),
+        evaluate_isotopologue(
+            others, ["0"] * len(others), temperature, scaling.factor, imag_cutoff, collected, project
+        ),
+        evaluate_isotopologue(others, labels[n:], temperature, scaling.factor, imag_cutoff, collected, project),
     )
 
     # Reactants (and products) must be minima
@@ -473,9 +557,23 @@ def compute_kie(
     trpf = reactant.trpf_factor / other.trpf_factor
     kie = imag_ratio * zpe * exc * trpf
     if kind == "KIE":
-        tunnel_corr = tunneling_correction(tunneling, other.light.imaginary, other.heavy.imaginary, temperature)
+        if tunneling == "skodje" and barrier is None:
+            energies = [d.energy for d in reactants + others]
+            if all(e is not None for e in energies):
+                barrier = (sum(d.energy for d in others) - sum(d.energy for d in reactants)) * HARTREE_TO_KCAL_PER_MOL
+        tunnel_corr = tunneling_correction(
+            tunneling, other.light.imaginary, other.heavy.imaginary, temperature, barrier
+        )
     else:
         tunnel_corr = 1.0
+
+    reference_result = None
+    if reference is not None:
+        reference_result = compute_kie(
+            reactants, others if kind == "KIE" else None, others if kind == "EQE" else None, iso=reference,
+            temperature=temperature, scale=scaling.factor, imag_cutoff=imag_cutoff, tunneling=tunneling,
+            scale_type=scale_type, project=project, barrier=barrier,
+        )  # fmt: skip
 
     return IsotopeEffect(
         kind=kind,
@@ -493,4 +591,7 @@ def compute_kie(
         tunnel_corr=float(tunnel_corr),
         kie_tunnel=float(kie * tunnel_corr),
         warnings=tuple(collected),
+        project=project,
+        barrier=barrier if tunneling == "skodje" else None,
+        reference=reference_result,
     )

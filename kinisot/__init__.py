@@ -11,15 +11,16 @@ Python::
     result.kie_tunnel, result.zpe, result.exc, result.trpf, result.to_dict()
 """
 
-__version__ = "2.3.0.dev0"
+__version__ = "2.4.0.dev0"
 
 from .api import IsotopeEffect, IsotopologueResult, SideResult, SpeciesResult, compute_kie
 from .backends import load_hessian
 from .backends.gaussian import parse_gaussian
 from .exceptions import KinisotError, KinisotInputError, KinisotParseError, KinisotWarning
 from .hessian import HessianInput, mass_weight
-from .isotopes import Substitution, substitute
+from .isotopes import Substitution, isotope_mass, light_mass, substitute
 from .Kinisot import compute_isotope_effect  # deprecated, removed in 3.0
+from .projection import project_external_modes
 from .scaling import ScalingChoice, choose_scaling_factor, find_scaling_factor
 from .thermo import harmonic_frequencies
 
@@ -35,6 +36,9 @@ __all__ = [
     "parse_gaussian",
     "substitute",
     "Substitution",
+    "isotope_mass",
+    "light_mass",
+    "project_external_modes",
     "mass_weight",
     "harmonic_frequencies",
     "find_scaling_factor",

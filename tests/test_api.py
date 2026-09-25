@@ -57,7 +57,7 @@ def test_species_details(claisen):
     assert light.name == "claisen_ts" and light.label == "0" and heavy.label == "5"
     assert light.imaginary == pytest.approx(463.9, abs=0.05)
     assert len(light.frequencies) == 35 and len(light.discarded) == 6
-    assert [s.atom for s in heavy.substitutions] == [5] and heavy.masses[4] == pytest.approx(13.00335)
+    assert [s.atom for s in heavy.substitutions] == [5] and heavy.masses[4] == pytest.approx(13.00335, abs=1e-5)
     assert claisen.reactant.light.species[0].imaginary is None
     assert claisen.reactant.heavy.labels == ("5",)
     assert claisen.other.name == "claisen_ts"
@@ -68,9 +68,9 @@ def test_to_dict_and_json_round_trip(claisen):
     text = claisen.to_json()
     assert json.loads(text) == d
     assert d["kie_tunnel"] == claisen.kie_tunnel and d["kind"] == "KIE"
-    assert d["transition_structure"]["heavy"]["species"][0]["substitutions"] == [
-        {"atom": 5, "element": "C", "light_mass": 12.0, "heavy_mass": 13.00335}
-    ]
+    sub = d["transition_structure"]["heavy"]["species"][0]["substitutions"][0]
+    assert sub["atom"] == 5 and sub["element"] == "C" and sub["isotope"] == "13C"
+    assert sub["light_mass"] == 12.0 and sub["heavy_mass"] == pytest.approx(13.003355, abs=1e-6)
     assert d["reactant"]["light"]["species"][0]["imaginary_frequency"] is None
     assert d["scale_source"] == "user" and d["warnings"] == []
     row = claisen.summary_row()

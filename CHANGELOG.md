@@ -2,6 +2,50 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.0] - Unreleased
+
+Phase 7 of the [implementation plan](IMPLEMENTATION_PLAN.md): isotopes,
+external modes, tunnelling.
+
+### Added
+
+- **Isotope table** (`kinisot/isotope_data.py`, generated from the
+  `periodictable` package: AME 2020 masses for every naturally occurring
+  isotope of 83 elements plus ³H, ¹¹C, ¹⁴C, ¹³N, ¹⁵O, ¹⁸F, ³²P, ³³P, ³⁵S,
+  ³⁶Cl, ¹²⁵I, ¹³¹I). Both isotopologues are built from it, so Gaussian, ORCA
+  and any other program give the same numbers for the same Hessian.
+- **Explicit isotope syntax**: `--iso 5:13C`, `3:17O`, `7:D`, `7:T`, or an
+  explicit mass `5:13.5`; a bare number means the default heavy label
+  (H, C, N, O, S, Cl, Br, Si). Labels that do not match the atom's element
+  are refused.
+- **Eckart projection** of translations and rotations (`--project`,
+  `project=True`); external modes are removed by value and the reaction
+  coordinate is the most negative remaining mode. Needs the geometry, which
+  the Gaussian (archive) and ORCA (`$atoms`) readers now provide.
+- **Skodje–Truhlar tunnelling** (`--tunneling skodje`, barrier from
+  `--barrier KCAL` or from the electronic energies now read from the files:
+  Gaussian archive `HF=`, ORCA `FINAL SINGLE POINT ENERGY`).
+- **Reference isotopologue** (`--reference ATOMS`, `reference=`): the KIE
+  is also reported relative to a second substitution.
+- **Temperature scans**: `-t 273,298,323` or `-t 250:350:10` give one
+  result line per temperature (and one JSON entry / CSV row each).
+
+### Changed
+
+- **Bare oxygen index means ¹⁸O** (was ¹⁷O); a note is printed once per
+  file in this release. `3:17O` gives the old behaviour.
+- **Isotope masses** moved from the five-decimal values of Kinisot 1.x/2.x
+  (¹H 1.00783, ²H 2.0141, ¹³C 13.00335, ¹⁷O 16.9991) to AME 2020. Largest
+  change in a golden KIE: 1.2 × 10⁻⁶ relative (the H7,H8 Claisen case);
+  a few bundled results move in the sixth decimal. Golden tests updated.
+- Projection versus the lowest-six rule on the bundled Gaussian examples:
+  the corrected KIEs differ by 5 × 10⁻⁸ (Claisen C4), 4 × 10⁻⁷ (Claisen
+  H7,H8), 2 × 10⁻⁸ (Diels–Alder C15) and 3 × 10⁻⁸ (CD₃ EQE). Projection
+  stays off by default for Gaussian/ORCA input through 2.x, as decided.
+- The `substitute()` API returns AME masses and records the isotope in each
+  `Substitution`; `parse_label()` returns `(index, symbol, mass number,
+  mass)` tuples.
+
 ## [2.3.0] - Unreleased
 
 Phase 5 of the [implementation plan](IMPLEMENTATION_PLAN.md): GoodVibes

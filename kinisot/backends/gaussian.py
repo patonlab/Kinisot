@@ -53,6 +53,17 @@ def _find_archive(lines):
     return archive
 
 
+def _energy_from_archive(archive):
+    """Electronic energy (Hartree) from the archive's HF= field, or None."""
+    for field in archive.split("\\"):
+        if field.startswith("HF="):
+            try:
+                return float(field[3:])
+            except ValueError:
+                return None
+    return None
+
+
 def _level_from_archive(archive):
     fields = archive.split("\\")
     if len(fields) > 5 and fields[4] and fields[5]:
@@ -158,6 +169,7 @@ def parse_gaussian(file):
         linear=linear,
         positions=_positions_from_archive(archive, natoms),
         program_frequencies=tuple(printed[-(3 * natoms - 5) :]) if printed else None,
+        energy=_energy_from_archive(archive),
     )
 
 

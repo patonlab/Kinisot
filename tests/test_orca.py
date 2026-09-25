@@ -12,6 +12,7 @@ from kinisot.backends import detect_program
 from kinisot.backends.gaussian import is_linear, parse_gaussian
 from kinisot.backends.orca import orca_paths, parse_orca
 from kinisot.hessian import linear_from_geometry, mass_weight
+from kinisot.isotopes import light_masses
 from kinisot.scaling import find_scaling_factor
 
 GS_G, TS_G = datapath("gaussian/claisen_gs.out"), datapath("gaussian/claisen_ts.out")
@@ -43,8 +44,9 @@ def test_orca_input_matches_gaussian():
     g, o = parse_gaussian(GS_G), parse_orca(GS_O)
     assert o.program == "Orca" and o.level_of_theory == "B3LYP/6-31G(d)"
     assert o.atomic_numbers == g.atomic_numbers and o.symbols[:3] == ("C", "C", "O")
-    # ORCA's standard atomic weights are replaced by the pure-isotope masses Gaussian uses
-    assert o.masses == pytest.approx(g.masses)
+    # ORCA reports standard atomic weights; both isotopologues are built from Kinisot's table anyway
+    assert o.masses[0] == 12.011 and g.masses[0] == 12.0
+    assert light_masses(o) == light_masses(g)
     assert np.abs(o.hessian - g.hessian).max() < 1e-9
     assert np.abs(o.positions - g.positions).max() < 1e-6
     assert o.program_frequencies is not None and len(o.program_frequencies) == 36
@@ -151,6 +153,7 @@ def test_unsubstitutable_orca_element_keeps_program_mass(tmp_path):
     (tmp_path / "n.hess").write_text(text)
     data = parse_orca(str(tmp_path / "n.hess"))
     assert data.symbols[2] == "N" and data.masses[2] == 14.007 and data.level_of_theory is None
+    assert light_masses(data)[2] == pytest.approx(14.003074, abs=1e-6)
 
 
 def test_synthetic_gaussian_without_frequencies_skips_check(tmp_path):

@@ -8,10 +8,9 @@ and the level of theory from the output with GoodVibes' ORCA-aware
 ``level_of_theory``.
 
 Masses: ORCA reports standard atomic weights (C 12.011) rather than pure
-isotopes. For the elements Kinisot can substitute the light isotopologue is
-built from the pure-isotope masses of :mod:`kinisot.isotopes` so that the
-same Hessian gives the same numbers whichever program produced it; other
-elements keep ORCA's masses until the full isotope table of Phase 7.
+isotopes. They are stored as reported; :mod:`kinisot.isotopes` builds both
+isotopologues from its own AME 2020 table and only uses the reported masses
+to check that no isotope was substituted in ORCA's input.
 """
 
 import os
@@ -21,7 +20,7 @@ from goodvibes.io import parse_hessian as _gv_parse_hessian
 
 from ..exceptions import KinisotParseError
 from ..hessian import HessianInput, linear_from_geometry
-from ..isotopes import ELEMENT_SYMBOLS, SUBSTITUTIONS
+from ..isotopes import ELEMENT_SYMBOLS
 
 __all__ = ["parse_orca", "orca_paths"]
 
@@ -87,17 +86,23 @@ def parse_orca(file):
         )
 
     atomic_numbers = []
-    masses = []
-    for symbol, mass in zip(symbols, orca_masses):
+    for symbol in symbols:
         z = _ATOMIC_NUMBERS.get(symbol.upper())
         if z is None:
             raise KinisotParseError("%s: unknown element symbol %r in $atoms" % (hess_path, symbol))
         atomic_numbers.append(z)
-        entry = SUBSTITUTIONS.get(ELEMENT_SYMBOLS[z])
-        masses.append(entry[1] if entry is not None else mass)
+    masses = orca_masses
 
     level = None
+    energy = None
     if out is not None:
+        try:
+            with open(out, encoding="utf-8", errors="replace") as handle:
+                for line in handle:
+                    if line.startswith("FINAL SINGLE POINT ENERGY"):
+                        energy = float(line.split()[-1])
+        except (OSError, ValueError):
+            energy = None
         try:
             level = _gv_level_of_theory(out)
         except (OSError, ValueError, IndexError):
@@ -118,4 +123,5 @@ def parse_orca(file):
         linear=linear_from_geometry(positions, masses),
         positions=positions,
         program_frequencies=tuple(vibrational) if vibrational else None,
+        energy=energy,
     )

@@ -34,6 +34,11 @@ CI runs the same commands on Linux, macOS and Windows for Python 3.9–3.13.
   Kinisot reads (see `docs/file_formats.md`), or build synthetic files with
   the helpers in `tests/conftest.py`.
 
+## Regenerating data
+
+`python scripts/make_isotope_data.py` rebuilds `kinisot/isotope_data.py` from
+the `periodictable` package (AME 2020 masses); commit the result.
+
 ## Adding a backend (ORCA, ASE, ...)
 
 See `kinisot/backends/orca.py` for a complete example and

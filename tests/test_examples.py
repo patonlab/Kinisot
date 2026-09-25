@@ -43,8 +43,8 @@ COMMANDS = example_commands()
 
 
 def test_all_example_commands_found():
-    assert len(COMMANDS) == 21
-    assert sum(1 for case, _, _ in COMMANDS if case == "claisen") == 7
+    assert len(COMMANDS) == 26
+    assert sum(1 for case, _, _ in COMMANDS if case == "claisen") == 12
 
 
 @pytest.mark.parametrize("case", sorted({case for case, _, _ in COMMANDS}))

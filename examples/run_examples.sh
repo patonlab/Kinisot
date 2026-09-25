@@ -21,10 +21,16 @@ rm -f "$HERE"/*/expected_output.dat
 cd "$DATA"
 
 # Claisen rearrangement of allyl vinyl ether at 393 K, B3LYP/6-31G(d) frequencies scaled by 0.961.
-# One run per position: 13C at C1-C6 and the 2H2 effect at the C7/C8 (CH2 of the vinyl group) hydrogens.
-for atoms in 1 2 3 4 5 6 7,8; do
+# One run per position: 13C at C1-C6, 18O and 17O at O3, and the 2H2 effect at hydrogens 7 and 8.
+for atoms in 1 2 3:18O 3:17O 4 5 6 7,8; do
     run claisen --rct claisen_gs.out --ts claisen_ts.out --iso "$atoms" -t 393 -s 0.961
 done
+# The same C4 KIE with the external modes projected out, relative to C5 as an internal reference,
+# with the Skodje-Truhlar correction (barrier from the energies in the files), and as a temperature scan.
+run claisen --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 393 -s 0.961 --project
+run claisen --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 393 -s 0.961 --reference 5
+run claisen --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 393 -s 0.961 --tunneling skodje
+run claisen --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 300:400:50 -s 0.961
 
 # Diels-Alder reaction of isoprene with maleic anhydride at 298.15 K, scaled by 0.963.
 # First the same 13C KIE from (a) the pre-reaction complex as a single reactant file and

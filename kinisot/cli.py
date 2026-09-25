@@ -56,8 +56,35 @@ class Logger:
             self.log.close()
 
 
-def write_results(log, result):
-    """Write the results table for one calculation to the log."""
+def parse_temperatures(text):
+    """'393' -> [393.0]; '273,298,323' -> list; '250:350:10' -> range (inclusive end)."""
+    values = []
+    for part in str(text).replace(";", ",").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if ":" in part:
+            pieces = part.split(":")
+            if len(pieces) != 3:
+                raise ValueError("temperature range must be START:STOP:STEP (got %r)" % part)
+            start, stop, step = (float(p) for p in pieces)
+            if step <= 0 or stop < start:
+                raise ValueError("temperature range %r must have STOP >= START and STEP > 0" % part)
+            t = start
+            while t <= stop + 1e-9:
+                values.append(round(t, 6))
+                t += step
+        else:
+            values.append(float(part))
+    if not values:
+        raise ValueError("no temperature given")
+    return values
+
+
+def write_results(log, results):
+    """Write the results table for one calculation (one or more temperatures) to the log."""
+    results = list(results)
+    result = results[0]
     is_kie = result.kind == "KIE"
     rct, oth = result.reactant, result.other
     rct_iso, oth_iso = " / ".join(rct.heavy.labels), " / ".join(oth.heavy.labels)
@@ -66,12 +93,16 @@ def write_results(log, result):
         "\n\n"
         + (SPACE * 17)
         + "  Temp = "
-        + str(result.temperature)
+        + (str(result.temperature) if len(results) == 1 else ", ".join(str(r.temperature) for r in results))
         + "K / Vib. scale factor = "
         + str(result.scale_factor)
     )
     if is_kie and result.tunneling != "bell":
         log.Write(" / tunnelling: " + result.tunneling)
+        if result.barrier is not None:
+            log.Write(" (barrier %.2f kcal/mol)" % result.barrier)
+    if result.project:
+        log.Write(" / external modes projected")
     log.Write(("\n  ").ljust(50))
     log.Write(
         " {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n".format(
@@ -97,29 +128,43 @@ def write_results(log, result):
         log.Write("{:21.3e} {:10.3e} {:10.3e}".format(oth.zpe_factor, oth.exc_factor, oth.trpf_factor))
 
     log.Write("\n" + DASH_LINE)
-    log.Write(("\n  " + result.kind + " @ " + str(result.temperature) + " K").ljust(50))
-    if is_kie:
-        log.Write(
-            "{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
-                result.imag_ratio,
-                result.zpe,
-                result.exc,
-                result.trpf,
-                result.kie,
-                result.tunnel_corr,
-                result.kie_tunnel,
+    for r in results:
+        log.Write(("\n  " + r.kind + " @ " + str(r.temperature) + " K").ljust(50))
+        if is_kie:
+            log.Write(
+                "{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
+                    r.imag_ratio, r.zpe, r.exc, r.trpf, r.kie, r.tunnel_corr, r.kie_tunnel
+                )
             )
-        )
-    else:
-        log.Write(
-            "{:21.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
-                result.zpe, result.exc, result.trpf, result.kie, result.tunnel_corr, result.kie_tunnel
+        else:
+            log.Write(
+                "{:21.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
+                    r.zpe, r.exc, r.trpf, r.kie, r.tunnel_corr, r.kie_tunnel
+                )
             )
-        )
+        if r.reference is not None:
+            ref = r.reference
+            log.Write(
+                ("\n  relative to iso @ " + " / ".join(ref.reactant.heavy.labels + ref.other.heavy.labels) + ":").ljust(
+                    50
+                )
+            )
+            log.Write(
+                "{:>43} {:10.6f} {:>10} {:10.6f}".format(
+                    "%s = %.6f" % (r.kind, ref.kie), r.kie_relative, "", r.kie_tunnel_relative
+                )
+                if is_kie
+                else "{:>54} {:10.6f} {:>10} {:10.6f}".format(
+                    "%s = %.6f" % (r.kind, ref.kie), r.kie_relative, "", r.kie_tunnel_relative
+                )
+            )
     log.Write("\n" + DASH_LINE + "\n")
 
     # Which modes went into the partition functions, so that a misassigned external mode is visible
-    log.Write("\n  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes\n")
+    log.Write(
+        "\n  Vibrational modes (scaled, cm-1): kept in the partition function / %s as external modes\n"
+        % ("projected out (residual values)" if result.project else "discarded")
+    )
     for isotopologue, tags in (
         (rct.light, None),
         (rct.heavy, rct.heavy.labels),
@@ -139,9 +184,10 @@ def write_results(log, result):
 
 
 def write_json(path, result):
-    """Write the full result of one run as a JSON document (overwrites ``path``)."""
+    """Write the full result of one run (or a list, one per temperature) as JSON (overwrites ``path``)."""
+    payload = [r.to_dict() for r in result] if isinstance(result, list) else result.to_dict()
     with open(path, "w") as handle:
-        json.dump(result.to_dict(), handle, indent=2)
+        json.dump(payload, handle, indent=2)
         handle.write("\n")
 
 
@@ -189,9 +235,10 @@ def build_parser():
         "-t",
         "--temperature",
         dest="temperature",
-        type=float,
-        default=298.15,
-        help="temperature in Kelvin (default 298.15)",
+        default="298.15",
+        metavar="K",
+        help="temperature in Kelvin (default 298.15); a list (273,298,323) or a range (250:350:10) gives one "
+        "result line per temperature",
     )
     parser.add_argument(
         "-s",
@@ -221,9 +268,35 @@ def build_parser():
         "--tunneling",
         "--tunnelling",
         dest="tunneling",
-        choices=["bell", "wigner", "none"],
+        choices=["bell", "wigner", "skodje", "none"],
         default="bell",
-        help="tunnelling correction for a KIE: Bell infinite parabola (default), Wigner, or none",
+        help="tunnelling correction for a KIE: Bell infinite parabola (default), Wigner, Skodje-Truhlar (needs the "
+        "barrier: --barrier, or electronic energies in the files), or none",
+    )
+    parser.add_argument(
+        "--barrier",
+        dest="barrier",
+        type=float,
+        default=None,
+        metavar="KCAL",
+        help="barrier height in kcal/mol for --tunneling skodje (default: E(TS) - E(reactants) from the files)",
+    )
+    parser.add_argument(
+        "--project",
+        dest="project",
+        action="store_true",
+        default=False,
+        help="project translations and rotations out of the Hessian before diagonalizing (uses the geometry) "
+        "instead of discarding the 5/6 lowest modes",
+    )
+    parser.add_argument("--no-project", dest="project", action="store_false", help=SUPPRESS)
+    parser.add_argument(
+        "--reference",
+        dest="reference",
+        action="append",
+        metavar="ATOMS",
+        help="isotope label(s) of a reference isotopologue (same form as --iso); the KIE is also reported divided "
+        "by the reference KIE",
     )
     parser.add_argument(
         "-o",
@@ -257,7 +330,11 @@ def main(argv=None):
         parser.error("either --ts (for a KIE) or --prd (for an EQE) is required")
     if options.ts is not None and options.prd is not None:
         parser.error("--ts and --prd cannot be combined: use --ts for a KIE or --prd for an EQE")
-    if options.temperature <= 0:
+    try:
+        temperatures = parse_temperatures(options.temperature)
+    except ValueError as err:
+        parser.error(str(err))
+    if min(temperatures) <= 0:
         parser.error("the temperature must be positive")
     if options.freq_scale_factor is not None and options.freq_scale_factor <= 0:
         parser.error("the scaling factor must be positive")
@@ -271,6 +348,11 @@ def main(argv=None):
             "%d files were given but %d --iso labels: give one --iso per file (0 for no substitution) or a "
             "single --iso when the atom numbering is the same" % (len(files), len(options.label))
         )
+    reference = None
+    if options.reference:
+        reference = options.reference * 2 if len(options.reference) == 1 else list(options.reference)
+        if len(reference) != len(files):
+            parser.error("%d files were given but %d --reference labels" % (len(files), len(options.reference)))
 
     try:
         log = Logger(options.output, quiet=options.quiet, overwrite=options.overwrite)
@@ -284,28 +366,39 @@ def main(argv=None):
         for file, label in zip(files, labels):
             log.Write("  Species: {} isotopologue: {}\n".format(file, label))
         try:
+            results = []
+            seen = set()
             with warnings.catch_warnings(record=True) as caught:
                 warnings.simplefilter("always", KinisotWarning)
-                result = compute_kie(
-                    rct=options.rct,
-                    ts=options.ts,
-                    prd=options.prd,
-                    iso=labels,
-                    temperature=options.temperature,
-                    scale=options.freq_scale_factor,
-                    imag_cutoff=options.freq_cutoff,
-                    tunneling=options.tunneling,
-                    scale_type=options.scale_type,
-                )
-            for message in result.scaling.messages:
+                for temperature in temperatures:
+                    results.append(
+                        compute_kie(
+                            rct=options.rct,
+                            ts=options.ts,
+                            prd=options.prd,
+                            iso=labels,
+                            temperature=temperature,
+                            scale=options.freq_scale_factor,
+                            imag_cutoff=options.freq_cutoff,
+                            tunneling=options.tunneling,
+                            scale_type=options.scale_type,
+                            project=options.project,
+                            barrier=options.barrier,
+                            reference=reference,
+                        )
+                    )
+            for message in results[0].scaling.messages:
                 log.Write("\n  " + message)
             for warning in caught:
-                log.Write("\n  WARNING: " + str(warning.message))
-            write_results(log, result)
+                if str(warning.message) not in seen:
+                    seen.add(str(warning.message))
+                    log.Write("\n  WARNING: " + str(warning.message))
+            write_results(log, results)
             if options.json_path:
-                write_json(options.json_path, result)
+                write_json(options.json_path, results[0] if len(results) == 1 else results)
             if options.csv_path:
-                append_csv(options.csv_path, result)
+                for result in results:
+                    append_csv(options.csv_path, result)
         except KinisotError as err:
             log.Writeonlyfile("o  ERROR: " + str(err))
             print("\no  ERROR: " + str(err) + "\n", file=sys.stderr)

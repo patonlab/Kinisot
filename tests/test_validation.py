@@ -141,7 +141,9 @@ def test_linear_molecule_drops_five_modes(tmp_path):
     ],
 )
 def test_parse_label(label, expected):
-    assert parse_label(label, 14, "f.out") == expected
+    entries = parse_label(label, 14, "f.out")
+    assert [e[0] for e in entries] == expected
+    assert all(e[1:] == (None, None, None) for e in entries)  # bare numbers: default heavy isotope
 
 
 @pytest.mark.parametrize(
@@ -167,22 +169,24 @@ def test_out_of_range_label_is_an_error_not_a_silent_noop():
 def test_substitution_records():
     data = parse_gaussian(GS)
     masses, applied = substitute(data, "5,7")
-    assert masses[4] == pytest.approx(13.00335) and masses[6] == pytest.approx(2.0141)
-    assert [(s.atom, s.symbol) for s in applied] == [(5, "C"), (7, "H")]
+    assert masses[4] == pytest.approx(13.00335, abs=1e-5) and masses[6] == pytest.approx(2.0141, abs=1e-5)
+    assert [(s.atom, s.symbol, s.isotope) for s in applied] == [(5, "C", "13C"), (7, "H", "2H")]
     assert str(applied[0]).startswith("C (")
 
 
-def test_unsupported_element(tmp_path):
-    masses = [14.00307, 1.00783, 1.00783]
-    path = write_gaussian_like(tmp_path / "nh2.out", [7, 1, 1], masses, synthetic_hessian(masses, FREQS_MINIMUM))
-    with pytest.raises(KinisotInputError, match=r"atom 1 is N.*supported"):
+def test_element_without_default_heavy_isotope(tmp_path):
+    masses = [18.99840, 1.00783, 1.00783]  # fluorine is monoisotopic: no default heavy label
+    path = write_gaussian_like(tmp_path / "fh2.out", [9, 1, 1], masses, synthetic_hessian(masses, FREQS_MINIMUM))
+    with pytest.raises(KinisotInputError, match=r"atom 1 is F, which has no default heavy isotope"):
         substitute(parse_gaussian(path), "1")
+    masses_n, _ = substitute(parse_gaussian(path), "1:18F")  # explicit isotope works
+    assert masses_n[0] == pytest.approx(18.0009373, abs=1e-6)
 
 
 def test_already_substituted_atom(tmp_path):
     masses = [12.0, 2.0141, 1.00783]
     path = write_gaussian_like(tmp_path / "chd.out", Z_CH2, masses, synthetic_hessian(masses, FREQS_MINIMUM))
-    with pytest.raises(KinisotInputError, match="has mass 2.01410, not the 1H mass"):
+    with pytest.raises(KinisotInputError, match="has mass 2.01410 in the program's output but the light isotope 1H"):
         substitute(parse_gaussian(path), "2")
 
 
@@ -245,10 +249,10 @@ def test_ts_with_two_imaginary_modes_warns(tmp_path):
     )
     with pytest.warns(KinisotWarning, match="2 imaginary frequencies"):
         r = kie([rct], [ts], ["1", "1"])
-    assert r.other.light.imaginary == pytest.approx(500.0, abs=1e-3)
+    assert r.other.light.imaginary == pytest.approx(500.0, abs=0.01)  # synthetic masses vs AME 2020: 1e-3 shift
     # the second imaginary mode was discarded with the external modes, so one external mode (3.0) leaks
     # into the vibrational product: exactly what the warning tells the user
-    assert r.other.light.frequencies == pytest.approx([3.0, 3000.0], abs=1e-3)
+    assert r.other.light.frequencies == pytest.approx([3.0, 3000.0], abs=0.01)
     assert len(r.warnings) == 2 and "2 imaginary frequencies" in r.warnings[0]  # light and heavy TS
 
 

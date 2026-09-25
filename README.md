@@ -79,8 +79,8 @@ The equations behind every column are in [docs/theory.md](docs/theory.md).
 
 ```
 kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso ATOMS ...]
-        [-t K] [-s FACTOR] [--imag-cutoff CM-1] [--tunneling MODEL] [-o FILE] [--overwrite] [-q]
-        [--json FILE] [--csv FILE]
+        [-t K] [-s FACTOR] [--imag-cutoff CM-1] [--tunneling MODEL] [--barrier KCAL] [--project]
+        [--reference ATOMS] [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
 ```
 
 `python -m kinisot` is equivalent to `kinisot`.
@@ -98,10 +98,12 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | Flag | Meaning |
 | --- | --- |
 | `--iso ATOMS` | atom number(s) to replace with the heavy isotope, comma separated (`7,8` substitutes two hydrogens). Atom numbers follow the order of the atoms in the quantum-chemistry input. Kinisot checks that the atoms exist, can be substituted, still carry the light isotope, and that both sides of the reaction substitute the same elements. |
-| `-t`, `--temperature` | temperature in K at which the partition functions are evaluated (default 298.15). It need not match the frequency job. |
+| `-t`, `--temperature` | temperature in K at which the partition functions are evaluated (default 298.15). It need not match the frequency job. A list (`273,298,323`) or range (`250:350:10`) gives one result line per temperature. |
 | `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) (version 5, via GoodVibes) for the level of theory detected in the files, or 1.0 with a message if it is not listed. `--scale-type harm` or `fund` picks the harmonic or fundamental factor instead. |
 | `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
-| `--tunneling` | `bell` (default), `wigner` or `none`. |
+| `--tunneling` | `bell` (default), `wigner`, `skodje` (Skodje–Truhlar, needs the barrier: `--barrier KCAL` or the electronic energies in the files) or `none`. |
+| `--project` | project translations and rotations out of the Hessian (Eckart) instead of discarding the six lowest modes; recommended for finite-difference Hessians. |
+| `--reference ATOMS` | a second isotopologue; the KIE is also reported divided by its KIE (natural-abundance NMR style). |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
 | `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
 | `--version` | print the version. |
@@ -110,10 +112,17 @@ Invalid input (an atom number out of range, a reactant with an imaginary
 frequency, a file that is not a completed frequency job, ...) stops the run
 with a message and exit code 1.
 
-**Isotopes.** A bare atom number substitutes ¹H → ²H, ¹²C → ¹³C and
-¹⁶O → ¹⁷O; other elements are rejected with a message. An explicit
-syntax (`--iso 5:18O`) with a full isotope table is scheduled
-(implementation plan, Phase 7).
+**Isotopes.** A bare atom number substitutes the usual heavy label:
+¹H → ²H, ¹²C → ¹³C, ¹⁴N → ¹⁵N, ¹⁶O → ¹⁸O, ³²S → ³⁴S, ³⁵Cl → ³⁷Cl,
+⁷⁹Br → ⁸¹Br, ²⁸Si → ²⁹Si. Any isotope in the table can be asked for
+explicitly: `--iso 3:17O`, `--iso 7:D` (or `7:T`), `--iso 5:14C`, or an
+explicit mass `--iso 5:13.5`. Masses are AME 2020 values for every
+naturally occurring isotope of 83 elements plus the common radioactive
+labels; both isotopologues are built from this table (the light one from
+the most abundant isotope, as Gaussian does), so Gaussian, ORCA and other
+programs give the same numbers for the same Hessian. Note that Kinisot
+≤ 2.3 substituted ¹⁷O for a bare oxygen index; 2.4 warns once when it sees
+one.
 
 ## Input files
 
@@ -131,12 +140,14 @@ Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
   applied to all modes, including the imaginary one. Kinisot checks that it
   reproduces the frequencies the program printed and warns if not.
 - Translations and rotations are removed by discarding the lowest 5/6
-  eigenvalues rather than by projection (Eckart projection is planned).
-  The discarded modes are printed so this can be checked.
+  eigenvalues; `--project` removes them by Eckart projection instead. On
+  converged Gaussian geometries the two agree to better than 4 × 10⁻⁷ in
+  the KIE; projection matters for noisy (finite-difference) Hessians.
 - One imaginary mode per transition structure; a second one triggers a
   warning.
 - Tunnelling by Bell's one-dimensional infinite-parabola model (default), the
-  Wigner correction, or none; Bell is refused below the crossover
+  Wigner correction, the Skodje–Truhlar correction (which also uses the
+  barrier height), or none; Bell is refused below the crossover
   temperature h c |ν‡| / 2π k.
 - Rigid rotor / harmonic oscillator, no conformational averaging, no
   solvent corrections: compute those outside Kinisot if you need them.
@@ -160,7 +171,8 @@ gs, ts = parse_gaussian("claisen_gs.out"), parse_gaussian("claisen_ts.out")   # 
 ```
 
 `compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0,
-imag_cutoff=50.0, tunneling="bell", scale_type="zpe")` takes Gaussian or ORCA file paths or `HessianInput`
+imag_cutoff=50.0, tunneling="bell", scale_type="zpe", project=False,
+barrier=None, reference=None)` takes Gaussian or ORCA file paths or `HessianInput`
 objects (one or a list per side), `scale=None` for automatic Truhlar
 lookup, and `tunneling` in `"bell"`, `"wigner"`, `"none"`. It returns a
 frozen `IsotopeEffect` whose `reactant` and `other` (transition structure

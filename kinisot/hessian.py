@@ -34,6 +34,8 @@ class HessianInput:
     program_frequencies : optional vibrational frequencies (cm-1, unscaled,
         negative for imaginary) as printed by the program, used only to
         check that Kinisot reproduces them for the unsubstituted species.
+    energy : optional electronic energy in Hartree (for the Skodje-Truhlar
+        barrier height).
     """
 
     hessian: np.ndarray
@@ -45,6 +47,7 @@ class HessianInput:
     linear: bool = False
     positions: Optional[np.ndarray] = None
     program_frequencies: Optional[Tuple[float, ...]] = None
+    energy: Optional[float] = None
 
     def __post_init__(self):
         hessian = np.array(self.hessian, dtype=float)

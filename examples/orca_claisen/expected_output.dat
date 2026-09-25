@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
+  KINISOT.py v 2.4.0.dev0: 2026-09-25 13:47
   Species: claisen_gs.out isotopologue: 5
   Species: claisen_ts.hess isotopologue: 5
 
@@ -21,7 +21,7 @@ o claisen_ts: iso @ 5                                 463.8  1.178e+00  1.017e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 5): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
 
-  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
+  KINISOT.py v 2.4.0.dev0: 2026-09-25 13:47
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
@@ -36,7 +36,7 @@ o claisen_ts                                          471.6
 o claisen_gs: iso @ 4                                        1.186e+00  1.021e+00  9.093e-01
 o claisen_ts: iso @ 4                                 465.7  1.143e+00  1.019e+00  9.288e-01
                                                     --------------------------------------------------------------------------
-  KIE @ 393.0 K                                    1.012716   1.037214   1.001894   0.978989   1.030281   1.003269   1.033649
+  KIE @ 393.0 K                                    1.012716   1.037214   1.001894   0.978989   1.030282   1.003269   1.033649
                                                     --------------------------------------------------------------------------
 
   Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes

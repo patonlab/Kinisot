@@ -7,7 +7,9 @@ Characterization tests pinning the numerical behavior of Kinisot.
 Golden values were generated from v2.0.2 and cross-checked against the
 reference outputs shipped with that release, which they matched to all
 printed digits. They were regenerated after the v2.0.3 physical constants
-fix (ATOMIC_MASS_UNIT typo), which moved KIE values by <3e-6 relative.
+fix (ATOMIC_MASS_UNIT typo), which moved KIE values by <3e-6 relative, and
+again for v2.4.0, when the isotope masses moved from the five-decimal values
+of Kinisot 1.x/2.x to AME 2020 (largest change 1.2e-6 relative).
 """
 
 import warnings
@@ -34,35 +36,35 @@ CASES = [
     # Claisen rearrangement, 13C/2H KIEs at 393 K with 0.961 scaling
     ("claisen_C5_393K", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
      ["5", "5"], 393.0, 0.961,
-     1.000175989, 0.999077127, 1.000680383, 1.001962438, 1.001895135, 1.000044475, 1.001939694),
+     1.000175990, 0.999077117, 1.000680386, 1.001962452, 1.001895143, 1.000044475, 1.001939702),
     ("claisen_C4_393K", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
      ["4", "4"], 393.0, 0.961,
-     1.012716215, 1.036593731, 1.001969536, 0.978988748, 1.029742315, 1.003156971, 1.032993182),
+     1.012716276, 1.036593905, 1.001969546, 0.978988650, 1.029742457, 1.003156985, 1.032993339),
     ("claisen_H78_393K", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
      ["7,8", "7,8"], 393.0, 0.961,
-     1.007258229, 0.885607175, 1.063923244, 1.006138148, 0.954882344, 1.001815886, 0.956616301),
+     1.007258283, 0.885606164, 1.063923796, 1.006138202, 0.954881853, 1.001815899, 0.956615822),
     # Same substitution, different temperature and no scaling
     ("claisen_C5_298K_unscaled", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
      ["5", "5"], 298.15, 1.0,
-     1.000175989, 0.998734385, 1.001118940, 1.001962438, 1.001990364, 1.000087837, 1.002078376),
+     1.000175990, 0.998734371, 1.001118946, 1.001962452, 1.001990371, 1.000087838, 1.002078384),
     # Diels-Alder with two separate reactant files
     ("DA_multi_rct_C19", ["gaussian/dienophile.out", "gaussian/diene.out"], ["gaussian/DATS.out"], None,
      ["0", "10", "19"], 298.15, 0.963,
-     1.000072559, 0.995775463, 0.981489550, 1.023884832, 1.000759499, 1.000027858, 1.000787377),
+     1.000072559, 0.995775433, 0.981489432, 1.023884989, 1.000759502, 1.000027858, 1.000787381),
     ("DA_multi_rct_C15", ["gaussian/dienophile.out", "gaussian/diene.out"], ["gaussian/DATS.out"], None,
      ["0", "6", "15"], 298.15, 0.963,
-     1.009797738, 1.001688142, 0.986483717, 1.020845417, 1.018630864, 1.003711397, 1.022411407),
+     1.009797786, 1.001688125, 0.986483642, 1.020845549, 1.018630948, 1.003711415, 1.022411511),
     # Same TS carbon via the pre-formed reactant complex (single reactant file)
     ("DA_single_rct_C15", ["gaussian/DATS_rct.out"], ["gaussian/DATS.out"], None,
      ["15", "15"], 298.15, 0.963,
-     1.009797738, 1.003033140, 1.012514194, 0.992401183, 1.017742871, 1.003711397, 1.021520119),
+     1.009797786, 1.003033133, 1.012514270, 0.992401147, 1.017742952, 1.003711415, 1.021520218),
     # Equilibrium isotope effect (--prd path): CD3 axial/equatorial preference
     ("EQE_tmch_290K", ["gaussian/tetramethylcyclohexane.out"], None, ["gaussian/tetramethylcyclohexane.out"],
      ["24,25,26", "28,29,30"], 290.0, 1.0,
-     1.000000000, 1.027782351, 1.025380776, 0.985373194, 1.038453539, 1.000000000, 1.038453539),
+     1.000000000, 1.027782603, 1.025380992, 0.985373090, 1.038453903, 1.000000000, 1.038453903),
     ("EQE_tmch_300K", ["gaussian/tetramethylcyclohexane.out"], None, ["gaussian/tetramethylcyclohexane.out"],
      ["24,25,26", "28,29,30"], 300.0, 1.0,
-     1.000000000, 1.026843954, 1.025139873, 0.985373194, 1.037261647, 1.000000000, 1.037261647),
+     1.000000000, 1.026844198, 1.025140087, 0.985373090, 1.037262000, 1.000000000, 1.037262000),
 ]  # fmt: skip
 
 

@@ -18,7 +18,7 @@ kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 393          # scali
 ```
                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE
 C5  KIE @ 393.0 K  1.000176   0.999077   1.000680   1.001962   1.001895   1.000044   1.001940
-C4  KIE @ 393.0 K  1.012716   1.037214   1.001894   0.978989   1.030281   1.003269   1.033649
+C4  KIE @ 393.0 K  1.012716   1.037214   1.001894   0.978989   1.030282   1.003269   1.033649
 ```
 
 The second run detects B3LYP/6-31G(d) from the `! B3LYP 6-31G(d) Opt Freq`
