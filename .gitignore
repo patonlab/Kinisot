@@ -9,3 +9,4 @@ htmlcov/
 __pycache__/
 build/
 *.egg-info/
+benchmarks/report.json

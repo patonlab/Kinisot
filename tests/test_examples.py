@@ -72,3 +72,27 @@ def test_api_example_script_runs():
     proc = subprocess.run([sys.executable, os.path.join(EXAMPLES, "api_example.py")], capture_output=True, text=True)
     assert proc.returncode == 0, proc.stderr
     assert "4            1.0127     1.0366     0.9790     1.0297     1.0330" in proc.stdout
+
+
+def test_benchmark_runner(tmp_path, monkeypatch):
+    import importlib.util
+    import json
+    import sys
+
+    spec = importlib.util.spec_from_file_location("bench_run", os.path.join(ROOT, "benchmarks", "run.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    cases = module.load_cases(["claisen"])
+    assert len(cases) == 1 and cases[0]["reference"]["doi"] == "10.1021/ja992372h"
+    rows = module.run_case(cases[0])
+    assert [r["position"] for r in rows][:2] == ["C1", "C2"]
+    assert rows[3]["computed"] == pytest.approx(1.032993, abs=1e-6)  # C4, Bell-corrected, from the Claisen example
+    assert all(r["experimental"] is None for r in rows)  # placeholders until entered from the paper
+    text = module.format_case(cases[0], rows)
+    assert "no experimental value" in text and "enter them in `case.json`" in text
+    # a filled-in value produces a deviation and a mean absolute deviation
+    cases[0]["kies"][3]["experimental"], cases[0]["kies"][3]["uncertainty"] = 1.030, 0.002
+    rows = module.run_case(cases[0])
+    assert rows[3]["deviation"] == pytest.approx(1.032993 - 1.030, abs=1e-5)
+    assert "Mean absolute deviation over 1 measured positions" in module.format_case(cases[0], rows)
+    del sys, json

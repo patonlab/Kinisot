@@ -1,0 +1,28 @@
+{
+  "name": "Diels-Alder reaction of isoprene with maleic anhydride",
+  "reference": {
+    "citation": "D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358",
+    "doi": "10.1021/ja00141a030",
+    "method": "13C and 2H KIEs by NMR at natural abundance, 25 C"
+  },
+  "temperature": 298.15,
+  "scale": 0.963,
+  "level_of_theory": "B3LYP/6-31G(d)",
+  "tunneling": "bell",
+  "project": false,
+  "reactants": ["../../tests/data/gaussian/dienophile.out", "../../tests/data/gaussian/diene.out"],
+  "transition_structure": ["../../tests/data/gaussian/DATS.out"],
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {"position": "diene C6 (TS C15)", "iso": ["0", "6", "15"], "experimental": null, "uncertainty": null, "note": "diene terminus"},
+    {"position": "diene C10 (TS C19)", "iso": ["0", "10", "19"], "experimental": null, "uncertainty": null, "note": "diene terminus"},
+    {"position": "diene C1 (TS C10)", "iso": ["0", "1", "10"], "experimental": null, "uncertainty": null, "note": ""},
+    {"position": "diene C2 (TS C11)", "iso": ["0", "2", "11"], "experimental": null, "uncertainty": null, "note": ""},
+    {"position": "diene C4 (TS C13)", "iso": ["0", "4", "13"], "experimental": null, "uncertainty": null, "note": ""},
+    {"position": "dienophile C1 (TS C1)", "iso": ["1", "0", "1"], "experimental": null, "uncertainty": null, "note": ""},
+    {"position": "dienophile C1 (TS C2)", "iso": ["1", "0", "2"], "experimental": null, "uncertainty": null, "note": ""},
+    {"position": "dienophile H5 (TS H7)", "iso": ["5", "0", "7"], "experimental": null, "uncertainty": null, "note": "secondary 2H KIE"},
+    {"position": "dienophile H5 (TS H5)", "iso": ["5", "0", "5"], "experimental": null, "uncertainty": null, "note": "secondary 2H KIE"}
+  ]
+}

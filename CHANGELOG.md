@@ -24,6 +24,12 @@ machine-learned potentials.
   with a warning.
 - `examples/mlip_claisen/` and ASE JSON fixtures (`tests/data/ase/`); the
   Claisen KIE from the JSON form matches the Gaussian path to 10⁻¹⁰.
+- `benchmarks/`: a runner and case-file format for comparing computed with
+  experimental isotope effects, with the Claisen and Diels–Alder cases
+  (experimental values to be entered from the papers).
+- The release workflow now also creates a GitHub Release with the changelog
+  section as notes; Dependabot watches the Actions versions; `.zenodo.json`
+  carries the archive metadata.
 
 ## [2.4.0] - Unreleased
 

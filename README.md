@@ -200,6 +200,8 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
 - [docs/theory.md](docs/theory.md), [docs/file_formats.md](docs/file_formats.md),
   [docs/faq.md](docs/faq.md), [docs/comparison.md](docs/comparison.md)
   (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).
+- [benchmarks/](benchmarks/README.md): computed versus experimental KIEs,
+  one directory per reaction, with a runner that regenerates the report.
 - [CHANGELOG.md](CHANGELOG.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
   for what changed and what is coming.
 - A [video guide](http://www.youtube.com/watch?v=r4x2gmkc0U8) to an older

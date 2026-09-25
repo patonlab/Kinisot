@@ -18,6 +18,10 @@ on:
 permissions:
   contents: read
 
+# The tag also creates a GitHub Release (which Zenodo archives when the
+# repository is connected at https://zenodo.org/account/settings/github/)
+# with the matching CHANGELOG section as release notes.
+
 jobs:
   build:
     name: Build sdist and wheel
@@ -77,3 +81,34 @@ jobs:
           path: dist/
 
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  release:
+    name: GitHub Release
+    needs: publish
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Extract the CHANGELOG section for this version
+        run: |
+          python - "${GITHUB_REF_NAME#v}" > notes.md <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          match = re.search(r"^## \[%s\].*?$(.*?)(?=^## \[|\Z)" % re.escape(version), text, re.M | re.S)
+          print(match.group(1).strip() if match else "See CHANGELOG.md.")
+          PY
+          cat notes.md
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Kinisot $GITHUB_REF_NAME" --notes-file notes.md

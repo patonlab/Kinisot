@@ -75,6 +75,15 @@ git push origin v2.1.0
 ```
 
 The workflow checks that the tag matches `kinisot.__version__`, runs the
-tests, builds the sdist and wheel, and uploads them. Once the release is on
-PyPI the conda-forge bot opens the feedstock update automatically
+tests, builds the sdist and wheel, uploads them, and then creates a GitHub
+Release whose notes are the matching CHANGELOG section. Once the release is
+on PyPI the conda-forge bot opens the feedstock update automatically
 (`recipe/meta.yaml` in this repository is the template to keep in sync).
+
+**Zenodo DOI per release**: connect the repository once at
+https://zenodo.org/account/settings/github/ (flip the switch for
+`patonlab/Kinisot`); every GitHub Release is then archived with the
+metadata in `.zenodo.json` and gets its own DOI under the existing concept
+DOI. Update `CITATION.cff` (`version`, `date-released`) with each release.
+Dependabot keeps the Actions versions in the workflows current (monthly
+pull requests).
