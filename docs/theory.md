@@ -103,8 +103,10 @@ and the KIE correction is the ratio for the two isotopologues,
 The formula diverges as u‡ → 2π (T → h c |ν‡| / 2π k, the crossover
 temperature) and is meaningless below it: for a 1000i cm⁻¹ mode that is
 229 K. Above that limit it reproduces the Wigner correction 1 + u‡²/24 to
-first order. Kinisot prints both the uncorrected and the corrected KIE;
-report the one that matches the model used in the work you compare with.
+first order; `--tunneling wigner` uses that expansion and `--tunneling none`
+turns the correction off. Kinisot prints both the uncorrected and the
+corrected KIE; report the one that matches the model used in the work you
+compare with.
 
 ## 5. Scaling factors
 

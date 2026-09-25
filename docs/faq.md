@@ -32,6 +32,13 @@ and products must be minima. If the mode is a numerical artefact (a few
 cm⁻¹ on a floppy molecule), raise `--imag-cutoff` above its magnitude;
 otherwise re-optimize.
 
+**Which tunnelling correction should I use?** Bell's infinite parabola is
+the default and what the Claisen study of Meyer, DelMonte and Singleton
+found sufficient for heavy-atom KIEs; `--tunneling wigner` is its
+first-order expansion and `--tunneling none` gives the semiclassical value.
+Bell is refused below the crossover temperature, where neither
+one-dimensional model is trustworthy.
+
 **Which scaling factor is applied?** The ZPE factor from the Truhlar
 database for the detected level of theory, or 1.0 if it is not listed.
 Give `-s` to override. Only ZPE, EXC and the tunnelling correction depend
@@ -51,7 +58,7 @@ or use the lowest-energy pair.
 evaluates the partition functions at `-t`; the Hessian does not depend on
 temperature.
 
-**How do I get the numbers into a script?** `python -m kinisot ... -q
--o results.dat` and parse the `KIE @` lines, or call
-`kinisot.compute_isotope_effect()` from Python. A structured result object
-and `--json` output are planned (Phase 4).
+**How do I get the numbers into a script?** `kinisot ... --json run.json`
+or `--csv runs.csv` (one row per run), or call `kinisot.compute_kie()` from
+Python and use the returned `IsotopeEffect` (`r.kie_tunnel`, `r.to_dict()`,
+see `examples/api_example.py`).

@@ -5,17 +5,18 @@
 Characterization tests pinning the numerical behavior of Kinisot.
 
 Golden values were generated from v2.0.2 and cross-checked against the
-reference outputs shipped in tests/data/gaussian/ (claisen_kinisot.dat,
-tetramethylcyclohexane_kinisot.dat, comparison.dat), which they matched to
-all printed digits. They were then regenerated after the v2.0.3 physical
-constants fix (ATOMIC_MASS_UNIT typo), which moved KIE values by <3e-6
-relative; the shipped .dat files still agree to their printed 6 decimals.
+reference outputs shipped with that release, which they matched to all
+printed digits. They were regenerated after the v2.0.3 physical constants
+fix (ATOMIC_MASS_UNIT typo), which moved KIE values by <3e-6 relative.
 """
+
+import warnings
 
 import pytest
 from conftest import datapath
 
-from kinisot import Kinisot
+from kinisot import compute_isotope_effect, compute_kie, find_scaling_factor
+from kinisot.backends.gaussian import is_linear
 
 REL = 1e-6
 
@@ -24,162 +25,45 @@ def run_kie(reactants, ts, prd, iso, temperature, scaling, freq_cutoff=50.0):
     rct = [datapath(p) for p in reactants]
     ts = [datapath(p) for p in ts] if ts else None
     prd = [datapath(p) for p in prd] if prd else None
-    return Kinisot.compute_isotope_effect(rct, ts, prd, iso, temperature, scaling, freq_cutoff)
+    return compute_kie(rct, ts, prd, iso=iso, temperature=temperature, scale=scaling, imag_cutoff=freq_cutoff)
 
 
 # Columns: name, reactants, ts, prd, iso labels (one per file), T/K, scale factor,
 #          V-ratio, ZPE, EXC, TRPF, KIE, 1D-tunn, corr-KIE
 CASES = [
     # Claisen rearrangement, 13C/2H KIEs at 393 K with 0.961 scaling
-    (
-        "claisen_C5_393K",
-        ["gaussian/claisen_gs.out"],
-        ["gaussian/claisen_ts.out"],
-        None,
-        ["5", "5"],
-        393.0,
-        0.961,
-        1.000175989,
-        0.999077127,
-        1.000680383,
-        1.001962438,
-        1.001895135,
-        1.000044475,
-        1.001939694,
-    ),
-    (
-        "claisen_C4_393K",
-        ["gaussian/claisen_gs.out"],
-        ["gaussian/claisen_ts.out"],
-        None,
-        ["4", "4"],
-        393.0,
-        0.961,
-        1.012716215,
-        1.036593731,
-        1.001969536,
-        0.978988748,
-        1.029742315,
-        1.003156971,
-        1.032993182,
-    ),
-    (
-        "claisen_H78_393K",
-        ["gaussian/claisen_gs.out"],
-        ["gaussian/claisen_ts.out"],
-        None,
-        ["7,8", "7,8"],
-        393.0,
-        0.961,
-        1.007258229,
-        0.885607175,
-        1.063923244,
-        1.006138148,
-        0.954882344,
-        1.001815886,
-        0.956616301,
-    ),
+    ("claisen_C5_393K", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
+     ["5", "5"], 393.0, 0.961,
+     1.000175989, 0.999077127, 1.000680383, 1.001962438, 1.001895135, 1.000044475, 1.001939694),
+    ("claisen_C4_393K", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
+     ["4", "4"], 393.0, 0.961,
+     1.012716215, 1.036593731, 1.001969536, 0.978988748, 1.029742315, 1.003156971, 1.032993182),
+    ("claisen_H78_393K", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
+     ["7,8", "7,8"], 393.0, 0.961,
+     1.007258229, 0.885607175, 1.063923244, 1.006138148, 0.954882344, 1.001815886, 0.956616301),
     # Same substitution, different temperature and no scaling
-    (
-        "claisen_C5_298K_unscaled",
-        ["gaussian/claisen_gs.out"],
-        ["gaussian/claisen_ts.out"],
-        None,
-        ["5", "5"],
-        298.15,
-        1.0,
-        1.000175989,
-        0.998734385,
-        1.001118940,
-        1.001962438,
-        1.001990364,
-        1.000087837,
-        1.002078376,
-    ),
+    ("claisen_C5_298K_unscaled", ["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None,
+     ["5", "5"], 298.15, 1.0,
+     1.000175989, 0.998734385, 1.001118940, 1.001962438, 1.001990364, 1.000087837, 1.002078376),
     # Diels-Alder with two separate reactant files
-    (
-        "DA_multi_rct_C19",
-        ["gaussian/dienophile.out", "gaussian/diene.out"],
-        ["gaussian/DATS.out"],
-        None,
-        ["0", "10", "19"],
-        298.15,
-        0.963,
-        1.000072559,
-        0.995775463,
-        0.981489550,
-        1.023884832,
-        1.000759499,
-        1.000027858,
-        1.000787377,
-    ),
-    (
-        "DA_multi_rct_C15",
-        ["gaussian/dienophile.out", "gaussian/diene.out"],
-        ["gaussian/DATS.out"],
-        None,
-        ["0", "6", "15"],
-        298.15,
-        0.963,
-        1.009797738,
-        1.001688142,
-        0.986483717,
-        1.020845417,
-        1.018630864,
-        1.003711397,
-        1.022411407,
-    ),
+    ("DA_multi_rct_C19", ["gaussian/dienophile.out", "gaussian/diene.out"], ["gaussian/DATS.out"], None,
+     ["0", "10", "19"], 298.15, 0.963,
+     1.000072559, 0.995775463, 0.981489550, 1.023884832, 1.000759499, 1.000027858, 1.000787377),
+    ("DA_multi_rct_C15", ["gaussian/dienophile.out", "gaussian/diene.out"], ["gaussian/DATS.out"], None,
+     ["0", "6", "15"], 298.15, 0.963,
+     1.009797738, 1.001688142, 0.986483717, 1.020845417, 1.018630864, 1.003711397, 1.022411407),
     # Same TS carbon via the pre-formed reactant complex (single reactant file)
-    (
-        "DA_single_rct_C15",
-        ["gaussian/DATS_rct.out"],
-        ["gaussian/DATS.out"],
-        None,
-        ["15", "15"],
-        298.15,
-        0.963,
-        1.009797738,
-        1.003033140,
-        1.012514194,
-        0.992401183,
-        1.017742871,
-        1.003711397,
-        1.021520119,
-    ),
+    ("DA_single_rct_C15", ["gaussian/DATS_rct.out"], ["gaussian/DATS.out"], None,
+     ["15", "15"], 298.15, 0.963,
+     1.009797738, 1.003033140, 1.012514194, 0.992401183, 1.017742871, 1.003711397, 1.021520119),
     # Equilibrium isotope effect (--prd path): CD3 axial/equatorial preference
-    (
-        "EQE_tmch_290K",
-        ["gaussian/tetramethylcyclohexane.out"],
-        None,
-        ["gaussian/tetramethylcyclohexane.out"],
-        ["24,25,26", "28,29,30"],
-        290.0,
-        1.0,
-        1.000000000,
-        1.027782351,
-        1.025380776,
-        0.985373194,
-        1.038453539,
-        1.000000000,
-        1.038453539,
-    ),
-    (
-        "EQE_tmch_300K",
-        ["gaussian/tetramethylcyclohexane.out"],
-        None,
-        ["gaussian/tetramethylcyclohexane.out"],
-        ["24,25,26", "28,29,30"],
-        300.0,
-        1.0,
-        1.000000000,
-        1.026843954,
-        1.025139873,
-        0.985373194,
-        1.037261647,
-        1.000000000,
-        1.037261647,
-    ),
-]
+    ("EQE_tmch_290K", ["gaussian/tetramethylcyclohexane.out"], None, ["gaussian/tetramethylcyclohexane.out"],
+     ["24,25,26", "28,29,30"], 290.0, 1.0,
+     1.000000000, 1.027782351, 1.025380776, 0.985373194, 1.038453539, 1.000000000, 1.038453539),
+    ("EQE_tmch_300K", ["gaussian/tetramethylcyclohexane.out"], None, ["gaussian/tetramethylcyclohexane.out"],
+     ["24,25,26", "28,29,30"], 300.0, 1.0,
+     1.000000000, 1.026843954, 1.025139873, 0.985373194, 1.037261647, 1.000000000, 1.037261647),
+]  # fmt: skip
 
 
 @pytest.mark.parametrize(
@@ -190,16 +74,36 @@ CASES = [
 def test_isotope_effect(
     name, reactants, ts, prd, iso, temperature, scaling, vratio, ZPE, EXC, TRPF, KIE, tunn, corrKIE
 ):
-    (rpfrs, zpe_val, exc_val, trpf_val, kie_val, corr_kie_val, tunn_corr_val, freq_fac) = run_kie(
-        reactants, ts, prd, iso, temperature, scaling
+    r = run_kie(reactants, ts, prd, iso, temperature, scaling)
+    assert r.imag_ratio == pytest.approx(vratio, rel=REL)
+    assert r.zpe == pytest.approx(ZPE, rel=REL)
+    assert r.exc == pytest.approx(EXC, rel=REL)
+    assert r.trpf == pytest.approx(TRPF, rel=REL)
+    assert r.kie == pytest.approx(KIE, rel=REL)
+    assert r.tunnel_corr == pytest.approx(tunn, rel=REL)
+    assert r.kie_tunnel == pytest.approx(corrKIE, rel=REL)
+    assert r.kind == ("KIE" if ts else "EQE")
+
+
+def test_deprecated_compute_isotope_effect_matches_compute_kie():
+    args = (["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None, ["5", "5"], 393.0, 0.961)
+    new = run_kie(*args)
+    with pytest.warns(DeprecationWarning, match="compute_isotope_effect is deprecated"):
+        species, zpe, exc, trpf, kie, kie_tunnel, tunnel_corr, freq_fac = compute_isotope_effect(
+            [datapath(args[0][0])], [datapath(args[1][0])], None, ["5", "5"], 393.0, 0.961
+        )
+    assert (zpe, exc, trpf, kie, kie_tunnel, tunnel_corr, freq_fac) == (
+        new.zpe,
+        new.exc,
+        new.trpf,
+        new.kie,
+        new.kie_tunnel,
+        new.tunnel_corr,
+        new.imag_ratio,
     )
-    assert freq_fac == pytest.approx(vratio, rel=REL)
-    assert zpe_val == pytest.approx(ZPE, rel=REL)
-    assert exc_val == pytest.approx(EXC, rel=REL)
-    assert trpf_val == pytest.approx(TRPF, rel=REL)
-    assert kie_val == pytest.approx(KIE, rel=REL)
-    assert tunn_corr_val == pytest.approx(tunn, rel=REL)
-    assert corr_kie_val == pytest.approx(corrKIE, rel=REL)
+    assert species[2].im_frequency_wn == pytest.approx(463.9, abs=0.05)
+    assert not hasattr(species[0], "im_frequency_wn")  # ground state has none
+    assert species[1].PF == new.reactant.heavy.log_pf
 
 
 @pytest.mark.parametrize(
@@ -219,7 +123,7 @@ def test_isotope_effect(
     ids=lambda v: str(v),
 )
 def test_find_scaling_factor(level, expected):
-    factor, ref = Kinisot.find_scaling_factor(level)
+    factor, ref = find_scaling_factor(level)
     if expected is None:
         assert factor is None and ref is None
     else:
@@ -228,8 +132,6 @@ def test_find_scaling_factor(level, expected):
 
 
 def test_is_linear(tmp_path):
-    from kinisot.Hess_to_Freq import is_linear
-
     # Linear molecule (CO2-like): first rotational constant is zero
     co2 = tmp_path / "co2.out"
     co2.write_text(" Rotational constants (GHZ):      0.0000000     11.6919157     11.6919157\n")
@@ -245,8 +147,6 @@ def test_is_linear(tmp_path):
 
 
 def test_examples_are_nonlinear():
-    from kinisot.Hess_to_Freq import is_linear
-
     for f in ["gaussian/claisen_gs.out", "gaussian/DATS.out", "gaussian/tetramethylcyclohexane.out"]:
         assert is_linear(datapath(f)) == "none"
 
@@ -259,7 +159,10 @@ def test_ts_without_imaginary_frequency_raises():
 
 
 def test_ts_imaginary_frequency_detected():
-    # The uphill TS mode of the Claisen TS at 0.961 scaling, from claisen_kinisot.dat
-    rpfrs, *_ = run_kie(["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None, ["5", "5"], 393.0, 0.961)
-    assert rpfrs[2].im_frequency_wn == pytest.approx(463.9, abs=0.05)
-    assert not hasattr(rpfrs[0], "im_frequency_wn")  # ground state has none
+    # The uphill TS mode of the Claisen TS at 0.961 scaling
+    r = run_kie(["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None, ["5", "5"], 393.0, 0.961)
+    assert r.other.light.imaginary == pytest.approx(463.9, abs=0.05)
+    assert r.reactant.light.imaginary is None  # ground state has none
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        run_kie(["gaussian/claisen_gs.out"], ["gaussian/claisen_ts.out"], None, ["5", "5"], 393.0, 0.961)

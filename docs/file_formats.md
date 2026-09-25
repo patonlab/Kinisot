@@ -47,3 +47,8 @@ so this backend will project them out before removing external modes.
 header with version and time, the species and their isotope labels, the
 scaling factor found, the results table, and the modes kept/discarded for
 every species. New runs are **appended**; `--overwrite` starts afresh.
+
+`--json FILE` writes the full result of one run (the dictionary returned by
+`IsotopeEffect.to_dict()`: every factor, frequency, mass and substitution)
+and `--csv FILE` appends one summary row per run with a header line when the
+file is new.

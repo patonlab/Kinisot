@@ -16,26 +16,35 @@ from conftest import (
     write_ts,
 )
 
-from kinisot import Kinisot
+from kinisot import compute_kie
+from kinisot.api import evaluate_isotopologue
+from kinisot.backends import load_hessian
+from kinisot.backends.gaussian import is_linear, level_of_theory, parse_gaussian
 from kinisot.exceptions import KinisotInputError, KinisotParseError, KinisotWarning
-from kinisot.Hess_to_Freq import (
-    is_linear,
-    level_of_theory,
-    mass_weight,
-    parse_gaussian,
-    parse_label,
-    read_hess,
-    substitute,
-)
+from kinisot.Hess_to_Freq import read_hess
+from kinisot.hessian import mass_weight
+from kinisot.isotopes import parse_label, substitute
+from kinisot.thermo import harmonic_frequencies
 
 GS = datapath("gaussian/claisen_gs.out")
 TS = datapath("gaussian/claisen_ts.out")
 
 
 def kie(rct, ts, labels, **kw):
-    return Kinisot.compute_isotope_effect(
-        rct, ts, None, labels, kw.get("T", 298.15), kw.get("s", 1.0), kw.get("cutoff", 50.0)
+    return compute_kie(
+        rct,
+        ts,
+        None,
+        iso=labels,
+        temperature=kw.get("T", 298.15),
+        scale=kw.get("s", 1.0),
+        imag_cutoff=kw.get("cutoff", 50.0),
     )
+
+
+def rpfr(files, labels):
+    """One isotopologue of one side, as evaluate_isotopologue returns it."""
+    return evaluate_isotopologue([load_hessian(f) for f in files], list(labels), 298.15, 1.0, 50.0, [])
 
 
 # --- parsing -----------------------------------------------------------------
@@ -80,14 +89,14 @@ def test_windows_archive_separator_and_wrapping(tmp_path):
     path = write_minimum(tmp_path / "win.out", separator="|", wrap=7)
     data = parse_gaussian(path)
     assert data.level_of_theory == "RB3LYP/6-31G(d)"
-    freqs = Kinisot.harmonic_frequencies(mass_weight(data.hessian, data.masses))
+    freqs = harmonic_frequencies(mass_weight(data.hessian, data.masses))
     assert freqs[6:] == pytest.approx([900.0, 1400.0, 3000.0], abs=1e-3)
 
 
 def test_synthetic_frequencies_round_trip(tmp_path):
     path = write_ts(tmp_path / "ts.out")
     data = parse_gaussian(path)
-    freqs = Kinisot.harmonic_frequencies(mass_weight(data.hessian, data.masses))
+    freqs = harmonic_frequencies(mass_weight(data.hessian, data.masses))
     assert freqs == pytest.approx([-500.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 1400.0, 3000.0], abs=1e-3)
     assert data.atomic_numbers == (6, 1, 1)
     assert data.natoms == 3 and not data.linear
@@ -113,9 +122,9 @@ def test_linear_molecule_drops_five_modes(tmp_path):
         rotational="0.0000000 11.6919157 11.6919157",
     )
     assert parse_gaussian(path).linear and is_linear(path) == "linear"
-    rpfr = Kinisot.calc_rpfr([path], ["0"])
-    assert len(rpfr.frequency_wn) == 4
-    assert rpfr.discarded_wn[path] == pytest.approx([0.5, 1.0, 1.5, 2.0, 2.5], abs=1e-3)
+    side = rpfr([path], ["0"])
+    assert len(side.frequencies) == 4
+    assert side.species[0].discarded == pytest.approx([0.5, 1.0, 1.5, 2.0, 2.5], abs=1e-3)
 
 
 # --- labels ------------------------------------------------------------------
@@ -198,17 +207,21 @@ def test_reactant_with_imaginary_frequency():
 
 def test_product_with_imaginary_frequency():
     with pytest.raises(KinisotInputError, match="given as a product"):
-        Kinisot.compute_isotope_effect([GS], None, [TS], ["5", "5"])
+        compute_kie([GS], None, [TS], iso=["5", "5"])
 
 
 def test_ts_and_prd_together():
     with pytest.raises(KinisotInputError, match="not both"):
-        Kinisot.compute_isotope_effect([GS], [TS], [TS], ["5", "5", "5"])
+        compute_kie([GS], [TS], [TS], iso=["5", "5", "5"])
 
 
 def test_label_count_mismatch():
     with pytest.raises(KinisotInputError, match="isotope labels"):
-        kie([GS], [TS], ["5"])
+        kie([GS, GS], [TS], ["5"])  # three files, one label
+    with pytest.raises(KinisotInputError, match="isotope labels"):
+        kie([GS], [TS], ["5", "5", "5"])
+    # a single label is applied to both files when there are exactly two
+    assert kie([GS], [TS], ["5"]).kie == kie([GS], [TS], ["5", "5"]).kie
 
 
 @pytest.mark.parametrize("kw, message", [({"T": -5.0}, "temperature"), ({"s": 0.0}, "scaling factor")])
@@ -220,7 +233,7 @@ def test_nonpositive_parameters(kw, message):
 def test_two_files_with_imaginary_modes_on_one_side(tmp_path):
     ts1, ts2 = write_ts(tmp_path / "ts1.out"), write_ts(tmp_path / "ts2.out")
     with pytest.raises(KinisotInputError, match="more than one file"):
-        Kinisot.calc_rpfr([ts1, ts2], ["0", "0"])
+        rpfr([ts1, ts2], ["0", "0"])
 
 
 def test_ts_with_two_imaginary_modes_warns(tmp_path):
@@ -231,11 +244,12 @@ def test_ts_with_two_imaginary_modes_warns(tmp_path):
         tmp_path / "ts2i.out", Z_CH2, MASSES_CH2, synthetic_hessian(MASSES_CH2, freqs, seed=2), nimag=2
     )
     with pytest.warns(KinisotWarning, match="2 imaginary frequencies"):
-        species, *_, freq_fac = kie([rct], [ts], ["1", "1"])
-    assert species[2].im_frequency_wn == pytest.approx(500.0, abs=1e-3)
+        r = kie([rct], [ts], ["1", "1"])
+    assert r.other.light.imaginary == pytest.approx(500.0, abs=1e-3)
     # the second imaginary mode was discarded with the external modes, so one external mode (3.0) leaks
     # into the vibrational product: exactly what the warning tells the user
-    assert species[2].frequency_wn == pytest.approx([3.0, 3000.0], abs=1e-3)
+    assert r.other.light.frequencies == pytest.approx([3.0, 3000.0], abs=1e-3)
+    assert len(r.warnings) == 2 and "2 imaginary frequencies" in r.warnings[0]  # light and heavy TS
 
 
 def test_negative_frequency_never_reaches_the_partition_function(tmp_path):
@@ -245,7 +259,7 @@ def test_negative_frequency_never_reaches_the_partition_function(tmp_path):
     )
     with pytest.warns(KinisotWarning):
         with pytest.raises(KinisotInputError, match="non-positive frequencies remain"):
-            Kinisot.calc_rpfr([path], ["0"])
+            rpfr([path], ["0"])
 
 
 def test_heavy_ts_mode_below_cutoff_is_reported():

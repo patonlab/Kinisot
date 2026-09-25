@@ -11,6 +11,9 @@ frequency outputs the examples read live in `../tests/data/gaussian/`.
 | [diels_alder](diels_alder/README.md) | Diels–Alder reaction of isoprene with maleic anhydride | ¹³C and ²H KIEs at 298 K; one versus two reactant files | `dienophile.out`, `diene.out`, `DATS_rct.out`, `DATS.out` |
 | [eqe_cyclohexane](eqe_cyclohexane/README.md) | CD₃ axial/equatorial preference in 1,1,3,3-tetramethylcyclohexane | equilibrium isotope effect at 290 and 300 K | `tetramethylcyclohexane.out` |
 
+The same calculations from Python: [api_example.py](api_example.py) and the
+executed notebook [examples.ipynb](examples.ipynb).
+
 Run everything:
 
 ```

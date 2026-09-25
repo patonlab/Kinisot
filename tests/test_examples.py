@@ -15,7 +15,7 @@ import shlex
 import pytest
 from conftest import datapath
 
-from kinisot import Kinisot
+from kinisot import cli
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXAMPLES = os.path.join(ROOT, "examples")
@@ -50,7 +50,7 @@ def test_examples_reproduce_expected_output(case, tmp_path, monkeypatch):
     output = str(tmp_path / "output.dat")
     for command_case, args in COMMANDS:
         if command_case == case:
-            assert Kinisot.main(shlex.split(args) + ["--quiet", "--output", output]) == 0
+            assert cli.main(shlex.split(args) + ["--quiet", "--output", output]) == 0
     with open(os.path.join(EXAMPLES, case, "expected_output.dat")) as handle:
         expected_text = handle.read()
     with open(output) as handle:
@@ -60,3 +60,12 @@ def test_examples_reproduce_expected_output(case, tmp_path, monkeypatch):
     assert produced == expected
     # the species header lines are recorded too
     assert produced_text.count("Species:") == expected_text.count("Species:")
+
+
+def test_api_example_script_runs():
+    import subprocess
+    import sys
+
+    proc = subprocess.run([sys.executable, os.path.join(EXAMPLES, "api_example.py")], capture_output=True, text=True)
+    assert proc.returncode == 0, proc.stderr
+    assert "4            1.0127     1.0366     0.9790     1.0297     1.0330" in proc.stdout

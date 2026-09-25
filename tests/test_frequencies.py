@@ -17,8 +17,9 @@ import numpy as np
 import pytest
 from conftest import datapath
 
-from kinisot import Kinisot
-from kinisot.Hess_to_Freq import mass_weight, parse_gaussian
+from kinisot.backends.gaussian import parse_gaussian
+from kinisot.hessian import mass_weight
+from kinisot.thermo import HESSIAN_TO_WAVENUMBER_SQ, harmonic_frequencies
 
 EXAMPLES = sorted(glob.glob(datapath("gaussian/*.out")))
 
@@ -38,7 +39,7 @@ def gaussian_printed(path):
 @pytest.mark.parametrize("path", EXAMPLES, ids=os.path.basename)
 def test_modes_match_gaussian(path):
     data = parse_gaussian(path)
-    freqs = Kinisot.harmonic_frequencies(mass_weight(data.hessian, data.masses))
+    freqs = harmonic_frequencies(mass_weight(data.hessian, data.masses))
     printed, low = gaussian_printed(path)
     assert len(printed) > 0
 
@@ -57,4 +58,4 @@ def test_modes_match_gaussian(path):
 
 def test_unit_conversion_constant():
     # 1 Hartree/(amu Bohr^2) corresponds to a wavenumber of about 5140 cm-1
-    assert np.sqrt(Kinisot.HESSIAN_TO_WAVENUMBER_SQ) == pytest.approx(5140.49, abs=0.05)
+    assert np.sqrt(HESSIAN_TO_WAVENUMBER_SQ) == pytest.approx(5140.49, abs=0.05)

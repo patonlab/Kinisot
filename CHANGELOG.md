@@ -2,6 +2,42 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - Unreleased
+
+Phase 4 of the [implementation plan](IMPLEMENTATION_PLAN.md): internal
+refactor and Python API. Numerically identical to 2.1.0 apart from the
+constants update listed under Changed.
+
+### Added
+
+- `kinisot.compute_kie()` returning a frozen `IsotopeEffect` (final factors,
+  per-side `SideResult`s with the light and heavy isotopologues, their kept,
+  discarded and imaginary frequencies, masses and substitutions, the scaling
+  choice and any warnings) with `to_dict()`, `to_json()` and
+  `summary_row()`. Inputs may be file paths or `HessianInput` objects.
+- `--json FILE` (full result of a run) and `--csv FILE` (one row per run).
+- `--tunneling bell|wigner|none` on the command line and `tunneling=` in the
+  API. The Bell correction is refused below the crossover temperature,
+  where it diverges, instead of returning a meaningless number.
+- `HessianInput`, the program-independent interchange type every backend
+  produces (Hessian, masses, atomic numbers, level of theory, linearity,
+  positions), in `kinisot/hessian.py`; `kinisot/backends/gaussian.py`
+  holds the Gaussian parser (now also reads the archive geometry).
+- `examples/api_example.py` and an executed `examples/examples.ipynb`.
+
+### Changed
+
+- Module layout: physics in `kinisot/thermo.py`, scaling in
+  `kinisot/scaling.py`, isotopes in `kinisot/isotopes.py`, the CLI in
+  `kinisot/cli.py`, the API in `kinisot/api.py`. `kinisot.Kinisot` and
+  `kinisot.Hess_to_Freq` remain as deprecation shims (removed in 3.0):
+  `compute_isotope_effect()`, `calc_rpfr`, `get_frequency_scaling()` and
+  the `calc_*_factor` functions warn with `DeprecationWarning` and forward
+  to the new code.
+- The scaling-factor table is a plain dictionary of named tuples
+  (`kinisot.vib_scale_factors.SCALING_FACTORS`) instead of a NumPy
+  structured array; factors are now exact decimals rather than float32.
+
 ## [2.1.0] - Unreleased
 
 Phases 2 (robustness) and 3 (packaging and documentation) of the

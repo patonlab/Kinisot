@@ -6,31 +6,43 @@ Command line::
 
 Python::
 
-    from kinisot import compute_isotope_effect
-    species, zpe, exc, trpf, kie, kie_tunnel, tunnel_corr, freq_ratio = compute_isotope_effect(
-        ["reactant.out"], ["ts.out"], None, ["5", "5"], temperature=393.0, freq_scale_factor=0.961)
+    from kinisot import compute_kie
+    result = compute_kie(rct="reactant.out", ts="ts.out", iso="5", temperature=393.0, scale=0.961)
+    result.kie_tunnel, result.zpe, result.exc, result.trpf, result.to_dict()
 """
 
-__version__ = "2.1.0.dev0"
+__version__ = "2.2.0.dev0"
 
+from .api import IsotopeEffect, IsotopologueResult, SideResult, SpeciesResult, compute_kie
+from .backends import load_hessian
+from .backends.gaussian import parse_gaussian
 from .exceptions import KinisotError, KinisotInputError, KinisotParseError, KinisotWarning
-from .Hess_to_Freq import FrequencyData, Substitution, mass_weight, parse_gaussian, read_hess, substitute
-from .Kinisot import calc_rpfr, compute_isotope_effect, find_scaling_factor, harmonic_frequencies
+from .hessian import HessianInput, mass_weight
+from .isotopes import Substitution, substitute
+from .Kinisot import compute_isotope_effect  # deprecated, removed in 3.0
+from .scaling import ScalingChoice, choose_scaling_factor, find_scaling_factor
+from .thermo import harmonic_frequencies
 
 __all__ = [
     "__version__",
-    "compute_isotope_effect",
-    "calc_rpfr",
-    "harmonic_frequencies",
-    "find_scaling_factor",
+    "compute_kie",
+    "IsotopeEffect",
+    "SideResult",
+    "IsotopologueResult",
+    "SpeciesResult",
+    "HessianInput",
+    "load_hessian",
     "parse_gaussian",
     "substitute",
-    "mass_weight",
-    "read_hess",
-    "FrequencyData",
     "Substitution",
+    "mass_weight",
+    "harmonic_frequencies",
+    "find_scaling_factor",
+    "choose_scaling_factor",
+    "ScalingChoice",
     "KinisotError",
     "KinisotInputError",
     "KinisotParseError",
     "KinisotWarning",
+    "compute_isotope_effect",
 ]

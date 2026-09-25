@@ -10,7 +10,7 @@ import sys
 import pytest
 from conftest import datapath, write_minimum, write_ts
 
-from kinisot import Kinisot
+from kinisot import __version__, cli
 
 GS = datapath("gaussian/claisen_gs.out")
 TS = datapath("gaussian/claisen_ts.out")
@@ -23,7 +23,7 @@ def run(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     def _run(args):
-        return Kinisot.main(args), tmp_path
+        return cli.main(args), tmp_path
 
     return _run
 
@@ -104,7 +104,7 @@ def test_version(run, capsys):
     with pytest.raises(SystemExit) as exc:
         run(["--version"])
     assert exc.value.code == 0
-    assert "Kinisot " + Kinisot.__version__ in capsys.readouterr().out
+    assert "Kinisot " + __version__ in capsys.readouterr().out
 
 
 @pytest.mark.parametrize(

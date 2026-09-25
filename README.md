@@ -79,7 +79,8 @@ The equations behind every column are in [docs/theory.md](docs/theory.md).
 
 ```
 kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso ATOMS ...]
-        [-t K] [-s FACTOR] [--imag-cutoff CM-1] [-o FILE] [--overwrite] [-q]
+        [-t K] [-s FACTOR] [--imag-cutoff CM-1] [--tunneling MODEL] [-o FILE] [--overwrite] [-q]
+        [--json FILE] [--csv FILE]
 ```
 
 `python -m kinisot` is equivalent to `kinisot`.
@@ -100,7 +101,9 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | `-t`, `--temperature` | temperature in K at which the partition functions are evaluated (default 298.15). It need not match the frequency job. |
 | `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) for the level of theory detected in the files, or 1.0 with a message if it is not listed. |
 | `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
+| `--tunneling` | `bell` (default), `wigner` or `none`. |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
+| `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
 | `--version` | print the version. |
 
 Invalid input (an atom number out of range, a reactant with an imaginary
@@ -131,29 +134,45 @@ Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
   The discarded modes are printed so this can be checked.
 - One imaginary mode per transition structure; a second one triggers a
   warning.
-- Tunnelling by Bell's one-dimensional infinite-parabola model; it is not
-  meaningful below the crossover temperature h c |ν‡| / 2π k.
+- Tunnelling by Bell's one-dimensional infinite-parabola model (default), the
+  Wigner correction, or none; Bell is refused below the crossover
+  temperature h c |ν‡| / 2π k.
 - Rigid rotor / harmonic oscillator, no conformational averaging, no
   solvent corrections: compute those outside Kinisot if you need them.
 
 ## Python API
 
 ```python
-from kinisot import compute_isotope_effect
+from kinisot import compute_kie, parse_gaussian
 
-species, zpe, exc, trpf, kie, kie_tunnel, tunnel_corr, freq_ratio = compute_isotope_effect(
-    rct=["claisen_gs.out"], ts=["claisen_ts.out"], prd=None, label=["1", "1"],
-    temperature=393.0, freq_scale_factor=0.961)
-print(kie_tunnel)                      # 1.014739...
-print(species[2].im_frequency_wn)      # 463.9 (light TS)
-print(species[3].frequency_wn[:3])     # kept modes of the heavy TS
+r = compute_kie(rct="claisen_gs.out", ts="claisen_ts.out", iso="1", temperature=393.0, scale=0.961)
+r.kie_tunnel                          # 1.014739 (the corr-KIE column)
+r.kie, r.zpe, r.exc, r.trpf, r.imag_ratio, r.tunnel_corr
+r.other.light.imaginary               # 463.9  (light TS reaction coordinate, cm-1)
+r.reactant.rpfr, r.other.rpfr         # reduced partition function ratios (s/s')f
+r.to_dict(); r.to_json()              # everything, JSON-serializable
+r.summary_row()                       # one flat row, as written by --csv
+
+gs, ts = parse_gaussian("claisen_gs.out"), parse_gaussian("claisen_ts.out")   # parse once,
+[compute_kie(rct=gs, ts=ts, iso=a, temperature=393.0, scale=0.961).kie_tunnel  # scan positions
+ for a in ("1", "2", "3", "4", "5", "6")]
 ```
 
-`species` holds the four `calc_rpfr` results (reactant light/heavy, TS or
-product light/heavy) with their kept, discarded and imaginary frequencies.
-Errors are `kinisot.KinisotInputError` / `kinisot.KinisotParseError`
-(both `ValueError` subclasses). A structured result object and `--json`
-output are planned (Phase 4).
+`compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0,
+imag_cutoff=50.0, tunneling="bell")` takes file paths or `HessianInput`
+objects (one or a list per side), `scale=None` for automatic Truhlar
+lookup, and `tunneling` in `"bell"`, `"wigner"`, `"none"`. It returns a
+frozen `IsotopeEffect` whose `reactant` and `other` (transition structure
+or product) sides hold the light and heavy isotopologues with their kept,
+discarded and imaginary frequencies, masses and substitutions. Problems
+raise `kinisot.KinisotInputError` / `KinisotParseError` (both `ValueError`
+subclasses); non-fatal ones are `KinisotWarning`s and are listed in
+`r.warnings`. See [examples/api_example.py](examples/api_example.py) and
+[examples/examples.ipynb](examples/examples.ipynb). The 2.x function
+`compute_isotope_effect()` still works but is deprecated.
+
+Machine-readable output from the command line: `--json run.json` (the
+full result of one run) and `--csv runs.csv` (one row per run, appended).
 
 ## Examples and documentation
 

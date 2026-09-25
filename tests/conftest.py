@@ -20,7 +20,7 @@ def synthetic_hessian(masses, freqs_cm, seed=0):
     Used to build small Gaussian-like files with chosen frequencies so that
     mode-counting logic can be tested without real quantum chemistry output.
     """
-    from kinisot.Kinisot import HESSIAN_TO_WAVENUMBER_SQ
+    from kinisot.thermo import HESSIAN_TO_WAVENUMBER_SQ
 
     n = 3 * len(masses)
     freqs = np.asarray(freqs_cm, dtype=float)
