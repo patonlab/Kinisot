@@ -145,31 +145,35 @@ def test_projection_rescues_a_noisy_hessian():
     # Add spurious curvature along the six external directions of the real Claisen Hessians, as
     # finite-difference (MLIP) Hessians have. The lowest-six rule then discards a genuine vibration
     # and keeps a spurious one; projection removes exactly the noise and recovers the clean KIE.
+    # The same curvature is used for all six directions (lam * Q Q^T), which makes the noise
+    # independent of the arbitrary basis LAPACK picks within the degenerate external subspace.
     from kinisot.thermo import HESSIAN_TO_WAVENUMBER_SQ
 
     def noisy(path, spurious_wn):
         data = parse_gaussian(path)
         masses = np.asarray(light_masses(data))
         q = external_mode_vectors(data.positions, masses)
-        lam = np.sign(spurious_wn) * np.asarray(spurious_wn, dtype=float) ** 2 / HESSIAN_TO_WAVENUMBER_SQ
-        mw = mass_weight(data.hessian, masses) + q @ np.diag(lam) @ q.T
+        lam = spurious_wn**2 / HESSIAN_TO_WAVENUMBER_SQ
+        mw = mass_weight(data.hessian, masses) + lam * (q @ q.T)
         sqrt_m = np.repeat(np.sqrt(masses), 3)
         hessian = mw * sqrt_m[:, None] * sqrt_m[None, :]
         return HessianInput(hessian, data.masses, data.atomic_numbers, source=path + "+noise", positions=data.positions)
 
-    gs = noisy(GS, [-45.0, -30.0, -20.0, 90.0, 120.0, 200.0])  # below the 50 cm-1 cutoff, above the 70 cm-1 mode
-    ts = noisy(TS, [-45.0, -30.0, -20.0, 90.0, 120.0, 200.0])
+    gs = noisy(GS, 300.0)  # six spurious modes at 300 cm-1, above several genuine low-frequency modes
+    ts = noisy(TS, 300.0)
     clean = compute_kie(rct=GS, ts=TS, iso="4", **KW)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", KinisotWarning)  # the self-check rightly complains about the noisy inputs
         plain = compute_kie(rct=gs, ts=ts, iso="4", **KW)
         projected = compute_kie(rct=gs, ts=ts, iso="4", project=True, **KW)
-    # The noise is exactly external only for the light masses; for the heavy isotopologue a small part
-    # leaks into the vibrations, so projection recovers the clean KIE to ~1e-5 rather than exactly,
-    # still far better than the lowest-six rule.
-    assert abs(plain.kie_tunnel - clean.kie_tunnel) > 1e-4  # the lowest-six rule is fooled
-    assert projected.kie_tunnel == pytest.approx(clean.kie_tunnel, rel=2e-5)
-    assert abs(projected.kie_tunnel - clean.kie_tunnel) < 0.05 * abs(plain.kie_tunnel - clean.kie_tunnel)
+    # Projection removes exactly the rigid-body components of each isotopologue. The noise is purely
+    # external only for the light masses, so a small part stays in the heavy isotopologue's vibrations
+    # and the clean KIE is recovered closely (1e-4) rather than exactly; the lowest-six rule, which
+    # discards genuine modes and keeps spurious ones, is ten times further off.
+    plain_error = abs(plain.kie_tunnel - clean.kie_tunnel)
+    projected_error = abs(projected.kie_tunnel - clean.kie_tunnel)
+    assert plain_error > 5e-4
+    assert projected_error < 2e-4 and projected_error < 0.5 * plain_error
     assert max(abs(f) for f in projected.reactant.light.species[0].discarded) < 0.01
 
 

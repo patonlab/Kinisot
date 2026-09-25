@@ -15,9 +15,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install ruff
+      - run: python -m pip install ruff build
       - run: ruff check .
       - run: ruff format --check .
+      - name: Build the wheel and check that every subpackage is inside
+        run: |
+          python -m build --wheel
+          python - <<'PY'
+          import glob, zipfile
+          names = {i.filename for i in zipfile.ZipFile(glob.glob("dist/*.whl")[0]).infolist()}
+          for required in ("kinisot/backends/__init__.py", "kinisot/backends/ase.py", "kinisot/isotope_data.py"):
+              assert required in names, "missing from the wheel: " + required
+          data = [n for n in names if n.endswith((".out", ".hess", ".dat"))]
+          assert not data, "test data must not ship in the wheel: %r" % data
+          print("wheel ok:", len(names), "files")
+          PY
 
   test:
     name: Python ${{ matrix.python-version }} / ${{ matrix.os }}
@@ -36,10 +48,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install package and test dependencies
+      - name: Install package (editable, so coverage measures the source tree) and test dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install ".[test,ase]"
+          python -m pip install -e ".[test,ase]"
 
       - name: Run tests with coverage
         run: pytest tests/ -v --cov=kinisot --cov-report=term-missing --cov-fail-under=80
