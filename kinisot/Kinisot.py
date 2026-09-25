@@ -15,28 +15,39 @@ import numpy as np
 
 from . import __version__
 from .exceptions import KinisotError, KinisotInputError, KinisotWarning
-from .Hess_to_Freq import (is_linear, level_of_theory, mass_weight, parse_gaussian, read_hess,
-                           substitute)
+from .Hess_to_Freq import is_linear, level_of_theory, mass_weight, parse_gaussian, read_hess, substitute
 from .vib_scale_factors import scaling_data, scaling_refs
 
-__all__ = ["compute_isotope_effect", "calc_rpfr", "harmonic_frequencies", "find_scaling_factor",
-           "get_frequency_scaling", "read_hess", "is_linear", "level_of_theory", "Logger",
-           "build_parser", "main", "__version__"]
+__all__ = [
+    "compute_isotope_effect",
+    "calc_rpfr",
+    "harmonic_frequencies",
+    "find_scaling_factor",
+    "get_frequency_scaling",
+    "read_hess",
+    "is_linear",
+    "level_of_theory",
+    "Logger",
+    "build_parser",
+    "main",
+    "__version__",
+]
 
 # PHYSICAL CONSTANTS (CODATA 2010; SI apart from the speed of light in cm/s)
-PLANCK_CONSTANT = 6.62606957e-34      # J s
-BOLTZMANN_CONSTANT = 1.3806488e-23    # J / K
-SPEED_OF_LIGHT = 2.99792458e10        # cm / s
-ENERGY_AU = 4.35974434e-18            # J
-BOHR_RADIUS = 5.2917721092e-11        # m
-ATOMIC_MASS_UNIT = 1.660538921e-27    # kg
+PLANCK_CONSTANT = 6.62606957e-34  # J s
+BOLTZMANN_CONSTANT = 1.3806488e-23  # J / K
+SPEED_OF_LIGHT = 2.99792458e10  # cm / s
+ENERGY_AU = 4.35974434e-18  # J
+BOHR_RADIUS = 5.2917721092e-11  # m
+ATOMIC_MASS_UNIT = 1.660538921e-27  # kg
 
 # Multiply a mass-weighted Hessian in Hartree/(amu Bohr^2) by this to get eigenvalues in cm^-2
-HESSIAN_TO_WAVENUMBER_SQ = (ENERGY_AU / (BOHR_RADIUS ** 2 * ATOMIC_MASS_UNIT)
-                            / ((SPEED_OF_LIGHT * 2 * np.pi) ** 2))
+HESSIAN_TO_WAVENUMBER_SQ = ENERGY_AU / (BOHR_RADIUS**2 * ATOMIC_MASS_UNIT) / ((SPEED_OF_LIGHT * 2 * np.pi) ** 2)
 
 # print formatting
-space = "   "; dash = "--"; dash_line = space * 17 + " " + dash * 37
+space = "   "
+dash = "--"
+dash_line = space * 17 + " " + dash * 37
 
 
 class Logger:
@@ -51,7 +62,7 @@ class Logger:
     def __init__(self, path="Kinisot_output.dat", quiet=False, overwrite=False):
         self.path = path
         self.quiet = quiet
-        self.log = open(path, 'w' if overwrite else 'a')
+        self.log = open(path, "w" if overwrite else "a")
 
     def __enter__(self):
         return self
@@ -63,7 +74,7 @@ class Logger:
     def Write(self, message):
         """Write a message to the terminal (unless quiet) and to the file."""
         if not self.quiet:
-            print(message, end='')
+            print(message, end="")
         self.log.write(message)
 
     def Writeonlyfile(self, message):
@@ -84,15 +95,17 @@ def find_scaling_factor(level):
     case and hyphens and stripping Gaussian's R/U/RO spin prefix. Returns
     (factor, reference) or (None, None) if the level is not in the database.
     """
+
     def norm(name):
         return name.upper().replace("-", "")
+
     candidates = {norm(level)}
     for prefix in ("RO", "R", "U"):
         if level.upper().startswith(prefix):
-            candidates.add(norm(level[len(prefix):]))
+            candidates.add(norm(level[len(prefix) :]))
     for scal in scaling_data:
-        if norm(scal['level'].decode("utf-8")) in candidates:
-            return scal['zpe_fac'], scaling_refs[scal['zpe_ref']]
+        if norm(scal["level"].decode("utf-8")) in candidates:
+            return scal["zpe_fac"], scaling_refs[scal["zpe_ref"]]
     return None, None
 
 
@@ -116,20 +129,20 @@ def get_frequency_scaling(files, log):
     level = next(iter(levels))
     factor, ref = find_scaling_factor(level) if level != "unknown" else (None, None)
     if factor is None:
-        log.Write("\n  Unable to find vibrational scaling factor for %s; using value of 1.0 "
-                  "(override with -s)" % level)
+        log.Write("\n  Unable to find vibrational scaling factor for %s; using value of 1.0 (override with -s)" % level)
         return 1.0
     factor = round(float(factor), 4)
-    log.Write("\n  Found vibrational scaling factor %s for %s level of theory "
-              "(ZPE factor, Truhlar database)" % (factor, level))
+    log.Write(
+        "\n  Found vibrational scaling factor %s for %s level of theory "
+        "(ZPE factor, Truhlar database)" % (factor, level)
+    )
     log.Write("\n  REF: " + ref)
     return factor
 
 
 def _reduced_energies(frequency_wn, temperature):
     """u = h c nu / k T for an array of wavenumbers."""
-    return (PLANCK_CONSTANT * SPEED_OF_LIGHT * np.asarray(frequency_wn, dtype=float)
-            / (BOLTZMANN_CONSTANT * temperature))
+    return PLANCK_CONSTANT * SPEED_OF_LIGHT * np.asarray(frequency_wn, dtype=float) / (BOLTZMANN_CONSTANT * temperature)
 
 
 def calc_product_factor(frequency_wn):
@@ -215,17 +228,18 @@ class calc_rpfr:
                         "the largest is treated as the reaction coordinate and the others are "
                         "discarded with the external modes, which leaves one low-frequency "
                         "external mode in the vibrational product. Check the structure."
-                        % (file, len(imaginary), freq_cutoff,
-                           ", ".join("%.1fi" % -f for f in imaginary)),
-                        KinisotWarning, stacklevel=2)
-            discarded = freqs[(1 if len(imaginary) else 0):n_external]
+                        % (file, len(imaginary), freq_cutoff, ", ".join("%.1fi" % -f for f in imaginary)),
+                        KinisotWarning,
+                        stacklevel=2,
+                    )
+            discarded = freqs[(1 if len(imaginary) else 0) : n_external]
             kept = freqs[n_external:]
             if np.any(kept <= 0):
                 raise KinisotInputError(
                     "%s: %d non-positive frequencies remain after removing %d external modes "
                     "(%s); the structure is not a stationary point Kinisot can use"
-                    % (file, int(np.sum(kept <= 0)), n_external,
-                       ", ".join("%.1f" % f for f in kept[kept <= 0])))
+                    % (file, int(np.sum(kept <= 0)), n_external, ", ".join("%.1f" % f for f in kept[kept <= 0]))
+                )
             self.discarded_wn[file] = [float(f) for f in discarded]
             self.kept_wn[file] = [float(f) for f in kept]
             self.frequency_wn.extend(self.kept_wn[file])
@@ -238,7 +252,8 @@ class calc_rpfr:
         if len(self.im_frequencies) > 1:
             raise KinisotInputError(
                 "more than one file on the same side of the reaction has an imaginary "
-                "frequency: %s" % ", ".join("%s (%.1fi cm-1)" % item for item in self.im_frequencies.items()))
+                "frequency: %s" % ", ".join("%s (%.1fi cm-1)" % item for item in self.im_frequencies.items())
+            )
         if len(self.im_frequencies) == 1:
             self.im_frequency_wn = next(iter(self.im_frequencies.values()))
 
@@ -257,8 +272,9 @@ def _check_substitution_balance(reactant_side, other_side, side_name):
         raise KinisotInputError(
             "the isotopic substitutions differ between the reactant side [%s] and the %s side "
             "[%s]. An isotope effect compares the same isotopologue on both sides; check the atom "
-            "numbering in each file." % (_describe(reactant_side.substituted), side_name,
-                                          _describe(other_side.substituted)))
+            "numbering in each file."
+            % (_describe(reactant_side.substituted), side_name, _describe(other_side.substituted))
+        )
 
 
 def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_factor=1.0, freq_cutoff=50.0):
@@ -273,15 +289,17 @@ def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_f
     input and KinisotParseError for unusable files.
     """
     if (ts is None) == (prd is None):
-        raise KinisotInputError("give either transition structure files (KIE) or product files "
-                                "(EQE), not both and not neither")
+        raise KinisotInputError(
+            "give either transition structure files (KIE) or product files (EQE), not both and not neither"
+        )
     rct = list(rct)
     other = list(ts if ts is not None else prd)
     side_name = "transition structure" if ts is not None else "product"
     label = list(label)
     if len(label) != len(rct) + len(other):
-        raise KinisotInputError("%d files were given but %d isotope labels; give one label per file"
-                                % (len(rct) + len(other), len(label)))
+        raise KinisotInputError(
+            "%d files were given but %d isotope labels; give one label per file" % (len(rct) + len(other), len(label))
+        )
     if temperature <= 0:
         raise KinisotInputError("temperature must be positive (got %s K)" % temperature)
     if freq_scale_factor <= 0:
@@ -289,9 +307,9 @@ def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_f
 
     # Calculates the RPFR terms for each species and its isotopologue
     species = []
-    for iso in [['0'] * len(rct), label[0:len(rct)]]:
+    for iso in [["0"] * len(rct), label[0 : len(rct)]]:
         species.append(calc_rpfr(rct, iso, temperature, freq_scale_factor, freq_cutoff))
-    for iso in [['0'] * len(other), label[len(rct):]]:
+    for iso in [["0"] * len(other), label[len(rct) :]]:
         species.append(calc_rpfr(other, iso, temperature, freq_scale_factor, freq_cutoff))
 
     # Reactants (and products) must be minima
@@ -302,14 +320,16 @@ def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_f
             raise KinisotInputError(
                 "%s has an imaginary frequency (%.1fi cm-1) but was given as a %s. Reactants and "
                 "products must be minima; re-optimize the structure or, if this is a spurious "
-                "low mode, raise --imag-cutoff above %.1f" % (file, im, role, im))
+                "low mode, raise --imag-cutoff above %.1f" % (file, im, role, im)
+            )
 
     if ts is not None:
         # Check for the presence of an imaginary frequency in both TS isotopologues
         if not (species[2].im_frequencies and species[3].im_frequencies):
             raise KinisotInputError(
                 "Kinisot requires a transition structure with an imaginary frequency beyond the "
-                "%.1f cm-1 cutoff (--imag-cutoff)! Files given as --ts: %s" % (freq_cutoff, ", ".join(other)))
+                "%.1f cm-1 cutoff (--imag-cutoff)! Files given as --ts: %s" % (freq_cutoff, ", ".join(other))
+            )
         freq_fac = species[2].im_frequency_wn / species[3].im_frequency_wn
     else:
         freq_fac = 1.0
@@ -325,12 +345,16 @@ def compute_isotope_effect(rct, ts, prd, label, temperature=298.15, freq_scale_f
     # Conversion from wavenumbers to SI energy units; then divide by kT
     tofreq = SPEED_OF_LIGHT * PLANCK_CONSTANT / BOLTZMANN_CONSTANT / temperature
     if ts is not None:
-        parabolic_tunn_corr = (freq_fac * np.sin(0.5 * tofreq * species[3].im_frequency_wn)
-                               / np.sin(0.5 * tofreq * species[2].im_frequency_wn))
+        parabolic_tunn_corr = (
+            freq_fac
+            * np.sin(0.5 * tofreq * species[3].im_frequency_wn)
+            / np.sin(0.5 * tofreq * species[2].im_frequency_wn)
+        )
     else:
         parabolic_tunn_corr = 1.0
 
-    # (a) the Bigeleisen-Mayer KIE with classical nuclei and (b) a value corrected to include quantum tunneling effects...
+    # (a) the Bigeleisen-Mayer KIE with classical nuclei and
+    # (b) a value corrected to include quantum tunneling effects
     KIE_no_tunnel = freq_fac * ZPE * EXC * TRPF
     KIE_tunnel = KIE_no_tunnel * parabolic_tunn_corr
 
@@ -351,12 +375,15 @@ def write_results(log, files, labels, n_rct, is_kie, temperature, scale, result)
     species, ZPE, EXC, TRPF, KIE_no_tunnel, KIE_tunnel, parabolic_tunn_corr, freq_fac = result
     rct_files, oth_files = files[:n_rct], files[n_rct:]
     rct_name, oth_name = _side_name(rct_files), _side_name(oth_files)
-    rct_iso, oth_iso = ' / '.join(labels[:n_rct]), ' / '.join(labels[n_rct:])
+    rct_iso, oth_iso = " / ".join(labels[:n_rct]), " / ".join(labels[n_rct:])
 
     log.Write("\n\n" + (space * 17) + "  Temp = " + str(temperature) + "K / Vib. scale factor = " + str(scale))
     log.Write(("\n  ").ljust(50))
-    log.Write(' {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n'.format(
-        "V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"))
+    log.Write(
+        " {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n".format(
+            "V-ratio", "ZPE", "EXC", "TRPF", "KIE", "1D-tunn", "corr-KIE"
+        )
+    )
 
     # Per-species Bigeleisen-Mayer factors (light / heavy); the final line is their ratio
     def factors(light, heavy):
@@ -365,35 +392,50 @@ def write_results(log, files, labels, n_rct, is_kie, temperature, scale, result)
     log.Write("\no " + rct_name.ljust(47) + "   " + dash * 37)
     log.Write("\no " + oth_name.ljust(47))
     if is_kie:
-        log.Write('{:10.1f}'.format(species[2].im_frequency_wn))
+        log.Write("{:10.1f}".format(species[2].im_frequency_wn))
     log.Write("\no " + (rct_name + ": iso @ " + rct_iso).ljust(47))
-    log.Write('           {:10.3e} {:10.3e} {:10.3e}'.format(*factors(species[0], species[1])))
+    log.Write("           {:10.3e} {:10.3e} {:10.3e}".format(*factors(species[0], species[1])))
     log.Write("\no " + (oth_name + ": iso @ " + oth_iso).ljust(47))
     if is_kie:
-        log.Write('{:10.1f} {:10.3e} {:10.3e} {:10.3e}'.format(species[3].im_frequency_wn, *factors(species[2], species[3])))
+        log.Write(
+            "{:10.1f} {:10.3e} {:10.3e} {:10.3e}".format(species[3].im_frequency_wn, *factors(species[2], species[3]))
+        )
     else:
-        log.Write('{:21.3e} {:10.3e} {:10.3e}'.format(*factors(species[2], species[3])))
+        log.Write("{:21.3e} {:10.3e} {:10.3e}".format(*factors(species[2], species[3])))
 
-    log.Write('\n' + dash_line)
+    log.Write("\n" + dash_line)
     log.Write(("\n  " + ("KIE" if is_kie else "EQE") + " @ " + str(temperature) + " K").ljust(50))
     if is_kie:
-        log.Write('{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}'.format(
-            freq_fac, ZPE, EXC, TRPF, KIE_no_tunnel, parabolic_tunn_corr, KIE_tunnel))
+        log.Write(
+            "{:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
+                freq_fac, ZPE, EXC, TRPF, KIE_no_tunnel, parabolic_tunn_corr, KIE_tunnel
+            )
+        )
     else:
-        log.Write('{:21.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}'.format(
-            ZPE, EXC, TRPF, KIE_no_tunnel, parabolic_tunn_corr, KIE_tunnel))
-    log.Write('\n' + dash_line + '\n')
+        log.Write(
+            "{:21.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}".format(
+                ZPE, EXC, TRPF, KIE_no_tunnel, parabolic_tunn_corr, KIE_tunnel
+            )
+        )
+    log.Write("\n" + dash_line + "\n")
 
     # Which modes went into the partition functions, so that a misassigned external mode is visible
     log.Write("\n  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes\n")
-    for sp, iso_labels in ((species[0], None), (species[1], labels[:n_rct]), (species[2], None), (species[3], labels[n_rct:])):
+    for sp, iso_labels in (
+        (species[0], None),
+        (species[1], labels[:n_rct]),
+        (species[2], None),
+        (species[3], labels[n_rct:]),
+    ):
         for i, file in enumerate(sp.files):
             tag = "light" if iso_labels is None else "iso @ " + iso_labels[i]
             line = "  %s (%s):" % (_short_name(file), tag)
             if file in sp.im_frequencies:
                 line += " imaginary %.1fi;" % sp.im_frequencies[file]
             line += " %d kept; discarded: %s" % (
-                len(sp.kept_wn[file]), " ".join("%.1f" % f for f in sp.discarded_wn[file]))
+                len(sp.kept_wn[file]),
+                " ".join("%.1f" % f for f in sp.discarded_wn[file]),
+            )
             log.Write(line + "\n")
 
 
@@ -401,31 +443,66 @@ def build_parser():
     parser = ArgumentParser(
         prog="kinisot",
         description="Kinetic (--ts) and equilibrium (--prd) isotope effects from Gaussian frequency "
-                    "calculations, using the Bigeleisen-Mayer equation and a Bell tunnelling correction.",
-        epilog="Example: kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 5 -t 393 -s 0.961")
-    parser.add_argument("--rct", dest="rct", action='append', required=True, metavar="FILE",
-                        help="reactant frequency output; repeat for bimolecular reactions")
-    parser.add_argument("--ts", dest="ts", action='append', metavar="FILE",
-                        help="transition structure frequency output (KIE)")
-    parser.add_argument("--prd", dest="prd", action='append', metavar="FILE",
-                        help="product frequency output (EQE)")
-    parser.add_argument("--iso", dest="label", action='append', required=True, metavar="ATOMS",
-                        help="atom number(s) to replace with the heavy isotope (2H, 13C, 17O), comma "
-                             "separated, e.g. 7,8. Give one --iso per file in the order of the --rct "
-                             "then --ts/--prd files, or a single --iso when the atom numbering is the "
-                             "same in all files. Use 0 for a file without substitution.")
-    parser.add_argument("-t", "--temperature", dest="temperature", type=float, default=298.15,
-                        help="temperature in Kelvin (default 298.15)")
-    parser.add_argument("-s", "--scale", dest="freq_scale_factor", type=float, default=None,
-                        help="vibrational scaling factor (default: ZPE factor from the Truhlar database "
-                             "for the detected level of theory, else 1.0)")
-    parser.add_argument("--imag-cutoff", dest="freq_cutoff", type=float, default=50.0,
-                        help="a mode below -CUTOFF cm-1 is the reaction coordinate (default 50)")
+        "calculations, using the Bigeleisen-Mayer equation and a Bell tunnelling correction.",
+        epilog="Example: kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 5 -t 393 -s 0.961",
+    )
+    parser.add_argument(
+        "--rct",
+        dest="rct",
+        action="append",
+        required=True,
+        metavar="FILE",
+        help="reactant frequency output; repeat for bimolecular reactions",
+    )
+    parser.add_argument(
+        "--ts", dest="ts", action="append", metavar="FILE", help="transition structure frequency output (KIE)"
+    )
+    parser.add_argument("--prd", dest="prd", action="append", metavar="FILE", help="product frequency output (EQE)")
+    parser.add_argument(
+        "--iso",
+        dest="label",
+        action="append",
+        required=True,
+        metavar="ATOMS",
+        help="atom number(s) to replace with the heavy isotope (2H, 13C, 17O), comma "
+        "separated, e.g. 7,8. Give one --iso per file in the order of the --rct "
+        "then --ts/--prd files, or a single --iso when the atom numbering is the "
+        "same in all files. Use 0 for a file without substitution.",
+    )
+    parser.add_argument(
+        "-t",
+        "--temperature",
+        dest="temperature",
+        type=float,
+        default=298.15,
+        help="temperature in Kelvin (default 298.15)",
+    )
+    parser.add_argument(
+        "-s",
+        "--scale",
+        dest="freq_scale_factor",
+        type=float,
+        default=None,
+        help="vibrational scaling factor (default: ZPE factor from the Truhlar database "
+        "for the detected level of theory, else 1.0)",
+    )
+    parser.add_argument(
+        "--imag-cutoff",
+        dest="freq_cutoff",
+        type=float,
+        default=50.0,
+        help="a mode below -CUTOFF cm-1 is the reaction coordinate (default 50)",
+    )
     parser.add_argument("--cutoff", dest="freq_cutoff", type=float, default=50.0, help=SUPPRESS)
-    parser.add_argument("-o", "--output", dest="output", default="Kinisot_output.dat", metavar="FILE",
-                        help="results file; new results are appended (default Kinisot_output.dat)")
-    parser.add_argument("--overwrite", action="store_true",
-                        help="start a fresh results file instead of appending")
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="output",
+        default="Kinisot_output.dat",
+        metavar="FILE",
+        help="results file; new results are appended (default Kinisot_output.dat)",
+    )
+    parser.add_argument("--overwrite", action="store_true", help="start a fresh results file instead of appending")
     parser.add_argument("-q", "--quiet", action="store_true", help="do not print results to the terminal")
     parser.add_argument("--version", action="version", version="Kinisot " + __version__)
     return parser
@@ -450,15 +527,17 @@ def main(argv=None):
     # if only one set of labels is provided, assume that the atom numbering is the same for rct and ts/prd
     labels = options.label * 2 if len(options.label) == 1 else list(options.label)
     if len(labels) != len(files):
-        parser.error("%d files were given but %d --iso labels: give one --iso per file (0 for no "
-                     "substitution) or a single --iso when the atom numbering is the same"
-                     % (len(files), len(options.label)))
+        parser.error(
+            "%d files were given but %d --iso labels: give one --iso per file (0 for no "
+            "substitution) or a single --iso when the atom numbering is the same" % (len(files), len(options.label))
+        )
 
     try:
         log = Logger(options.output, quiet=options.quiet, overwrite=options.overwrite)
     except OSError as err:
-        print("\no  ERROR: cannot open the results file %s: %s\n" % (options.output, err.strerror or err),
-              file=sys.stderr)
+        print(
+            "\no  ERROR: cannot open the results file %s: %s\n" % (options.output, err.strerror or err), file=sys.stderr
+        )
         return 1
     with log:
         log.Write("\n  " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M") + "\n")
@@ -472,8 +551,9 @@ def main(argv=None):
 
             with warnings.catch_warnings(record=True) as caught:
                 warnings.simplefilter("always", KinisotWarning)
-                result = compute_isotope_effect(options.rct, options.ts, options.prd, labels,
-                                                options.temperature, scale, options.freq_cutoff)
+                result = compute_isotope_effect(
+                    options.rct, options.ts, options.prd, labels, options.temperature, scale, options.freq_cutoff
+                )
             for warning in caught:
                 log.Write("\n  WARNING: " + str(warning.message))
 

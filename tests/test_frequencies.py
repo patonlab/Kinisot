@@ -15,12 +15,12 @@ import os
 
 import numpy as np
 import pytest
+from conftest import datapath
 
 from kinisot import Kinisot
 from kinisot.Hess_to_Freq import mass_weight, parse_gaussian
-from conftest import datapath
 
-EXAMPLES = sorted(glob.glob(datapath('gaussian/*.out')))
+EXAMPLES = sorted(glob.glob(datapath("gaussian/*.out")))
 
 
 def gaussian_printed(path):
@@ -28,14 +28,14 @@ def gaussian_printed(path):
     with open(path) as handle:
         for line in handle:
             s = line.strip()
-            if s.startswith('Frequencies --'):
+            if s.startswith("Frequencies --"):
                 freqs += [float(x) for x in s.split()[2:]]
-            elif s.startswith('Low frequencies ---'):
+            elif s.startswith("Low frequencies ---"):
                 low += [float(x) for x in s.split()[3:]]
     return np.array(freqs), np.sort(np.array(low))
 
 
-@pytest.mark.parametrize('path', EXAMPLES, ids=os.path.basename)
+@pytest.mark.parametrize("path", EXAMPLES, ids=os.path.basename)
 def test_modes_match_gaussian(path):
     data = parse_gaussian(path)
     freqs = Kinisot.harmonic_frequencies(mass_weight(data.hessian, data.masses))

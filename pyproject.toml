@@ -47,11 +47,12 @@ target-version = "py39"
 extend-exclude = ["tests/data"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP"]
+select = ["E", "F", "W", "I", "B"]
 ignore = ["E741"]
 
 [tool.ruff.lint.per-file-ignores]
 "kinisot/__init__.py" = ["E402"]
+"kinisot/vib_scale_factors.py" = ["E501"]   # data table; replaced by GoodVibes in Phase 5
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
