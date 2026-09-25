@@ -25,14 +25,38 @@ and outputs edited by hand.
 Atom numbering is the order of the atoms in the Gaussian input, starting at
 1; the `--iso` labels use that numbering.
 
-## ORCA (planned, implementation plan Phase 5)
+## ORCA (supported)
 
-ORCA writes the Hessian to a separate `name.hess` file next to `name.out`.
-Kinisot will accept either file and locate the other. Note that ORCA's
-default masses are standard atomic weights (C 12.011) rather than pure
-isotopes; Kinisot will build both isotopologues from its own isotope
-table so that Gaussian and ORCA inputs give the same numbers for the same
-Hessian.
+ORCA writes the Hessian to `name.hess` next to `name.out`; give Kinisot
+either path and it finds the other by name (the `.hess` file alone is
+enough for the numbers; the `.out` supplies the level of theory from the
+`!` keyword line, parsed by GoodVibes). From the `.hess` file Kinisot reads
+`$hessian` (through GoodVibes), `$atoms` (element symbols and the geometry
+in the Hessian's frame, used to decide linearity) and
+`$vibrational_frequencies` (for the self-check below).
+
+**Masses.** ORCA lists standard atomic weights (C 12.011, H 1.008). For the
+elements Kinisot can substitute, the light isotopologue is built from the
+pure most-abundant-isotope masses Gaussian uses (¹²C 12.000, ¹H 1.00783,
+¹⁶O 15.99491), so the same Hessian gives the same isotope effect from
+either program; other elements keep ORCA's masses until the full isotope
+table of Phase 7. This means Kinisot's unsubstituted frequencies differ
+very slightly from ORCA's printed ones (well under the 1 cm⁻¹ self-check
+tolerance for organic molecules).
+
+Caveats: `NumFreq` Hessians are noisier than analytic ones (projection,
+Phase 7, is recommended for them); `%freq scalfreq` scales ORCA's printed
+frequencies but not `$hessian`, so Kinisot's factor is applied to the raw
+frequencies as intended.
+
+## Frequency self-check
+
+For every unsubstituted species whose file lists the program's vibrational
+frequencies, Kinisot compares them with the ones it obtains from the
+Hessian and warns when they differ by more than 1 cm⁻¹ (the program
+projects out translations and rotations, Kinisot does not, hence the
+tolerance). The warning means the Hessian and the masses do not belong
+together (wrong file pairing, edited output, unit problem).
 
 ## ASE and machine-learned potentials (planned, Phase 8)
 

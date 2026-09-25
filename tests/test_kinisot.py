@@ -116,7 +116,10 @@ def test_deprecated_compute_isotope_effect_matches_compute_kie():
         ("UB3LYP/6-31G(d)", 0.977),  # U prefix stripped
         ("RHF/3-21G", 0.919),
         ("M06/maug-cc-pVTZ", 0.982),  # exact match, not shadowed by later rows
-        ("RM062X/maug-cc-pVTZ", 0.971),  # row was mislabeled M06/maug-cc-pVTZ before v2.0.3
+        ("RM062X/maug-cc-pVTZ", None),  # in Truhlar v3b2 (0.971) but not in v5, which lists maug-cc-pV(T+D)Z
+        ("MN15-L/MG3S", 0.977),  # needs the MN15-L alias Kinisot adds to GoodVibes' table
+        ("PBE1PBE/MG3S", 0.975),  # Gaussian's name for PBE0, resolved by GoodVibes
+        ("B3LYP/6-31G*", 0.977),  # star shorthand resolved by GoodVibes
         ("B3LYP/STO-3G", None),  # basis set not in database
         ("MADEUP/nonsense", None),
     ],

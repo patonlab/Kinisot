@@ -31,6 +31,9 @@ class HessianInput:
     linear : whether the molecule is linear (5 rather than 6 external modes).
     positions : optional (N, 3) Cartesian coordinates in Bohr, in the same
         frame as the Hessian (needed for projection of external modes).
+    program_frequencies : optional vibrational frequencies (cm-1, unscaled,
+        negative for imaginary) as printed by the program, used only to
+        check that Kinisot reproduces them for the unsubstituted species.
     """
 
     hessian: np.ndarray
@@ -41,6 +44,7 @@ class HessianInput:
     level_of_theory: Optional[str] = None
     linear: bool = False
     positions: Optional[np.ndarray] = None
+    program_frequencies: Optional[Tuple[float, ...]] = None
 
     def __post_init__(self):
         hessian = np.array(self.hessian, dtype=float)
@@ -62,6 +66,8 @@ class HessianInput:
         object.__setattr__(self, "masses", masses)
         object.__setattr__(self, "atomic_numbers", atomic_numbers)
         object.__setattr__(self, "positions", positions)
+        if self.program_frequencies is not None:
+            object.__setattr__(self, "program_frequencies", tuple(float(f) for f in self.program_frequencies))
 
     @property
     def natoms(self):
@@ -85,3 +91,24 @@ def mass_weight(hessian, masses):
     """Mass-weight a Cartesian Hessian: H_ij / sqrt(m_i m_j)."""
     weights = np.repeat(np.asarray(masses, dtype=float) ** -0.5, 3)
     return np.asarray(hessian) * weights[:, None] * weights[None, :]
+
+
+def linear_from_geometry(positions, masses, tolerance=1e-4):
+    """Whether a molecule is linear: its smallest principal moment of inertia is ~0.
+
+    ``positions`` in any consistent length unit (N, 3), ``masses`` in amu; the
+    test is on the smallest moment relative to the largest.
+    """
+    positions = np.asarray(positions, dtype=float)
+    masses = np.asarray(masses, dtype=float)
+    if len(masses) < 3:
+        return True
+    center = (masses[:, None] * positions).sum(axis=0) / masses.sum()
+    r = positions - center
+    inertia = np.zeros((3, 3))
+    for m, (x, y, z) in zip(masses, r):
+        inertia += m * np.array(
+            [[y * y + z * z, -x * y, -x * z], [-x * y, x * x + z * z, -y * z], [-x * z, -y * z, x * x + y * y]]
+        )
+    moments = np.linalg.eigvalsh(inertia)
+    return moments[0] < tolerance * max(moments[-1], 1e-300)

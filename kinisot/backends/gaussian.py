@@ -96,11 +96,14 @@ def parse_gaussian(file):
     lines = _read_lines(file)
     natoms = None
     atomic_numbers, masses = [], []
+    printed = []
     linear = False
 
     for raw in lines:
         line = raw.strip()
-        if line.startswith("NAtoms="):
+        if line.startswith("Frequencies --"):
+            printed.extend(float(x) for x in line.split()[2:])
+        elif line.startswith("NAtoms="):
             try:
                 natoms = int(line.split()[1])
             except (IndexError, ValueError):
@@ -154,6 +157,7 @@ def parse_gaussian(file):
         level_of_theory=_level_from_archive(archive),
         linear=linear,
         positions=_positions_from_archive(archive, natoms),
+        program_frequencies=tuple(printed[-(3 * natoms - 5) :]) if printed else None,
     )
 
 

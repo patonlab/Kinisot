@@ -159,7 +159,7 @@ def append_csv(path, result):
 def build_parser():
     parser = ArgumentParser(
         prog="kinisot",
-        description="Kinetic (--ts) and equilibrium (--prd) isotope effects from Gaussian frequency "
+        description="Kinetic (--ts) and equilibrium (--prd) isotope effects from Gaussian or ORCA frequency "
         "calculations, using the Bigeleisen-Mayer equation and a Bell tunnelling correction.",
         epilog="Example: kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 5 -t 393 -s 0.961",
     )
@@ -169,7 +169,7 @@ def build_parser():
         action="append",
         required=True,
         metavar="FILE",
-        help="reactant frequency output; repeat for bimolecular reactions",
+        help="reactant frequency output (Gaussian .log/.out, or ORCA .out/.hess); repeat for bimolecular reactions",
     )
     parser.add_argument(
         "--ts", dest="ts", action="append", metavar="FILE", help="transition structure frequency output (KIE)"
@@ -210,6 +210,13 @@ def build_parser():
         help="a mode below -CUTOFF cm-1 is the reaction coordinate (default 50)",
     )
     parser.add_argument("--cutoff", dest="freq_cutoff", type=float, default=50.0, help=SUPPRESS)
+    parser.add_argument(
+        "--scale-type",
+        dest="scale_type",
+        choices=["zpe", "harm", "fund"],
+        default="zpe",
+        help="which Truhlar factor to apply when -s is not given: ZPE (default), harmonic or fundamental",
+    )
     parser.add_argument(
         "--tunneling",
         "--tunnelling",
@@ -288,6 +295,7 @@ def main(argv=None):
                     scale=options.freq_scale_factor,
                     imag_cutoff=options.freq_cutoff,
                     tunneling=options.tunneling,
+                    scale_type=options.scale_type,
                 )
             for message in result.scaling.messages:
                 log.Write("\n  " + message)

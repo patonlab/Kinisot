@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: DATS_rct.out isotopologue: 15
   Species: DATS.out isotopologue: 15
 
@@ -21,7 +21,7 @@ o DATS: iso @ 15                                      424.0  1.205e+00  1.025e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 15): imaginary 424.0i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 0
   Species: diene.out isotopologue: 6
   Species: DATS.out isotopologue: 15
@@ -46,7 +46,7 @@ o DATS: iso @ 15                                      424.0  1.205e+00  1.025e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 15): imaginary 424.0i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 0
   Species: diene.out isotopologue: 10
   Species: DATS.out isotopologue: 19
@@ -71,7 +71,7 @@ o DATS: iso @ 19                                      428.1  1.214e+00  1.030e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 19): imaginary 428.1i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 0
   Species: diene.out isotopologue: 1
   Species: DATS.out isotopologue: 10
@@ -96,7 +96,7 @@ o DATS: iso @ 10                                      428.0  1.269e+00  1.015e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 10): imaginary 428.0i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 0
   Species: diene.out isotopologue: 2
   Species: DATS.out isotopologue: 11
@@ -121,7 +121,7 @@ o DATS: iso @ 11                                      428.1  1.249e+00  1.021e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 11): imaginary 428.1i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 0
   Species: diene.out isotopologue: 4
   Species: DATS.out isotopologue: 13
@@ -146,7 +146,7 @@ o DATS: iso @ 13                                      424.9  1.201e+00  1.028e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 13): imaginary 424.9i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 1
   Species: diene.out isotopologue: 0
   Species: DATS.out isotopologue: 1
@@ -171,7 +171,7 @@ o DATS: iso @ 1                                       424.4  1.239e+00  1.015e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 1): imaginary 424.4i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 1
   Species: diene.out isotopologue: 0
   Species: DATS.out isotopologue: 2
@@ -196,7 +196,7 @@ o DATS: iso @ 2                                       423.6  1.236e+00  1.015e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 2): imaginary 423.6i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 5
   Species: diene.out isotopologue: 0
   Species: DATS.out isotopologue: 7
@@ -221,7 +221,7 @@ o DATS: iso @ 7                                       428.1  1.297e+00  1.012e+0
   DATS (light): imaginary 428.2i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
   DATS (iso @ 7): imaginary 428.1i; 59 kept; discarded: -0.1 0.1 0.2 1.6 4.7 6.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: dienophile.out isotopologue: 5
   Species: diene.out isotopologue: 0
   Species: DATS.out isotopologue: 5

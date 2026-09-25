@@ -5,7 +5,7 @@
 [![CI](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml/badge.svg)](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml)
 
 **Kinisot** computes kinetic (KIE) and equilibrium (EQE) isotope effects
-from quantum-chemical frequency calculations. Give it the output files of a
+from Gaussian or ORCA frequency calculations. Give it the output files of a
 reactant and a transition structure (or a product), say which atoms carry
 the heavy isotope, and it re-mass-weights the Hessians, diagonalizes them,
 and evaluates the Bigeleisen–Mayer equation with a Bell tunnelling
@@ -99,7 +99,7 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | --- | --- |
 | `--iso ATOMS` | atom number(s) to replace with the heavy isotope, comma separated (`7,8` substitutes two hydrogens). Atom numbers follow the order of the atoms in the quantum-chemistry input. Kinisot checks that the atoms exist, can be substituted, still carry the light isotope, and that both sides of the reaction substitute the same elements. |
 | `-t`, `--temperature` | temperature in K at which the partition functions are evaluated (default 298.15). It need not match the frequency job. |
-| `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) for the level of theory detected in the files, or 1.0 with a message if it is not listed. |
+| `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) (version 5, via GoodVibes) for the level of theory detected in the files, or 1.0 with a message if it is not listed. `--scale-type harm` or `fund` picks the harmonic or fundamental factor instead. |
 | `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
 | `--tunneling` | `bell` (default), `wigner` or `none`. |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
@@ -120,7 +120,7 @@ syntax (`--iso 5:18O`) with a full isotope table is scheduled
 | Program | Status | What Kinisot reads |
 | --- | --- | --- |
 | Gaussian 09/16 | supported | a normally terminated `freq` job: atom masses and the force constants in the archive entry (`opt freq` jobs are fine) |
-| ORCA | planned (Phase 5) | `name.out` plus the `name.hess` file |
+| ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
 | ASE / machine-learned potentials | planned (Phase 8) | `VibrationsData` files, or Hessians computed with any ASE calculator |
 
 Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
@@ -128,7 +128,8 @@ Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
 ## What Kinisot assumes
 
 - Harmonic frequencies from the program's Hessian; the scaling factor is
-  applied to all modes, including the imaginary one.
+  applied to all modes, including the imaginary one. Kinisot checks that it
+  reproduces the frequencies the program printed and warns if not.
 - Translations and rotations are removed by discarding the lowest 5/6
   eigenvalues rather than by projection (Eckart projection is planned).
   The discarded modes are printed so this can be checked.
@@ -159,7 +160,7 @@ gs, ts = parse_gaussian("claisen_gs.out"), parse_gaussian("claisen_ts.out")   # 
 ```
 
 `compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0,
-imag_cutoff=50.0, tunneling="bell")` takes file paths or `HessianInput`
+imag_cutoff=50.0, tunneling="bell", scale_type="zpe")` takes Gaussian or ORCA file paths or `HessianInput`
 objects (one or a list per side), `scale=None` for automatic Truhlar
 lookup, and `tunneling` in `"bell"`, `"wigner"`, `"none"`. It returns a
 frozen `IsotopeEffect` whose `reactant` and `other` (transition structure

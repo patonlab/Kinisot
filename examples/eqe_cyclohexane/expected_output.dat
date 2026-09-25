@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: tetramethylcyclohexane.out isotopologue: 24,25,26
   Species: tetramethylcyclohexane.out isotopologue: 28,29,30
 
@@ -21,7 +21,7 @@ o tetramethylcyclohexane: iso @ 28,29,30                     4.203e+04  1.424e+0
   tetramethylcyclohexane (light): 84 kept; discarded: -4.9 -0.1 0.2 0.2 6.2 11.6
   tetramethylcyclohexane (iso @ 28,29,30): 84 kept; discarded: -4.8 -0.1 0.2 0.2 6.0 11.3
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: tetramethylcyclohexane.out isotopologue: 24,25,26
   Species: tetramethylcyclohexane.out isotopologue: 28,29,30
 

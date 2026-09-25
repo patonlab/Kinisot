@@ -24,6 +24,7 @@ requirements:
     - setuptools >=64
   run:
     - numpy >=1.22
+    - goodvibes >=4.4
     - python >=3.9
 
 test:

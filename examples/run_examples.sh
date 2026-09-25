@@ -41,6 +41,13 @@ run diels_alder --rct dienophile.out --rct diene.out --ts DATS.out --iso 1 --iso
 run diels_alder --rct dienophile.out --rct diene.out --ts DATS.out --iso 5 --iso 0 --iso 7 -s 0.963
 run diels_alder --rct dienophile.out --rct diene.out --ts DATS.out --iso 5 --iso 0 --iso 5 -s 0.963
 
+# The same Claisen KIE from ORCA-layout files (tests/data/orca, see its README); the second run
+# takes the scaling factor from the level of theory on ORCA's ! line.
+cd "$HERE/../tests/data/orca"
+run orca_claisen --rct claisen_gs.out --ts claisen_ts.hess --iso 5 -t 393 -s 0.961
+run orca_claisen --rct claisen_gs.out --ts claisen_ts.out --iso 4 -t 393
+cd "$DATA"
+
 # Equilibrium isotope effect: CD3 axial versus equatorial in 1,1,3,3-tetramethylcyclohexane,
 # from one frequency calculation with the deuteriums placed on either methyl group. Unscaled.
 run eqe_cyclohexane --rct tetramethylcyclohexane.out --prd tetramethylcyclohexane.out --iso 24,25,26 --iso 28,29,30 -s 1 -t 290

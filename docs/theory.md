@@ -111,11 +111,13 @@ compare with.
 ## 5. Scaling factors
 
 When `-s` is not given, the level of theory and basis set are read from the
-Gaussian archive entry and matched (case-insensitively, ignoring hyphens and
-Gaussian's R/U/RO prefix) against the Truhlar group database (version 3b2,
-Alecu, Zheng, Zhao, Truhlar, J. Chem. Theory Comput. 2010, 6, 2872). The
-**ZPE** scaling factor is used because the zero-point term dominates
-isotope effects. The factor multiplies all frequencies of all species, so
+output (Gaussian archive entry or ORCA `!` line) and matched, after
+GoodVibes' canonicalization of program-specific spellings and stripping
+Gaussian's R/U/RO prefix, against the Truhlar group database (version 5,
+shipped with GoodVibes; Alecu, Zheng, Zhao, Truhlar, J. Chem. Theory
+Comput. 2010, 6, 2872). The **ZPE** scaling factor is used by default
+because the zero-point term dominates isotope effects; `--scale-type harm`
+or `fund` selects the harmonic or fundamental factor. The factor multiplies all frequencies of all species, so
 only the temperature-dependent terms (ZPE, EXC, tunnelling) are affected;
 TRPF and V-ratio are ratios of frequencies and cancel it.
 

@@ -12,7 +12,7 @@ same Bigeleisen–Mayer treatment. On a Gaussian input the two agree to about
 
 | Aspect | Kinisot 2.1 | PyQuiver |
 | --- | --- | --- |
-| Hessian source | Gaussian archive | Gaussian archive, ORCA `.hess` |
+| Hessian source | Gaussian archive, ORCA `.hess` | Gaussian archive (`#p` output required), ORCA `.hess` |
 | External modes | not projected, lowest 5/6 dropped | same |
 | Imaginary-mode threshold | 50 cm⁻¹ | 50 cm⁻¹ |
 | Scaling | one factor, all modes, after diagonalization | same |
@@ -22,7 +22,7 @@ same Bigeleisen–Mayer treatment. On a Gaussian input the two agree to about
 | Isotopes | ²H, ¹³C, ¹⁷O by atom number | ²H ³H ¹³C ¹⁴C ¹⁵N ¹⁷O ¹⁸O ¹⁸F by label |
 | Reference isotopologue | no | yes |
 | Several reactant files | yes | no (one ground-state file) |
-| Scaling-factor lookup | automatic (Truhlar) | manual |
+| Scaling-factor lookup | automatic (Truhlar v5 via GoodVibes; ZPE, harmonic or fundamental) | manual |
 | Output | text table | text, CSV, pandas |
 
 ## PyQuiverHS
@@ -46,5 +46,6 @@ every position and temperature does not need a new Gaussian job.
 [GoodVibes](https://github.com/patonlab/GoodVibes) (same group) computes
 quasi-harmonic thermochemistry, not isotope effects, but from version 4.4 it
 parses Cartesian Hessians (Gaussian, ORCA) and program-independent levels
-of theory and scaling factors. Kinisot will build on it from Phase 5 of the
-implementation plan.
+of theory and scaling factors. Kinisot depends on it since 2.3: the Truhlar
+factors, the ORCA `$hessian` reader and ORCA level-of-theory detection come
+from GoodVibes.

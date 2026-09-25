@@ -278,6 +278,22 @@ def evaluate_species(data, label, temperature, scale, imag_cutoff, warnings_out)
             warnings.warn(message, KinisotWarning, stacklevel=4)
     discarded = freqs[(1 if imaginary is not None else 0) : n_external]
     kept = freqs[n_external:]
+    if not applied and data.program_frequencies is not None:
+        # Self-check for the unsubstituted species: Kinisot must reproduce the program's frequencies
+        # (which are projected, hence the 1 cm-1 tolerance). Catches unit and mass-convention mistakes.
+        # Drop the 5/6 modes closest to zero regardless of the cutoff, so the check is cutoff independent.
+        n_base = 5 if data.linear else 6
+        mine = np.sort(freqs[np.argsort(np.abs(freqs))[n_base:]]) / scale
+        theirs = np.sort(np.asarray(data.program_frequencies, dtype=float))
+        largest = float(np.abs(mine - theirs).max()) if len(mine) == len(theirs) else float("nan")
+        if len(mine) != len(theirs) or largest > 1.0:
+            message = (
+                "%s: the frequencies Kinisot computes from the Hessian differ from the %d the program printed "
+                "(largest difference %.2f cm-1); check that the file is a completed frequency job and that the "
+                "Hessian and the masses belong to the same geometry" % (data.source, len(theirs), largest)
+            )
+            warnings_out.append(message)
+            warnings.warn(message, KinisotWarning, stacklevel=4)
     if np.any(kept <= 0):
         raise KinisotInputError(
             "%s: %d non-positive frequencies remain after removing %d external modes (%s); the structure "
@@ -356,7 +372,17 @@ def _check_substitution_balance(reactant, other, side_name):
         )
 
 
-def compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0, imag_cutoff=50.0, tunneling="bell"):
+def compute_kie(
+    rct,
+    ts=None,
+    prd=None,
+    iso=None,
+    temperature=298.15,
+    scale=1.0,
+    imag_cutoff=50.0,
+    tunneling="bell",
+    scale_type="zpe",
+):
     """Compute a kinetic (``ts``) or equilibrium (``prd``) isotope effect.
 
     Parameters
@@ -375,6 +401,8 @@ def compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0,
     imag_cutoff : float, cm-1
         A mode below -imag_cutoff is the reaction coordinate.
     tunneling : 'bell' (default), 'wigner' or 'none'.
+    scale_type : which Truhlar factor to use when ``scale`` is None: 'zpe'
+        (default), 'harm' or 'fund'.
 
     Returns
     -------
@@ -403,7 +431,7 @@ def compute_kie(rct, ts=None, prd=None, iso=None, temperature=298.15, scale=1.0,
     if not reactants or not others:
         raise KinisotInputError("at least one reactant and one %s file are required" % side_name)
     labels = normalize_labels(iso, len(reactants), len(others))
-    scaling = choose_scaling_factor(reactants + others, scale)
+    scaling = choose_scaling_factor(reactants + others, scale, scale_type)
 
     collected = []
     n = len(reactants)

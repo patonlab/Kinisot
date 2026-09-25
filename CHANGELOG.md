@@ -2,6 +2,43 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.3.0] - Unreleased
+
+Phase 5 of the [implementation plan](IMPLEMENTATION_PLAN.md): GoodVibes
+integration and ORCA support.
+
+### Added
+
+- **ORCA input**: give `name.out` or `name.hess` (ORCA writes the Hessian
+  to the latter); the level of theory is read from the `!` line. The
+  program is detected from the file, so Gaussian and ORCA files can be
+  mixed. ORCA's standard atomic weights are replaced by pure-isotope masses
+  for the elements Kinisot can substitute, so the same Hessian gives the
+  same numbers from either program.
+- **Frequency self-check**: for every unsubstituted species Kinisot compares
+  the frequencies it obtains from the Hessian with the ones the program
+  printed and warns when they differ by more than 1 cm⁻¹.
+- `--scale-type zpe|harm|fund` (and `scale_type=` in the API) to apply the
+  harmonic or fundamental Truhlar factor instead of the ZPE one.
+- Geometry-based linearity test (`kinisot.hessian.linear_from_geometry`),
+  used for ORCA and available to every backend; `HessianInput` gains
+  `program_frequencies`.
+- `examples/orca_claisen/` and ORCA-layout test fixtures (`tests/data/orca/`).
+
+### Changed
+
+- **GoodVibes ≥ 4.4 is a dependency.** Scaling factors now come from the
+  Truhlar database version 5 shipped with GoodVibes, with its cross-program
+  canonicalization (Gaussian `PBE1PBE` = ORCA `PBE0`, `6-31G*` = `6-31G(d)`,
+  ...). Differences from the version 3b2 table Kinisot carried before:
+  M06-2X/6-31+G(d,p) 0.967 → 0.968; `M06-2X/maug-cc-pVTZ` and
+  `PW6B95/6-31+G(d,p)` are no longer listed (factor 1.0 with a message);
+  four spellings (`MN15-L`, `MN12-L`, `MN12-SX`, `M06-L(DKH2)`) are aliased
+  by Kinisot until GoodVibes carries them. The bundled examples are
+  unaffected (B3LYP/6-31G(d) → 0.977 in both).
+- `kinisot/vib_scale_factors.py` is gone; `kinisot.scaling.find_scaling_factor`
+  takes an optional scale type.
+
 ## [2.2.0] - Unreleased
 
 Phase 4 of the [implementation plan](IMPLEMENTATION_PLAN.md): internal

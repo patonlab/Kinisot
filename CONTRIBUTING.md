@@ -36,7 +36,8 @@ CI runs the same commands on Linux, macOS and Windows for Python 3.9–3.13.
 
 ## Adding a backend (ORCA, ASE, ...)
 
-See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), Phases 4, 5 and 8: a
+See `kinisot/backends/orca.py` for a complete example and
+[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), Phase 8, for ASE: a
 backend produces the Hessian (Hartree/Bohr²), the per-atom masses and
 atomic numbers, the level of theory and the linearity of the molecule; the
 physics in `Kinisot.py` is program independent. Add a fixture pair

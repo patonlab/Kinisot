@@ -11,7 +11,7 @@ Python::
     result.kie_tunnel, result.zpe, result.exc, result.trpf, result.to_dict()
 """
 
-__version__ = "2.2.0.dev0"
+__version__ = "2.3.0.dev0"
 
 from .api import IsotopeEffect, IsotopologueResult, SideResult, SpeciesResult, compute_kie
 from .backends import load_hessian

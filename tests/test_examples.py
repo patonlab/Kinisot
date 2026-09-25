@@ -27,12 +27,15 @@ def example_commands():
         script = handle.read()
     # expand the Claisen loop by hand; every other command is a plain `run` line
     loop = re.search(r"for atoms in (.*?); do\n\s*run claisen (.*?)\n", script)
-    commands = [("claisen", loop.group(2).replace('"$atoms"', atoms)) for atoms in loop.group(1).split()]
+    commands = [("claisen", "gaussian", loop.group(2).replace('"$atoms"', atoms)) for atoms in loop.group(1).split()]
+    directory = "gaussian"
     for line in script.splitlines():
         line = line.strip()
-        if line.startswith("run ") and '"$atoms"' not in line:
+        if line.startswith("cd "):
+            directory = "orca" if "orca" in line else "gaussian"
+        elif line.startswith("run ") and '"$atoms"' not in line:
             case, args = line.split(None, 1)[1].split(None, 1)
-            commands.append((case, args))
+            commands.append((case, directory, args))
     return commands
 
 
@@ -40,16 +43,16 @@ COMMANDS = example_commands()
 
 
 def test_all_example_commands_found():
-    assert len(COMMANDS) == 19
-    assert sum(1 for case, _ in COMMANDS if case == "claisen") == 7
+    assert len(COMMANDS) == 21
+    assert sum(1 for case, _, _ in COMMANDS if case == "claisen") == 7
 
 
-@pytest.mark.parametrize("case", sorted({case for case, _ in COMMANDS}))
+@pytest.mark.parametrize("case", sorted({case for case, _, _ in COMMANDS}))
 def test_examples_reproduce_expected_output(case, tmp_path, monkeypatch):
-    monkeypatch.chdir(datapath("gaussian"))
     output = str(tmp_path / "output.dat")
-    for command_case, args in COMMANDS:
+    for command_case, directory, args in COMMANDS:
         if command_case == case:
+            monkeypatch.chdir(datapath(directory))
             assert cli.main(shlex.split(args) + ["--quiet", "--output", output]) == 0
     with open(os.path.join(EXAMPLES, case, "expected_output.dat")) as handle:
         expected_text = handle.read()

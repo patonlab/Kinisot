@@ -10,7 +10,7 @@ readme = "README.md"
 license = {file = "LICENSE.txt"}
 authors = [{name = "Paton Research Group", email = "patonlab@colostate.edu"}]
 requires-python = ">=3.9"
-dependencies = ["numpy>=1.22"]
+dependencies = ["numpy>=1.22", "goodvibes>=4.4"]
 keywords = ["compchem", "kie", "eqe", "dft", "vibrational-scaling-factors", "kinisot", "frequencies", "isotope-effects"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -52,7 +52,6 @@ ignore = ["E741"]
 
 [tool.ruff.lint.per-file-ignores]
 "kinisot/__init__.py" = ["E402"]
-"kinisot/vib_scale_factors.py" = ["E501"]   # data table; replaced by GoodVibes in Phase 5
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

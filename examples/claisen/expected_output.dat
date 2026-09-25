@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 1
   Species: claisen_ts.out isotopologue: 1
 
@@ -21,7 +21,7 @@ o claisen_ts: iso @ 1                                 460.3  1.144e+00  1.021e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 1): imaginary 460.3i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 16.9
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 2
   Species: claisen_ts.out isotopologue: 2
 
@@ -43,7 +43,7 @@ o claisen_ts: iso @ 2                                 463.8  1.187e+00  1.016e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 2): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 3
   Species: claisen_ts.out isotopologue: 3
 
@@ -65,7 +65,7 @@ o claisen_ts: iso @ 3                                 460.7  1.064e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 3): imaginary 460.7i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
@@ -87,7 +87,7 @@ o claisen_ts: iso @ 4                                 458.1  1.141e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 5
   Species: claisen_ts.out isotopologue: 5
 
@@ -109,7 +109,7 @@ o claisen_ts: iso @ 5                                 463.8  1.178e+00  1.017e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 5): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 6
   Species: claisen_ts.out isotopologue: 6
 
@@ -131,7 +131,7 @@ o claisen_ts: iso @ 6                                 460.2  1.144e+00  1.021e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 6): imaginary 460.2i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  KINISOT.py v 2.3.0.dev0: 2026-09-25 13:22
   Species: claisen_gs.out isotopologue: 7,8
   Species: claisen_ts.out isotopologue: 7,8
 
