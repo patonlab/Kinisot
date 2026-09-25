@@ -57,15 +57,10 @@ output files (or the sections listed in `docs/file_formats.md`).
 ## Releasing
 
 Releases are published to PyPI by `.github/workflows/publish.yml` when a
-version tag is pushed. One-time setup (a maintainer with PyPI rights):
-
-1. On pypi.org, project *kinisot* → Manage → Publishing → add a trusted
-   publisher: owner `patonlab`, repository `Kinisot`, workflow
-   `publish.yml`, environment `pypi`. No API token is needed.
-2. On GitHub, Settings → Environments → create `pypi`. Adding yourself as a
-   required reviewer makes every release wait for a click.
-
-Then, for each release:
+version tag is pushed. PyPI trusted publishing (owner `patonlab`,
+repository `Kinisot`, workflow `publish.yml`, environment `pypi`) and the
+Zenodo–GitHub connection are configured, so no token or manual upload is
+involved. For each release:
 
 ```
 # bump __version__ in kinisot/__init__.py, move the CHANGELOG "Unreleased"
@@ -80,10 +75,8 @@ Release whose notes are the matching CHANGELOG section. Once the release is
 on PyPI the conda-forge bot opens the feedstock update automatically
 (`recipe/meta.yaml` in this repository is the template to keep in sync).
 
-**Zenodo DOI per release**: connect the repository once at
-https://zenodo.org/account/settings/github/ (flip the switch for
-`patonlab/Kinisot`); every GitHub Release is then archived with the
-metadata in `.zenodo.json` and gets its own DOI under the existing concept
-DOI. Update `CITATION.cff` (`version`, `date-released`) with each release.
-Dependabot keeps the Actions versions in the workflows current (monthly
-pull requests).
+**Zenodo DOI per release**: the repository is connected to Zenodo, so
+every GitHub Release is archived with the metadata in `.zenodo.json` and
+gets its own DOI under the existing concept DOI. Update `CITATION.cff`
+(`version`, `date-released`) with each release. Dependabot keeps the
+Actions versions in the workflows current (monthly pull requests).

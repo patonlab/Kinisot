@@ -1,14 +1,11 @@
 name: Publish to PyPI
 
 # Publishes a release to PyPI when a version tag (v2.1.0, v2.1.1, ...) is pushed.
-# Uses PyPI "trusted publishing" (OpenID Connect), so no API token is stored in
-# the repository. One-time setup, documented in CONTRIBUTING.md:
-#   1. On pypi.org, project "kinisot" -> Manage -> Publishing -> add publisher:
-#      owner "patonlab", repository "Kinisot", workflow "publish.yml", environment "pypi".
-#   2. In this repository: Settings -> Environments -> create "pypi" (optionally
-#      require a reviewer to approve each release).
-#   3. Bump __version__ in kinisot/__init__.py, update CHANGELOG.md, then
-#      git tag v<version> && git push origin v<version>.
+# Uses PyPI "trusted publishing" (OpenID Connect; configured for owner
+# "patonlab", repository "Kinisot", workflow "publish.yml", environment "pypi"),
+# so no API token is stored in the repository. To release: bump __version__ in
+# kinisot/__init__.py, update CHANGELOG.md and CITATION.cff, then
+#   git tag v<version> && git push origin v<version>
 
 on:
   push:
@@ -18,9 +15,8 @@ on:
 permissions:
   contents: read
 
-# The tag also creates a GitHub Release (which Zenodo archives when the
-# repository is connected at https://zenodo.org/account/settings/github/)
-# with the matching CHANGELOG section as release notes.
+# The tag also creates a GitHub Release, which the connected Zenodo account
+# archives with a DOI, with the matching CHANGELOG section as release notes.
 
 jobs:
   build:

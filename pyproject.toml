@@ -36,8 +36,8 @@ ase = ["ase>=3.23"]
 test = ["pytest", "pytest-cov"]
 lint = ["ruff"]
 
-[tool.setuptools]
-packages = ["kinisot"]
+[tool.setuptools.packages.find]
+include = ["kinisot*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "kinisot.__version__"}
@@ -58,4 +58,5 @@ ignore = ["E741"]
 testpaths = ["tests"]
 filterwarnings = [
     "error:kinisot\\.Kinisot\\..*is deprecated:DeprecationWarning",
+    "ignore:Setting the shape on a NumPy array:DeprecationWarning",
 ]

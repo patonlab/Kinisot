@@ -2,12 +2,51 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [2.5.0] - Unreleased
+## [2.5.0] - 2026-09-25
 
-Phase 8 of the [implementation plan](IMPLEMENTATION_PLAN.md): ASE and
-machine-learned potentials.
+The first release since 2.0.2. It contains everything developed as the
+milestones 2.0.3, 2.1.0, 2.2.0, 2.3.0 and 2.4.0 below, none of which was
+published separately; read those sections for the details. In short:
 
-### Added
+- **Correctness**: the atomic-mass-unit typo and duplicated constants
+  removed, CODATA 2018 constants, AME 2020 isotope masses, exact
+  scaling-factor lookup, linearity from the geometry, and every frequency
+  checked against what the program printed.
+- **Robustness**: validated input (atom numbers, elements, already
+  substituted atoms, structures that are not minima or transition
+  structures, mismatched substitutions), errors instead of crashes, a
+  results file that is appended to rather than overwritten.
+- **Inputs**: Gaussian, ORCA (`.out` + `.hess`) and ASE (`VibrationsData`
+  JSON, or any geometry with `--calc` and an ASE calculator, machine-learned
+  potentials included), mixable in one run.
+- **Physics options**: explicit isotope syntax with a full table (`5:13C`,
+  `3:17O`, `7:D`), a bare oxygen index now meaning ¹⁸O, Eckart projection of
+  external modes (default for ASE Hessians), Bell, Wigner and
+  Skodje–Truhlar tunnelling, a reference isotopologue, harmonic or
+  fundamental Truhlar factors, temperature scans.
+- **Interfaces**: the `kinisot` console script, `--json`/`--csv` output,
+  and a Python API (`compute_kie` returning an `IsotopeEffect`); the 2.0
+  functions remain as deprecated shims until 3.0.
+- **Project**: `pyproject.toml`, GoodVibes ≥ 4.4 as a dependency, worked
+  examples with verified outputs, documentation, a benchmark scaffold, CI
+  on three platforms, automated PyPI and GitHub releases.
+
+**Numerical changes relative to 2.0.2** (all documented in the milestone
+sections): the constants fix (< 3 × 10⁻⁶ in KIEs), CODATA 2018
+(7 × 10⁻⁹), AME 2020 isotope masses (≤ 1.2 × 10⁻⁶), the Truhlar v5
+scaling table (a few factors), and ¹⁸O instead of ¹⁷O for a bare oxygen
+index (`3:17O` restores the old value).
+
+### Fixed in the release preparation
+
+- The wheel now includes the `kinisot.backends` subpackage (package
+  discovery was limited to the top-level package, so an installed copy could
+  not be imported; the in-tree test runs did not notice). Verified by
+  installing the wheel and running the suite from outside the repository on
+  Python 3.9, 3.10, 3.12 and 3.13.
+
+### Phase 8 details (ASE and machine-learned potentials)
+
 
 - **ASE backend** (`pip install kinisot[ase]`): Hessians from
   `VibrationsData` JSON files, or computed from a geometry with any ASE
@@ -31,7 +70,7 @@ machine-learned potentials.
   section as notes; Dependabot watches the Actions versions; `.zenodo.json`
   carries the archive metadata.
 
-## [2.4.0] - Unreleased
+## [2.4.0] - development milestone (included in 2.5.0)
 
 Phase 7 of the [implementation plan](IMPLEMENTATION_PLAN.md): isotopes,
 external modes, tunnelling.
@@ -75,7 +114,7 @@ external modes, tunnelling.
   `Substitution`; `parse_label()` returns `(index, symbol, mass number,
   mass)` tuples.
 
-## [2.3.0] - Unreleased
+## [2.3.0] - development milestone (included in 2.5.0)
 
 Phase 5 of the [implementation plan](IMPLEMENTATION_PLAN.md): GoodVibes
 integration and ORCA support.
@@ -112,7 +151,7 @@ integration and ORCA support.
 - `kinisot/vib_scale_factors.py` is gone; `kinisot.scaling.find_scaling_factor`
   takes an optional scale type.
 
-## [2.2.0] - Unreleased
+## [2.2.0] - development milestone (included in 2.5.0)
 
 Phase 4 of the [implementation plan](IMPLEMENTATION_PLAN.md): internal
 refactor and Python API. Numerically identical to 2.1.0 apart from the
@@ -151,7 +190,7 @@ constants update listed under Changed.
   (`kinisot.vib_scale_factors.SCALING_FACTORS`) instead of a NumPy
   structured array; factors are now exact decimals rather than float32.
 
-## [2.1.0] - Unreleased
+## [2.1.0] - development milestone (included in 2.5.0)
 
 Phases 2 (robustness) and 3 (packaging and documentation) of the
 [implementation plan](IMPLEMENTATION_PLAN.md). Every result line of the
@@ -240,7 +279,7 @@ constants fix).
   is no longer supported.
 - `Logger.Fatal()`; the logger is now a context manager.
 
-## [2.0.3] - Unreleased
+## [2.0.3] - development milestone (included in 2.5.0)
 
 ### Fixed
 

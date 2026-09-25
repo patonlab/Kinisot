@@ -260,10 +260,9 @@ files each program must produce.
 
 Items 1–4 are in place: the changelog, the tag-driven PyPI workflow (which
 now also creates the GitHub Release with the changelog section as notes),
-Dependabot for the Actions versions, and `.zenodo.json` metadata. One
-switch remains for a maintainer: connecting the repository at
-https://zenodo.org/account/settings/github/ so each release is archived
-with a DOI (CONTRIBUTING.md, "Releasing").
+Dependabot for the Actions versions, and `.zenodo.json` metadata. PyPI
+trusted publishing and the Zenodo connection are configured (confirmed by
+the maintainer 2026-09-25), so a pushed `v*` tag is a complete release.
 
 1. CHANGELOG.md in Keep a Changelog format (started in 2.0.3).
 2. ✅ Tag-driven publishing (`.github/workflows/publish.yml`, 2026-09-25):

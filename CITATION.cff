@@ -6,7 +6,7 @@ authors:
   - family-names: Paton
     given-names: Robert S.
     affiliation: Colorado State University
-version: 2.1.0
+version: 2.5.0
 date-released: 2026-09-25
 doi: 10.5281/zenodo.19272
 url: https://github.com/patonlab/Kinisot
