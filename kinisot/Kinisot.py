@@ -13,6 +13,7 @@ from argparse import SUPPRESS, ArgumentParser
 
 import numpy as np
 
+from . import __version__
 from .exceptions import KinisotError, KinisotInputError, KinisotWarning
 from .Hess_to_Freq import (is_linear, level_of_theory, mass_weight, parse_gaussian, read_hess,
                            substitute)
@@ -21,9 +22,6 @@ from .vib_scale_factors import scaling_data, scaling_refs
 __all__ = ["compute_isotope_effect", "calc_rpfr", "harmonic_frequencies", "find_scaling_factor",
            "get_frequency_scaling", "read_hess", "is_linear", "level_of_theory", "Logger",
            "build_parser", "main", "__version__"]
-
-# version
-__version__ = "2.1.0.dev0"
 
 # PHYSICAL CONSTANTS (CODATA 2010; SI apart from the speed of light in cm/s)
 PLANCK_CONSTANT = 6.62606957e-34      # J s

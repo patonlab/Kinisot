@@ -4,47 +4,185 @@
 [![PyPI version](https://badge.fury.io/py/kinisot.svg)](https://badge.fury.io/py/kinisot)
 [![CI](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml/badge.svg)](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml)
 
-***
-## Introduction
+**Kinisot** computes kinetic (KIE) and equilibrium (EQE) isotope effects
+from quantum-chemical frequency calculations. Give it the output files of a
+reactant and a transition structure (or a product), say which atoms carry
+the heavy isotope, and it re-mass-weights the Hessians, diagonalizes them,
+and evaluates the Bigeleisen–Mayer equation with a Bell tunnelling
+correction at any temperature. No new frequency job is needed for each
+isotopologue. Kinisot is developed in the
+[Paton group](https://patonlab.colostate.edu) at Colorado State University
+and is a rewrite of the Fortran Kinisot by
+[Henry Rzepa](https://en.wikipedia.org/wiki/Henry_Rzepa).
 
-**Kinisot** is a Python program to compute kinetic isotope effects from two Gaussian output files, one of which is a ground state and the other a transition state. It is developed in the [Paton research group](https://patonlab.colostate.edu) at Colorado State University.
+## Quick start
 
-This is a Python version of [Kinisot](http://dx.doi.org/10.5281/zenodo.19272), inspired by the Fortran version originally written by [Henry Rzepa](https://en.wikipedia.org/wiki/Henry_Rzepa). This version does not require parameter files to run and allows easy manipulation of temperature and [vibrational scaling factors](http://t1.chem.umn.edu/freqscale/index.html). The level of theory and basis set are detected from in the output files and the program will attempt to assign the appropriate scaling factor based on data from the [Truhlar group](https://t1.chem.umn.edu/freqscale/index.html). Isotopic substitutions are to be specified by the command line, such that separate computations with Gaussian are not required. The program diagonalizes the mass-weighted Hessian matricies to obtain harmonic vibrational frequencies and Bigeleisen-Mayer Reduced Isotopic Partition Function Ratios. One difference with the Gaussian program itself is that the lowest five/six normal modes (translations and rotations) are not projected out, however, this is also the approach taken by [quiver](https://github.com/ekwan/quiver). Testing  this approach against calculation of the Reduced Isotopic Partition Function Ratios by hand (!) using the frequencies in the Gaussian output files led to agreeement up to 4DP. A one-dimensional tunneling correction is also included, which is the Bell infinite-parabola model.
-
-Also see related discussions on [computing KIE values](http://www.ch.imperial.ac.uk/rzepa/blog/?p=14327)
-
-The current version is currently hard-coded to consider <sup>2</sup>D/<sup>1</sup>H, <sup>13</sup>C/<sup>12</sup>C and <sup>17</sup>O/<sup>16</sup>O isotopic replacements. This can be modified in Hess_to_Freq.py.
-
-A video guide to using an older version this software is available at Youtube:
-
-[![Kinisot Video Guide](http://img.youtube.com/vi/r4x2gmkc0U8/0.jpg)](http://www.youtube.com/watch?v=r4x2gmkc0U8)
-
-
-## Installation
-
-To install **Kinisot** with [conda](https://anaconda.org/conda-forge/kinisot):
 ```
-conda install kinisot -c conda-forge
+pip install kinisot            # or: conda install -c conda-forge kinisot
+git clone https://github.com/patonlab/Kinisot && cd Kinisot/tests/data/gaussian
+kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 1 -t 393 -s 0.961
 ```
-To install **Kinisot** with [pypi](https://pypi.org/project/kinisot/):
+
+This computes the ¹³C KIE at carbon 1 of allyl vinyl ether for its Claisen
+rearrangement at 393 K, with B3LYP/6-31G(d) frequencies scaled by 0.961:
+
 ```
-pip install kinisot
+  KINISOT.py v 2.1.0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 1
+  Species: claisen_ts.out isotopologue: 1
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 1                                        1.148e+00  1.024e+00  9.246e-01
+o claisen_ts: iso @ 1                                 460.3  1.144e+00  1.021e+00  9.269e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.007880   1.003953   1.003421   0.997456   1.012744   1.001970   1.014739
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 1): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.3 23.0
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 1): imaginary 460.3i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 16.9
 ```
+
+The number to report is **corr-KIE = 1.015** (the semiclassical KIE of
+1.013 times the tunnelling correction). The same block is appended to
+`Kinisot_output.dat`.
+
+## Reading the output
+
+- **Species rows** show, for the reactant and the transition structure,
+  the imaginary frequency of each isotopologue (cm⁻¹) and the three
+  Bigeleisen–Mayer factors of that species as light/heavy ratios:
+  the zero-point energy term (`ZPE`), the excitation term (`EXC`) and the
+  Teller–Redlich product of frequencies (`TRPF`, heavy/light). Their
+  product is the reduced isotopic partition function ratio (s/s′)f.
+- **`KIE @ T`** is the ratio reactant/transition structure of every column:
+  `V-ratio` = ν‡(light)/ν‡(heavy); `ZPE`, `EXC`, `TRPF` as above;
+  `KIE` = V-ratio × ZPE × EXC × TRPF (semiclassical); `1D-tunn` = Bell
+  infinite-parabola tunnelling correction; `corr-KIE` = KIE × 1D-tunn.
+- **Vibrational modes**: how many modes entered each partition function
+  and which six (five for a linear molecule, plus the reaction coordinate)
+  were discarded as translations and rotations. On a converged geometry
+  the discarded values are within a few tens of cm⁻¹ of zero; a genuine
+  vibration in that list means the geometry needs tightening.
+- For an EQE the line is labelled `EQE @ T`, `V-ratio` is empty and
+  `1D-tunn` is 1.
+
+The equations behind every column are in [docs/theory.md](docs/theory.md).
 
 ## Usage
 
 ```
-python -m kinisot --rct reactant.out --ts ts.out --iso 5 [-t 393] [-s 0.961]
-python -m kinisot --rct reactant.out --prd product.out --iso 5          (equilibrium isotope effect)
-python -m kinisot --rct diene.out --rct dienophile.out --ts ts.out --iso 6 --iso 0 --iso 15   (bimolecular)
+kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso ATOMS ...]
+        [-t K] [-s FACTOR] [--imag-cutoff CM-1] [-o FILE] [--overwrite] [-q]
 ```
 
-*	The output files contain Gaussian frequency calculations performed for the reactant(s) and the transition structure (`--ts`, kinetic isotope effect) or product (`--prd`, equilibrium isotope effect) at the same level of theory.
-*	`--iso` gives the atom number(s) to replace with the heavy isotope (<sup>2</sup>H, <sup>13</sup>C or <sup>17</sup>O), comma separated for several atoms (`--iso 7,8`). Give one `--iso` per file, in the order of the `--rct` files followed by the `--ts`/`--prd` file(s), or a single `--iso` when the atom numbering is the same in all files. Use `--iso 0` for a file with no substituted atom (e.g. the second reactant of a bimolecular reaction). Kinisot checks that the atom numbers exist, that the atoms can be substituted, and that both sides of the reaction substitute the same elements.
-*	`-t` sets the temperature in Kelvin at which the reduced isotopic partition function ratios are evaluated (default 298.15 K). It does not have to match the temperature used in the Gaussian calculation.
-*	`-s` sets the vibrational scaling factor. When it is omitted the level of theory is detected from the output files and the ZPE scaling factor from the [Truhlar group database](https://comp.chem.umn.edu/freqscale/) is applied; if the level is not in the database, or the files disagree, the factor is 1.0 and a message says so.
-*	`--imag-cutoff` (default 50 cm<sup>-1</sup>): a mode below this value counts as the reaction coordinate of the transition structure. Reactants and products must not have one.
-*	Results are printed to the terminal and appended to `Kinisot_output.dat` (change the file with `-o`, start afresh with `--overwrite`, silence the terminal with `-q`). Each block lists the frequencies of the reaction-coordinate mode, the Bigeleisen-Mayer factors of every species and, on the `KIE @` line: the ratio of imaginary frequencies (V-ratio), the ZPE, excitation (EXC) and Teller-Redlich product (TRPF) factors, the semiclassical KIE, the Bell tunnelling correction (1D-tunn) and the tunnelling-corrected KIE (corr-KIE). The modes kept in, and discarded from, each partition function are listed below the table.
-*	Invalid input (an atom number out of range, a reactant with an imaginary frequency, different substitutions on the two sides, a file that is not a completed frequency job, ...) stops the run with a message and exit code 1.
+`python -m kinisot` is equivalent to `kinisot`.
 
-See [kinisot/examples/gaussian](kinisot/examples/gaussian) for worked examples with their reference outputs.
+**Three ways to describe a reaction**
+
+| Case | Command | Labels |
+| --- | --- | --- |
+| KIE, one reactant | `kinisot --rct gs.out --ts ts.out --iso 5` | one `--iso` when the atom numbering is the same in both files |
+| KIE, bimolecular | `kinisot --rct dienophile.out --rct diene.out --ts ts.out --iso 0 --iso 6 --iso 15` | one `--iso` per file, `--rct` files first, `0` for a file without a substituted atom |
+| EQE | `kinisot --rct conf_a.out --prd conf_b.out --iso 24,25,26 --iso 28,29,30` | the same, with the product instead of a TS |
+
+**Options**
+
+| Flag | Meaning |
+| --- | --- |
+| `--iso ATOMS` | atom number(s) to replace with the heavy isotope, comma separated (`7,8` substitutes two hydrogens). Atom numbers follow the order of the atoms in the quantum-chemistry input. Kinisot checks that the atoms exist, can be substituted, still carry the light isotope, and that both sides of the reaction substitute the same elements. |
+| `-t`, `--temperature` | temperature in K at which the partition functions are evaluated (default 298.15). It need not match the frequency job. |
+| `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) for the level of theory detected in the files, or 1.0 with a message if it is not listed. |
+| `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
+| `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
+| `--version` | print the version. |
+
+Invalid input (an atom number out of range, a reactant with an imaginary
+frequency, a file that is not a completed frequency job, ...) stops the run
+with a message and exit code 1.
+
+**Isotopes.** A bare atom number substitutes ¹H → ²H, ¹²C → ¹³C and
+¹⁶O → ¹⁷O; other elements are rejected with a message. An explicit
+syntax (`--iso 5:18O`) with a full isotope table is scheduled
+(implementation plan, Phase 7).
+
+## Input files
+
+| Program | Status | What Kinisot reads |
+| --- | --- | --- |
+| Gaussian 09/16 | supported | a normally terminated `freq` job: atom masses and the force constants in the archive entry (`opt freq` jobs are fine) |
+| ORCA | planned (Phase 5) | `name.out` plus the `name.hess` file |
+| ASE / machine-learned potentials | planned (Phase 8) | `VibrationsData` files, or Hessians computed with any ASE calculator |
+
+Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
+
+## What Kinisot assumes
+
+- Harmonic frequencies from the program's Hessian; the scaling factor is
+  applied to all modes, including the imaginary one.
+- Translations and rotations are removed by discarding the lowest 5/6
+  eigenvalues rather than by projection (Eckart projection is planned).
+  The discarded modes are printed so this can be checked.
+- One imaginary mode per transition structure; a second one triggers a
+  warning.
+- Tunnelling by Bell's one-dimensional infinite-parabola model; it is not
+  meaningful below the crossover temperature h c |ν‡| / 2π k.
+- Rigid rotor / harmonic oscillator, no conformational averaging, no
+  solvent corrections: compute those outside Kinisot if you need them.
+
+## Python API
+
+```python
+from kinisot import compute_isotope_effect
+
+species, zpe, exc, trpf, kie, kie_tunnel, tunnel_corr, freq_ratio = compute_isotope_effect(
+    rct=["claisen_gs.out"], ts=["claisen_ts.out"], prd=None, label=["1", "1"],
+    temperature=393.0, freq_scale_factor=0.961)
+print(kie_tunnel)                      # 1.014739...
+print(species[2].im_frequency_wn)      # 463.9 (light TS)
+print(species[3].frequency_wn[:3])     # kept modes of the heavy TS
+```
+
+`species` holds the four `calc_rpfr` results (reactant light/heavy, TS or
+product light/heavy) with their kept, discarded and imaginary frequencies.
+Errors are `kinisot.KinisotInputError` / `kinisot.KinisotParseError`
+(both `ValueError` subclasses). A structured result object and `--json`
+output are planned (Phase 4).
+
+## Examples and documentation
+
+- [examples/](examples/README.md): the Claisen rearrangement (¹³C, ¹⁷O
+  and ²H KIEs), a Diels–Alder reaction with one or two reactant files, and a
+  conformational EQE, each with the commands, the expected numbers and the
+  literature background.
+- [docs/theory.md](docs/theory.md), [docs/file_formats.md](docs/file_formats.md),
+  [docs/faq.md](docs/faq.md), [docs/comparison.md](docs/comparison.md)
+  (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).
+- [CHANGELOG.md](CHANGELOG.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
+  for what changed and what is coming.
+- A [video guide](http://www.youtube.com/watch?v=r4x2gmkc0U8) to an older
+  version, and Henry Rzepa's blog post on
+  [computing KIE values](http://www.ch.imperial.ac.uk/rzepa/blog/?p=14327).
+
+## Citing Kinisot
+
+Please cite the Zenodo record, DOI
+[10.5281/zenodo.19272](http://dx.doi.org/10.5281/zenodo.19272)
+([CITATION.cff](CITATION.cff) has the metadata; GitHub's "Cite this
+repository" button formats it). Vibrational scaling factors come from
+I. M. Alecu, J. Zheng, Y. Zhao, D. G. Truhlar, *J. Chem. Theory Comput.*
+**2010**, *6*, 2872.
+
+## Support and contributing
+
+Questions and bug reports: the [issue tracker](https://github.com/patonlab/Kinisot/issues)
+or [patonlab@colostate.edu](mailto:patonlab@colostate.edu). See
+[SUPPORT.md](SUPPORT.md) for what to include and
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to run the tests and add a
+backend. MIT licensed.

@@ -1,0 +1,154 @@
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 1
+  Species: claisen_ts.out isotopologue: 1
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 1                                        1.148e+00  1.024e+00  9.246e-01
+o claisen_ts: iso @ 1                                 460.3  1.144e+00  1.021e+00  9.269e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.007880   1.003953   1.003421   0.997456   1.012744   1.001970   1.014739
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 1): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.3 23.0
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 1): imaginary 460.3i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 16.9
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 2
+  Species: claisen_ts.out isotopologue: 2
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 2                                        1.186e+00  1.016e+00  9.157e-01
+o claisen_ts: iso @ 2                                 463.8  1.187e+00  1.016e+00  9.137e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.000281   0.999252   1.000203   1.002180   1.001916   1.000071   1.001988
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 2): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.4 23.0
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 2): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 3
+  Species: claisen_ts.out isotopologue: 3
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 3                                        1.088e+00  1.025e+00  9.337e-01
+o claisen_ts: iso @ 3                                 460.7  1.064e+00  1.019e+00  9.489e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.007026   1.022288   1.005866   0.983895   1.018833   1.001758   1.020625
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 3): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.0
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 3): imaginary 460.7i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 4
+  Species: claisen_ts.out isotopologue: 4
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 4                                        1.183e+00  1.022e+00  9.093e-01
+o claisen_ts: iso @ 4                                 458.1  1.141e+00  1.019e+00  9.288e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.012716   1.036594   1.001970   0.978989   1.029742   1.003157   1.032993
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 4): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 22.9
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 5
+  Species: claisen_ts.out isotopologue: 5
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 5                                        1.177e+00  1.018e+00  9.169e-01
+o claisen_ts: iso @ 5                                 463.8  1.178e+00  1.017e+00  9.151e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.000176   0.999077   1.000680   1.001962   1.001895   1.000044   1.001940
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 5): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.4 23.0
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 5): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 6
+  Species: claisen_ts.out isotopologue: 6
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 6                                        1.149e+00  1.025e+00  9.249e-01
+o claisen_ts: iso @ 6                                 460.2  1.144e+00  1.021e+00  9.268e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.008093   1.004481   1.004206   0.997962   1.014797   1.002022   1.016849
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 6): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.3 23.0
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 6): imaginary 460.2i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
+
+  KINISOT.py v 2.1.0.dev0: 2026-09-25 12:45
+  Species: claisen_gs.out isotopologue: 7,8
+  Species: claisen_ts.out isotopologue: 7,8
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 0.961
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs                                        --------------------------------------------------------------------------
+o claisen_ts                                          463.9
+o claisen_gs: iso @ 7,8                                      1.280e+02  1.411e+00  1.418e-01
+o claisen_ts: iso @ 7,8                               460.6  1.445e+02  1.326e+00  1.410e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.007258   0.885607   1.063923   1.006138   0.954882   1.001816   0.956616
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / discarded as external modes
+  claisen_gs (light): 36 kept; discarded: -0.2 -0.0 0.1 5.4 16.5 23.1
+  claisen_gs (iso @ 7,8): 36 kept; discarded: -0.2 -0.0 0.1 5.3 16.0 22.4
+  claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
+  claisen_ts (iso @ 7,8): imaginary 460.6i; 35 kept; discarded: -9.5 -0.2 0.1 0.1 13.0 16.5

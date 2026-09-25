@@ -116,7 +116,13 @@ from the text as first written:
 **Exit criteria:** no `sys.exit`/bare `except`/unclosed file in library
 code; error paths tested; coverage ≥ 80 % reported in CI.
 
-## Phase 3 — Packaging and documentation (v2.1.0, same release)
+## Phase 3 — Packaging and documentation ✅ (v2.1.0, implemented 2026-09-25)
+
+All items below are implemented; the wheel is 23 kB, `kinisot --version`
+works from a `pip install .`, ruff is clean and gates CI, and the README
+quick start is the Claisen block that `tests/test_examples.py` replays.
+Phase 6 item 2 (tag-driven PyPI publishing) was pulled forward into this
+phase at the maintainer's request.
 
 Packaging:
 
@@ -230,8 +236,12 @@ files each program must produce.
 ## Phase 6 — Release hygiene (ongoing)
 
 1. CHANGELOG.md in Keep a Changelog format (started in 2.0.3).
-2. Tag-driven publishing: build sdist/wheel and publish to PyPI with trusted
-   publishing on tag push; open the conda-forge bump automatically.
+2. ✅ Tag-driven publishing (`.github/workflows/publish.yml`, 2026-09-25):
+   on a `v*` tag the workflow checks the tag against `__version__`, runs
+   the tests, builds sdist/wheel and uploads with PyPI trusted publishing
+   (environment `pypi`). One-time PyPI/GitHub setup is in CONTRIBUTING.md.
+   The conda-forge bot picks up the PyPI release; keep `recipe/meta.yaml`
+   in sync.
 3. Dependabot for Actions versions.
 4. Zenodo integration so each tag gets a DOI; `CITATION.cff` updated by the
    release workflow.
@@ -310,8 +320,8 @@ Gaussian Hessian; documentation lists the MLIPs tried and their results.
 | ----- | ----------- | ------- | ---- |
 | 0 | Characterization + frequency/parity tests | — | none |
 | 1 | Six confirmed-bug fixes ✅ | v2.0.3 (publish now) | small documented shift |
-| 2 | Validation, exceptions, CLI/output fixes | v2.1.0 | low |
-| 3 | pyproject, entry point, README/examples/docs rewrite | v2.1.0 | low |
+| 2 | Validation, exceptions, CLI/output fixes ✅ | v2.1.0 | low |
+| 3 | pyproject, entry point, README/examples/docs rewrite ✅ | v2.1.0 | low |
 | 4 | Module split, result dataclass, Python API, JSON/CSV | v2.2.0 | medium (goldens) |
 | 5 | GoodVibes dependency, Truhlar v5, ORCA backend | v2.3.0 | scaling changes documented |
 | 6 | Automated publishing, Zenodo, changelog | ongoing | none |

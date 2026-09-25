@@ -5,7 +5,7 @@
 Characterization tests pinning the numerical behavior of Kinisot.
 
 Golden values were generated from v2.0.2 and cross-checked against the
-reference outputs shipped in kinisot/examples/gaussian/ (claisen_kinisot.dat,
+reference outputs shipped in tests/data/gaussian/ (claisen_kinisot.dat,
 tetramethylcyclohexane_kinisot.dat, comparison.dat), which they matched to
 all printed digits. They were then regenerated after the v2.0.3 physical
 constants fix (ATOMIC_MASS_UNIT typo), which moved KIE values by <3e-6

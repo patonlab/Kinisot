@@ -1,14 +1,8 @@
-# Copied from __main__.py in pip
-from __future__ import absolute_import
+"""Run Kinisot as ``python -m kinisot``."""
 
-import os
 import sys
 
-if __package__ == '':
-    path = os.path.dirname(os.path.dirname(__file__))
-    sys.path.insert(0, path)
+from .cli import main
 
-from kinisot import Kinisot
-
-if __name__ == '__main__':
-    sys.exit(Kinisot.main())
+if __name__ == "__main__":
+    sys.exit(main())

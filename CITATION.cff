@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use Kinisot in published work, please cite it as below."
+title: "Kinisot: kinetic and equilibrium isotope effects from computed Hessians"
+type: software
+authors:
+  - family-names: Paton
+    given-names: Robert S.
+    affiliation: Colorado State University
+version: 2.1.0
+date-released: 2026-09-25
+doi: 10.5281/zenodo.19272
+url: https://github.com/patonlab/Kinisot
+repository-code: https://github.com/patonlab/Kinisot
+license: MIT
+keywords:
+  - kinetic isotope effect
+  - equilibrium isotope effect
+  - Bigeleisen-Mayer
+  - computational chemistry
+  - Gaussian

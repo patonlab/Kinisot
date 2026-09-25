@@ -4,11 +4,28 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ## [2.1.0] - Unreleased
 
-Phase 2 of the [implementation plan](IMPLEMENTATION_PLAN.md): robustness.
-Every result line of the bundled examples is unchanged (to the 6 printed
-decimals, modulo the 2.0.3 constants fix).
+Phases 2 (robustness) and 3 (packaging and documentation) of the
+[implementation plan](IMPLEMENTATION_PLAN.md). Every result line of the
+bundled examples is unchanged (to the 6 printed decimals, modulo the 2.0.3
+constants fix).
 
 ### Added
+
+- `kinisot` console script (`python -m kinisot` still works) and a
+  `pyproject.toml` (PEP 621) build; `setup.py`/`setup.cfg` are gone. The
+  version is defined once, in `kinisot/__init__.py`, which now exports the
+  public API (`compute_isotope_effect`, `parse_gaussian`, the exception
+  classes, ...).
+- Worked examples in `examples/` (Claisen rearrangement, Diels–Alder with
+  one or two reactant files, conformational EQE) with the commands, the
+  expected output and literature background; `examples/run_examples.sh`
+  regenerates the outputs and `tests/test_examples.py` checks them.
+- `docs/theory.md` (the equations as implemented), `docs/file_formats.md`,
+  `docs/faq.md`, `docs/comparison.md`; a rewritten README with a quick
+  start, a guide to every output column and the Python API.
+- `CITATION.cff`, `CONTRIBUTING.md`, issue templates, `ruff` lint and
+  format checks in CI, and a tag-driven PyPI publishing workflow
+  (`.github/workflows/publish.yml`, trusted publishing).
 
 - Input validation with clear messages: `--iso` atom numbers out of range,
   `0` combined with atom numbers, duplicated atoms, atoms of an element
@@ -41,6 +58,9 @@ decimals, modulo the 2.0.3 constants fix).
 
 ### Changed
 
+- The Gaussian outputs used by the tests and examples moved from
+  `kinisot/examples/` to `tests/data/`; the wheel now weighs 23 kB instead
+  of shipping 2.8 MB of test data.
 - **Results file**: new results are appended to `Kinisot_output.dat`
   (or `--output`) instead of silently overwriting it, matching how the
   bundled example scripts collect a series of substitutions; use

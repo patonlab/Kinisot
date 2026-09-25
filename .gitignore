@@ -7,3 +7,5 @@ MANIFEST
 htmlcov/
 .pytest_cache/
 __pycache__/
+build/
+*.egg-info/

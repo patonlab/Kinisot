@@ -5,16 +5,12 @@ import os
 
 import numpy as np
 
-try:
-    import kinisot
-    BASEPATH = os.path.join(kinisot.__path__[0])
-except ImportError:
-    here = os.path.dirname(os.path.abspath(__file__))
-    BASEPATH = os.path.normpath(os.path.join(here, '..', 'kinisot'))
+DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def datapath(path):
-    return os.path.join(BASEPATH, 'examples', path)
+    """Absolute path of a test data file, e.g. datapath('gaussian/claisen_gs.out')."""
+    return os.path.join(DATA, path)
 
 
 def synthetic_hessian(masses, freqs_cm, seed=0):
