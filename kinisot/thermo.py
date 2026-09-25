@@ -9,13 +9,13 @@ import numpy as np
 
 from .exceptions import KinisotInputError
 
-# PHYSICAL CONSTANTS (CODATA 2010; SI apart from the speed of light in cm/s)
-PLANCK_CONSTANT = 6.62606957e-34  # J s
-BOLTZMANN_CONSTANT = 1.3806488e-23  # J / K
+# PHYSICAL CONSTANTS (CODATA 2018, https://physics.nist.gov/cuu/Constants/; SI apart from the speed of light in cm/s)
+PLANCK_CONSTANT = 6.62607015e-34  # J s
+BOLTZMANN_CONSTANT = 1.380649e-23  # J / K
 SPEED_OF_LIGHT = 2.99792458e10  # cm / s
-ENERGY_AU = 4.35974434e-18  # J
-BOHR_RADIUS = 5.2917721092e-11  # m
-ATOMIC_MASS_UNIT = 1.660538921e-27  # kg
+ENERGY_AU = 4.3597447222071e-18  # J
+BOHR_RADIUS = 5.29177210903e-11  # m
+ATOMIC_MASS_UNIT = 1.66053906660e-27  # kg
 BOHR_TO_ANGSTROM = BOHR_RADIUS * 1e10
 
 # Multiply a mass-weighted Hessian in Hartree/(amu Bohr^2) by this to get eigenvalues in cm^-2

@@ -34,6 +34,9 @@ constants update listed under Changed.
   `compute_isotope_effect()`, `calc_rpfr`, `get_frequency_scaling()` and
   the `calc_*_factor` functions warn with `DeprecationWarning` and forward
   to the new code.
+- Physical constants updated from CODATA 2010 to CODATA 2018 (h, k, E_h,
+  a_0, u). Largest change in any golden quantity: 7 × 10⁻⁹ relative; no
+  printed digit of the bundled examples changes.
 - The scaling-factor table is a plain dictionary of named tuples
   (`kinisot.vib_scale_factors.SCALING_FACTORS`) instead of a NumPy
   structured array; factors are now exact decimals rather than float32.

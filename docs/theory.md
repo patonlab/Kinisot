@@ -21,7 +21,7 @@ eigenvalues λ of **H'** give harmonic wavenumbers
 
 in cm⁻¹, negative for imaginary modes, where E_h, a_0, u and c are the
 Hartree energy, Bohr radius, atomic mass unit and speed of light (CODATA
-2010 values in `Kinisot.py`). The scaling factor multiplies every ν,
+2018 values in `kinisot/thermo.py`). The scaling factor multiplies every ν,
 including the imaginary one.
 
 **External modes.** Translations and rotations are not projected out.
@@ -119,13 +119,13 @@ isotope effects. The factor multiplies all frequencies of all species, so
 only the temperature-dependent terms (ZPE, EXC, tunnelling) are affected;
 TRPF and V-ratio are ratios of frequencies and cancel it.
 
-## 6. Constants (CODATA 2010)
+## 6. Constants (CODATA 2018)
 
 | Constant | Value |
 | --- | --- |
-| h | 6.62606957 × 10⁻³⁴ J s |
-| k | 1.3806488 × 10⁻²³ J K⁻¹ |
+| h | 6.62607015 × 10⁻³⁴ J s |
+| k | 1.380649 × 10⁻²³ J K⁻¹ |
 | c | 2.99792458 × 10¹⁰ cm s⁻¹ |
-| E_h | 4.35974434 × 10⁻¹⁸ J |
-| a_0 | 5.2917721092 × 10⁻¹¹ m |
-| u | 1.660538921 × 10⁻²⁷ kg |
+| E_h | 4.3597447222 × 10⁻¹⁸ J |
+| a_0 | 5.29177210903 × 10⁻¹¹ m |
+| u | 1.66053906660 × 10⁻²⁷ kg |
