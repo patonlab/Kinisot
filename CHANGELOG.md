@@ -2,6 +2,75 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - Unreleased
+
+Phase 2 of the [implementation plan](IMPLEMENTATION_PLAN.md): robustness.
+Every result line of the bundled examples is unchanged (to the 6 printed
+decimals, modulo the 2.0.3 constants fix).
+
+### Added
+
+- Input validation with clear messages: `--iso` atom numbers out of range,
+  `0` combined with atom numbers, duplicated atoms, atoms of an element
+  Kinisot cannot substitute, atoms that already carry a heavy isotope in the
+  Gaussian input, a reactant or product with an imaginary frequency, a
+  transition-structure side with more than one file carrying an imaginary
+  frequency, different substituted elements on the two sides of the reaction
+  (e.g. `13C` in the reactant but `2H` in the TS), and labels that request
+  no substitution at all. Previously most of these were silently ignored.
+- A warning when a transition structure has more than one imaginary
+  frequency beyond the cutoff; a negative frequency can no longer reach the
+  partition functions unnoticed (`nan` results).
+- The results table now lists, for every species, the modes kept in the
+  partition function and the modes discarded as external (translation and
+  rotation), so a misassigned low-frequency mode is visible.
+- `--output FILE` (`-o`), `--overwrite`, `--quiet` (`-q`), `--version`,
+  `--imag-cutoff` (the old spelling `--cutoff` still works), and long forms
+  `--temperature` and `--scale`.
+- `kinisot.exceptions` (`KinisotError`, `KinisotParseError`,
+  `KinisotInputError`, `KinisotWarning`); library code raises these instead
+  of calling `sys.exit()`. Both error classes also subclass `ValueError`.
+- `Hess_to_Freq.parse_gaussian()` returns a `FrequencyData` record (Hessian,
+  masses, atomic numbers, level of theory, linearity) from one read of the
+  file; `substitute()` reports which atoms were changed.
+- Tests: frequencies of every bundled output are checked against the values
+  Gaussian prints (kept modes to 0.05 cm-1, discarded modes against
+  Gaussian's low frequencies); error paths; CLI behaviour including a
+  `python -m kinisot` run. Coverage is reported in CI and must stay at or
+  above 80 %.
+
+### Changed
+
+- **Results file**: new results are appended to `Kinisot_output.dat`
+  (or `--output`) instead of silently overwriting it, matching how the
+  bundled example scripts collect a series of substitutions; use
+  `--overwrite` to start afresh. The `Species: ... isotopologue: ...` lines
+  are now written to the results file, not only to the terminal.
+- **Per-species rows** of the results table now show each species' own
+  Bigeleisen-Mayer factors, i.e. light/heavy ratios of the ZPE and
+  excitation terms and heavy/light ratio of the frequency product (TRPF).
+  Before 2.1.0 the TRPF column of the two rows was swapped (the reactant
+  row showed the transition-structure quantity). The final `KIE @` line is
+  unchanged and still equals the ratio of the two rows in every column.
+- File names in the table are shown without directory and extension; a
+  multi-file side is shown as `a + b`. The result line of an equilibrium
+  isotope effect is labelled `EQE @` instead of `KIE @`.
+- The level-of-theory check covers all files (not only the first two) and
+  its warning is printed to the terminal.
+- Unknown command-line flags are rejected (`parse_args`), `--ts` together
+  with `--prd` is rejected, and a non-positive temperature or scaling
+  factor is rejected. `-s` no longer treats `0` as "auto-detect".
+- Windows Gaussian archives (`|` separators) are parsed; archive entries
+  wrapped across lines are joined before parsing.
+- The Bigeleisen-Mayer terms are evaluated with NumPy array operations.
+
+### Removed
+
+- The `try/except` import shim: Kinisot is run as `python -m kinisot`
+  (or, from Phase 3, the `kinisot` console script); `python Kinisot.py`
+  is no longer supported.
+- `Logger.Fatal()`; the logger is now a context manager.
+
 ## [2.0.3] - Unreleased
 
 ### Fixed

@@ -33,12 +33,18 @@ pip install kinisot
 
 ## Usage
 
-```python
-python -m kinisot --rct reactant_output --ts ts_output --iso 1,2,3 (-t temperature) (-s scalefactor)  
 ```
-*	The two output files contain Gaussian frequency calculations performed for the reactant and transition state at the same level of theory.
-*	The `--iso` flag is required and specifies a string of atom number(s) which are to be substituted for heavier isotopes. Multiple atom numbers require quotation marks and are separated by spaces.
-*	The `-t` option specifies temperature (in Kelvin). N.B. This does not have to correspond to the temperature used in the Gaussian calculation since the Reduced Isotopic Partition Function Ratios are evalulated at the requested temperature. The default value is 298.15 K.
-*	The `-s` option is a scaling factor for vibrational frequencies. Empirical scaling factors have been determined for several functional/basis set combinations, and these are applied automatically using values from the Truhlar group based on detection of the level of theory and basis set in the output files. The ZPE-scaling factors are selected if available. The default value when no scaling factor is available is 1 (no scale factor).
+python -m kinisot --rct reactant.out --ts ts.out --iso 5 [-t 393] [-s 0.961]
+python -m kinisot --rct reactant.out --prd product.out --iso 5          (equilibrium isotope effect)
+python -m kinisot --rct diene.out --rct dienophile.out --ts ts.out --iso 6 --iso 0 --iso 15   (bimolecular)
+```
 
-See examples/ for more examples
+*	The output files contain Gaussian frequency calculations performed for the reactant(s) and the transition structure (`--ts`, kinetic isotope effect) or product (`--prd`, equilibrium isotope effect) at the same level of theory.
+*	`--iso` gives the atom number(s) to replace with the heavy isotope (<sup>2</sup>H, <sup>13</sup>C or <sup>17</sup>O), comma separated for several atoms (`--iso 7,8`). Give one `--iso` per file, in the order of the `--rct` files followed by the `--ts`/`--prd` file(s), or a single `--iso` when the atom numbering is the same in all files. Use `--iso 0` for a file with no substituted atom (e.g. the second reactant of a bimolecular reaction). Kinisot checks that the atom numbers exist, that the atoms can be substituted, and that both sides of the reaction substitute the same elements.
+*	`-t` sets the temperature in Kelvin at which the reduced isotopic partition function ratios are evaluated (default 298.15 K). It does not have to match the temperature used in the Gaussian calculation.
+*	`-s` sets the vibrational scaling factor. When it is omitted the level of theory is detected from the output files and the ZPE scaling factor from the [Truhlar group database](https://comp.chem.umn.edu/freqscale/) is applied; if the level is not in the database, or the files disagree, the factor is 1.0 and a message says so.
+*	`--imag-cutoff` (default 50 cm<sup>-1</sup>): a mode below this value counts as the reaction coordinate of the transition structure. Reactants and products must not have one.
+*	Results are printed to the terminal and appended to `Kinisot_output.dat` (change the file with `-o`, start afresh with `--overwrite`, silence the terminal with `-q`). Each block lists the frequencies of the reaction-coordinate mode, the Bigeleisen-Mayer factors of every species and, on the `KIE @` line: the ratio of imaginary frequencies (V-ratio), the ZPE, excitation (EXC) and Teller-Redlich product (TRPF) factors, the semiclassical KIE, the Bell tunnelling correction (1D-tunn) and the tunnelling-corrected KIE (corr-KIE). The modes kept in, and discarded from, each partition function are listed below the table.
+*	Invalid input (an atom number out of range, a reactant with an imaginary frequency, different substitutions on the two sides, a file that is not a completed frequency job, ...) stops the run with a message and exit code 1.
+
+See [kinisot/examples/gaussian](kinisot/examples/gaussian) for worked examples with their reference outputs.

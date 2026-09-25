@@ -41,7 +41,7 @@ Travis removed.
 Still to add (they are the checks run by hand in REVIEW.md §2 and belong in
 CI before the parser is replaced):
 
-4. `tests/test_frequencies.py`: for every bundled Gaussian output, Kinisot's
+4. ✅ `tests/test_frequencies.py`: for every bundled Gaussian output, Kinisot's
    kept modes must match the `Frequencies --` lines to 0.05 cm⁻¹ and the
    discarded modes must match `Low frequencies ---`. Catches any regression
    in mass weighting, unit conversion, or mode dropping, for any backend.
@@ -51,7 +51,8 @@ CI before the parser is replaced):
    to 2e-5 relative (skipped when PyQuiver is not installed; PyQuiver still
    carries the 1.660468e-27 amu typo, hence the loose tolerance).
 
-**Exit criteria:** both tests green in CI.
+**Exit criteria:** both tests green in CI (item 4 done; item 5 waits for
+the GoodVibes dependency in Phase 5).
 
 ## Phase 1 — Confirmed bug fixes ✅ (v2.0.3, unreleased)
 
@@ -61,7 +62,23 @@ publish v2.0.3 to PyPI and bump the conda-forge recipe. Do this before
 Phase 2 lands so users get the bug fixes without waiting for the CLI
 changes.
 
-## Phase 2 — Robustness (v2.1.0)
+## Phase 2 — Robustness ✅ (v2.1.0, implemented 2026-09-25)
+
+All eight items below are implemented (85 tests, 94 % coverage, every
+result line of the bundled examples unchanged). Two deliberate deviations
+from the text as first written:
+
+- Item 2, mixed elements: there is **no** `--allow-mixed-elements`
+  override. An isotope effect that substitutes different elements on the
+  two sides is not a defined quantity, so an override would only produce
+  meaningless numbers; the check is a plain error. (Different atom
+  numbering between files is not affected: only the *set* of substituted
+  elements must match.)
+- Item 6, results file: instead of refusing to overwrite without
+  `--overwrite`, new results are **appended** to the results file, which is
+  how the bundled example scripts and their reference `.dat` files were
+  produced (one block per substitution). `--overwrite` starts a fresh file.
+  Nothing is ever lost silently, and existing scripts keep working.
 
 1. **Exceptions, not exits**: `KinisotError` hierarchy
    (`KinisotParseError`, `KinisotInputError`) in `kinisot/exceptions.py`;
@@ -305,13 +322,18 @@ Phases 0–1 are done; 2–3 are a few days and unlock adoption; 4 is the
 largest single chunk (one reviewed PR per module move); 5 is now small
 because GoodVibes carries the parsers; 7 and 8 are scoped per feature.
 
-## Decisions to confirm before Phase 5
+## Decisions (confirmed 2026-09-25)
 
-1. GoodVibes as a hard dependency (recommended) versus an optional extra
-   with the in-repo Gaussian parser kept as a fallback.
-2. Change the bare-index oxygen default from ¹⁷O to ¹⁸O in Phase 7
-   (recommended, with a one-release warning) versus keeping ¹⁷O.
-3. Projection default for Gaussian/ORCA inputs: off through v2.x for
-   golden-number continuity (recommended), on in v3.0.
-4. Whether `Kinisot.py` keeps its capitalized module name behind the
-   deprecation shim beyond v2.2.
+1. **GoodVibes is a hard dependency from Phase 5** (`goodvibes>=4.4`). The
+   in-repo Gaussian parser is kept only until the parity test proves the
+   adapter equal, then deleted.
+2. **The bare-index oxygen default changes from ¹⁷O to ¹⁸O in Phase 7**,
+   with a one-release warning whenever a bare oxygen index is used and an
+   explicit `--iso 5:17O` form for the old behaviour.
+3. **Projection stays off by default for Gaussian and ORCA inputs through
+   v2.x** (golden-number continuity) and is on by default for the ASE
+   backend from its first release; the default flips for all backends in
+   v3.0.
+4. **`kinisot/Kinisot.py` survives as a deprecation shim through v2.x** and
+   is removed in v3.0; new code lives in `cli.py`, `thermo.py`, `hessian.py`
+   and `backends/` from Phase 4.
