@@ -73,7 +73,8 @@ Two forms of input:
    differences (`--delta`, default 0.01 Å) or with the calculator's
    `get_hessian` when it has one, and cached as `<name>.hessian.json` next
    to the geometry (reused while the geometry is unchanged and the `--calc`
-   specification matches). The geometry must be a stationary point of that
+   specification and `--delta` match; delete the file to force a
+   recomputation). The geometry must be a stationary point of that
    calculator.
 
 Masses come from Kinisot's isotope table (ASE's standard atomic weights
@@ -81,9 +82,19 @@ only identify elements). Projection of the external modes is on by default
 for these inputs, no scaling factor is applied unless `-s` is given, and
 imaginary modes below the cutoff are treated as real vibrations of the same
 magnitude with a warning. Calculator names: `emt` (ASE's test potential),
-`mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb`, `sevennet`,
+`xtb[:method]` (GFN2-xTB through `tblite`, SCF accuracy tightened to 0.01),
+`mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb[:model]` (an orb-models
+`ORB_PRETRAINED_MODELS` name, default `orb-v3-conservative-inf-omat`), `sevennet`,
 `aimnet2`, or `module.path:callable`; each package must be installed
 separately.
+
+**Finite-difference Hessians need a tightly converged energy.** Noise in
+the forces becomes noise in the Hessian and then in the isotope effect:
+with tblite's default SCF accuracy, an EQE between water's two equivalent
+hydrogens (exactly 1 by symmetry) comes out 1.0001 or 0.9996; with
+`accuracy=0.01` it is 1 ± 3 × 10⁻⁷. Converge any calculator well beyond
+what a geometry optimization needs, and use a symmetric EQE of this kind as
+a quick check of a new setup.
 
 ## Frequency self-check
 

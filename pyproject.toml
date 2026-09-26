@@ -33,7 +33,7 @@ kinisot = "kinisot.cli:main"
 
 [project.optional-dependencies]
 ase = ["ase>=3.23"]
-test = ["pytest", "pytest-cov"]
+test = ["pytest", "pytest-cov", "pyquiver-kie"]
 lint = ["ruff"]
 
 [tool.setuptools.packages.find]

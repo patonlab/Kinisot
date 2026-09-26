@@ -45,8 +45,11 @@ CI before the parser is replaced):
    kept modes must match the `Frequencies --` lines to 0.05 cm⁻¹ and the
    discarded modes must match `Low frequencies ---`. Catches any regression
    in mass weighting, unit conversion, or mode dropping, for any backend.
-5. ✅ (in `tests/test_orca.py`) mass-weighted Hessian from
-   `goodvibes.io.parse_hessian` equals Kinisot's parser to 1e-12; optional
+5. ✅ (in `tests/test_orca.py` and `tests/test_pyquiver.py`) mass-weighted
+   Hessian from `goodvibes.io.parse_hessian` equals Kinisot's parser to
+   1e-12; PyQuiver, given the same Hessians as `quiver.System` objects (no
+   `#p` output needed), agrees to 2.3e-6 on every Claisen and Diels–Alder
+   KIE (uncorrected, Bell, Wigner). The original text asked for an optional
    PyQuiver (`pyquiver-kie`) comparison on the Claisen and Diels–Alder KIEs
    to 2e-5 relative (skipped when PyQuiver is not installed; PyQuiver still
    carries the 1.660468e-27 amu typo, hence the loose tolerance).
@@ -222,7 +225,10 @@ needed.
 
 1. **Dependency**: `goodvibes>=4.4` in `pyproject.toml` and the conda
    recipe.
-2. **Upstream PR to GoodVibes (small, still to open)**: `FUNCTIONAL_ALIASES` for
+2. **Upstream PR to GoodVibes (prepared 2026-09-26: branch
+   `claude/scaling-factor-aliases` on patonlab/GoodVibes, commit 20a216b,
+   full GoodVibes suite passing; pull request to be opened by a maintainer)**:
+   `FUNCTIONAL_ALIASES` for
    `MN15-L`, `MN12-L`, `MN12-SX`, and hyphen handling for
    `M06-L(DKH2)/aug-cc-pwcVTZ-DK`, so the seven Kinisot rows in REVIEW §2.5
    resolve. Until merged, keep a five-line alias shim in Kinisot.
@@ -323,9 +329,23 @@ machine-learned potential could be exercised in this environment (the model
 packages and weights are not installable here), so the tests use ASE's
 built-in EMT potential on water, ammonia and N₂, and the MACE test is skipped
 unless `mace-torch` is installed; the `examples/mlip_claisen` numbers come
-from the Gaussian Hessians written in ASE's JSON form. **Still wanted:** a
-run of the Claisen example with MACE-MP/MACE-OFF/UMA structures optimized
-with the same potential, recorded in the example and in the Phase 9 suite.
+from the Gaussian Hessians written in ASE's JSON form. **Update 2026-09-26:**
+the Claisen reactant and transition structure were re-optimized with
+GFN2-xTB through the ASE backend (`scripts/make_claisen_structures.py`, Sella
+for the saddle point) and compared with B3LYP in `examples/mlip_claisen`;
+this exposed that finite-difference Hessians need a tight SCF, now the
+`--calc xtb` default. **Update 2026-09-26 (MACE):** the same script was run
+with MACE-OFF23 (small, medium, large) and MACE-MP-0 (medium), with weights
+from GitHub releases. The analytic MACE Hessian (`get_hessian`) matches
+finite differences to 1.5 × 10⁻⁷. None of the four has the concerted
+Claisen transition structure. MACE-OFF23 puts the pericyclic region 30 to
+40 kcal/mol too high and its saddle points are C–O cleavage. MACE-MP-0's is
+a C1–C6 ring closure with C–O intact. The script now validates every
+structure (one imaginary mode, partial-bond windows, bonds dominating the
+imaginary mode) and refuses these. No MACE KIEs are reported; the
+diagnostics are in the example. **Still wanted:** a potential trained on
+reactive data that passes the checks. `mace_omol`, `orb`, `sevennet`,
+`aimnet2` and UMA have not been tried.
 
 Design in REVIEW §6; prototypes verified 2026-09-25 (unit conversion to
 1.6e-6 cm⁻¹, `with_new_masses` isotopologues, EMT finite-difference failure

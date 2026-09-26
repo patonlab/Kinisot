@@ -41,20 +41,19 @@ __all__ = [
     "CALCULATORS",
 ]
 
-# --calc names -> (module, callable, default kwargs, pip hint). Any other value is taken as "module:callable".
+# --calc names -> (module, callable, default kwargs, pip hint, keyword that receives ":model").
+# Any other value is taken as "module.path:callable".
 CALCULATORS = {
-    "emt": ("ase.calculators.emt", "EMT", {}, "ase (built in; a test potential, not for chemistry)"),
-    "mace_mp": ("mace.calculators", "mace_mp", {"default_dtype": "float64"}, "mace-torch"),
-    "mace_off": ("mace.calculators", "mace_off", {"default_dtype": "float64"}, "mace-torch"),
-    "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch"),
-    "orb": (
-        "orb_models.forcefield.pretrained",
-        "orb_v3_conservative_inf_omat",
-        {},
-        "orb-models (wrap with ORBCalculator)",
-    ),
-    "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn"),
-    "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc"),
+    "emt": ("ase.calculators.emt", "EMT", {}, "ase (built in; a test potential, not for chemistry)", "model"),
+    # accuracy=0.01 tightens tblite's SCF: with the default (1.0) the force noise corrupts
+    # finite-difference Hessians at the 1e-4 level in isotope effects
+    "xtb": ("tblite.ase", "TBLite", {"method": "GFN2-xTB", "verbosity": 0, "accuracy": 0.01}, "tblite", "method"),
+    "mace_mp": ("mace.calculators", "mace_mp", {"default_dtype": "float64"}, "mace-torch", "model"),
+    "mace_off": ("mace.calculators", "mace_off", {"default_dtype": "float64"}, "mace-torch", "model"),
+    "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch", "model"),
+    "orb": ("kinisot.backends.ase", "orb_calculator", {}, "orb-models", "model"),
+    "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn", "model"),
+    "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc", "model"),
 }
 
 
@@ -68,18 +67,46 @@ def _require_ase():
         ) from None
 
 
+def orb_calculator(model="orb-v3-conservative-inf-omat", precision="float64"):
+    """ORB calculator for ``--calc orb[:model]``; ``model`` is a key of ORB_PRETRAINED_MODELS.
+
+    orb-models' loaders return the network (0.5) or the network and an atoms
+    adapter (0.6 and later), not an ASE calculator, so wrap them in ORBCalculator.
+    """
+    try:
+        from orb_models.forcefield import pretrained
+
+        try:
+            from orb_models.forcefield.inference.calculator import ORBCalculator
+        except ImportError:
+            from orb_models.forcefield.calculator import ORBCalculator
+    except ImportError as err:
+        raise KinisotInputError("cannot import orb_models for --calc orb (%s); install orb-models" % err) from None
+    if model not in pretrained.ORB_PRETRAINED_MODELS:
+        raise KinisotInputError(
+            "unknown ORB model %r: use one of %s" % (model, ", ".join(pretrained.ORB_PRETRAINED_MODELS))
+        )
+    loaded = pretrained.ORB_PRETRAINED_MODELS[model](precision=precision)
+    if isinstance(loaded, tuple):
+        network, adapter = loaded
+        return ORBCalculator(network, atoms_adapter=adapter)
+    return ORBCalculator(loaded)
+
+
 def build_calculator(spec):
     """Instantiate an ASE calculator from a --calc specification.
 
     ``spec`` is a name from CALCULATORS, optionally followed by ``:model``
-    (e.g. ``mace_mp:medium``), or ``module.path:callable`` for anything else.
-    The callable is called with no positional arguments (plus ``model=`` when given).
+    (e.g. ``mace_mp:medium``, ``xtb:GFN1-xTB``), or ``module.path:callable``
+    for anything else. The callable is called with no positional arguments
+    (plus the model keyword, ``model=`` or ``method=``, when a model is given).
     """
     _require_ase()
     name, _, model = spec.partition(":")
     kwargs = {}
+    model_key = "model"
     if name in CALCULATORS:
-        module_name, attribute, kwargs, hint = CALCULATORS[name]
+        module_name, attribute, kwargs, hint, model_key = CALCULATORS[name]
         kwargs = dict(kwargs)
     elif "." in name and model:
         module_name, attribute, hint = name, model, name
@@ -99,7 +126,7 @@ def build_calculator(spec):
     except AttributeError:
         raise KinisotInputError("%s has no %s (--calc %s)" % (module_name, attribute, spec)) from None
     if model:
-        kwargs["model"] = model
+        kwargs[model_key] = model
     try:
         return factory(**kwargs)
     except TypeError:
@@ -263,17 +290,22 @@ def save_hessian_json(data, path, atoms=None, calc_spec=None):
 
 
 def hessian_for_geometry(path, calc_spec, delta=0.01, nfree=2, cache=True, recompute=False):
-    """Hessian of the geometry file ``path`` with the calculator ``calc_spec``, cached as ``<stub>.hessian.json``."""
+    """Hessian of the geometry file ``path`` with the calculator ``calc_spec``, cached as ``<stub>.hessian.json``.
+
+    The cache is reused only when it is newer than the geometry and was made
+    with the same ``calc_spec``, ``delta`` and ``nfree``.
+    """
     _require_ase()
     from ase.io import read
     from ase.io.jsonio import decode
 
     stub = os.path.splitext(path)[0]
     cached = stub + ".hessian.json"
+    stencil = {"delta": float(delta), "nfree": int(nfree)}
     if cache and not recompute and os.path.exists(cached) and os.path.getmtime(cached) >= os.path.getmtime(path):
         with open(cached, encoding="utf-8") as handle:
             info = decode(handle.read())["atoms"].info
-        if info.get("kinisot_calc") == calc_spec:
+        if info.get("kinisot_calc") == calc_spec and info.get("kinisot_stencil") == stencil:
             return parse_ase_json(cached)
     try:
         atoms = read(path)
@@ -283,6 +315,7 @@ def hessian_for_geometry(path, calc_spec, delta=0.01, nfree=2, cache=True, recom
         atoms = atoms[-1]
     data = hessian_from_calculator(atoms, build_calculator(calc_spec), delta=delta, nfree=nfree, source=path)
     if cache:
+        atoms.info["kinisot_stencil"] = stencil
         save_hessian_json(data, cached, atoms=atoms, calc_spec=calc_spec)
         data = parse_ase_json(cached)
     return data

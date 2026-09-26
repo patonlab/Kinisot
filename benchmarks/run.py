@@ -83,7 +83,7 @@ def format_case(case, rows):
             case["reference"].get("method", ""),
             case.get("level_of_theory", "?"),
             case["temperature"],
-            case.get("scale"),
+            case.get("scale") if case.get("scale") is not None else "none",
             case.get("tunneling", "bell"),
             ", relative to isotopologue %s" % case["reference_isotopologue"]
             if case.get("reference_isotopologue")

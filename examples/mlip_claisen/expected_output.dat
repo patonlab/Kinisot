@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.5.0.dev0: 2026-09-25 15:23
+  KINISOT.py v 2.5.0: 2026-09-26 15:18
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
@@ -21,7 +21,7 @@ o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+0
   claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0.dev0: 2026-09-25 15:23
+  KINISOT.py v 2.5.0: 2026-09-26 15:18
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
@@ -42,3 +42,95 @@ o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+0
   claisen_gs.hessian (iso @ 4): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+
+  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  Species: claisen_gs.hessian.json isotopologue: 1
+  Species: claisen_ts.hessian.json isotopologue: 1
+
+  Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  494.0
+o claisen_gs.hessian: iso @ 1                                1.149e+00  1.025e+00  9.243e-01
+o claisen_ts.hessian: iso @ 1                         486.6  1.143e+00  1.015e+00  9.326e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.015193   1.005716   1.009428   0.991140   1.021491   1.004293   1.025876
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 1): 36 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 1): imaginary 486.6i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+
+  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  Species: claisen_gs.hessian.json isotopologue: 4
+  Species: claisen_ts.hessian.json isotopologue: 4
+
+  Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  494.0
+o claisen_gs.hessian: iso @ 4                                1.178e+00  1.022e+00  9.093e-01
+o claisen_ts.hessian: iso @ 4                         491.7  1.148e+00  1.021e+00  9.209e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.004713   1.026586   1.001017   0.987416   1.019481   1.001352   1.020858
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 4): 36 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 4): imaginary 491.7i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
+
+  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  Species: claisen_gs.hessian.json isotopologue: 6
+  Species: claisen_ts.hessian.json isotopologue: 6
+
+  Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  494.0
+o claisen_gs.hessian: iso @ 6                                1.150e+00  1.025e+00  9.252e-01
+o claisen_ts.hessian: iso @ 6                         486.6  1.142e+00  1.015e+00  9.326e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.015256   1.006620   1.009760   0.992078   1.023776   1.004311   1.028189
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 6): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 6): imaginary 486.6i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+
+  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  Species: claisen_gs.hessian.json isotopologue: 7,8
+  Species: claisen_ts.hessian.json isotopologue: 7,8
+
+  Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  494.0
+o claisen_gs.hessian: iso @ 7,8                              1.402e+02  1.396e+00  1.417e-01
+o claisen_ts.hessian: iso @ 7,8                       490.5  1.746e+02  1.260e+00  1.411e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.007143   0.803151   1.107496   1.003742   0.899193   1.002041   0.901029
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 7,8): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 7,8): imaginary 490.5i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
