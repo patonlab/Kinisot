@@ -43,7 +43,16 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   same reference convention, and `uncertainty` its stated error. Leave
   them `null` until they have been read from the paper: **never transcribe
   experimental numbers from memory**. The report marks such rows as
-  "no experimental value".
+  "no experimental value". When a paper reports independent measurements
+  separately, give both as lists (`[1.046, 1.051]`, `[0.005, 0.004]`); the
+  deviation is taken from their mean.
+- Optional: `reference` in a `kies` entry overrides `reference_isotopologue`
+  for that entry (13C and 2H KIEs are often measured against different
+  positions); `reference` at the top may be a list of sources; `notes`
+  is printed under the source line.
+- A case whose structures do not exist yet sets `reactants` and
+  `transition_structure` to `null` and each `iso` to `null`; the report
+  lists its measurements and marks it "Not computed yet".
 
 ## Status
 
@@ -51,7 +60,9 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | --- | --- | --- |
 | claisen | in repo (B3LYP/6-31G(d)) | to be entered from Meyer, DelMonte, Singleton, JACS 1999, 121, 10865 |
 | claisen_xtb | in repo (GFN2-xTB, `scripts/make_claisen_structures.py`) | same as claisen |
-| diels_alder | in repo (B3LYP/6-31G(d)) | to be entered from Singleton, Thomas, JACS 1995, 117, 9357 |
+| diels_alder | in repo (B3LYP/6-31G(d)) | to be entered from Singleton, Thomas, JACS 1995, 117, 9357 (Beno, Houk, Singleton, JACS 1996, 118, 9984 plot them only) |
+| baeyer_villiger | needed (addition of m-CPBA to cyclohexanone) | entered: Singleton, Szymanski, JACS 1999, 121, 9455, Figure 1a; Crow, Hirschi, Clinton, Hirschi, ChemRxiv 2026 (preprint), SI Tables S3a/S3b |
+| baeyer_villiger_migration | needed (migration step of the Criegee intermediate) | entered: same papers, 1999 Figure 1c and 2026 SI Table S8b |
 
 Further cases (an SN2 reaction, an epoxidation, an ene reaction, a hydride
 transfer, another EQE) need new frequency calculations at a documented

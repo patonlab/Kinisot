@@ -136,6 +136,61 @@ one.
 
 Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
 
+## Why the Bigeleisen–Mayer equation rather than free energies
+
+A KIE can also be taken from the free energies a quantum chemistry program
+prints for each isotopologue, as exp(ΔΔG‡/RT). With exact harmonic
+frequencies at an exact stationary point the two routes give the same
+number. In practice the Bigeleisen–Mayer equation, which Kinisot evaluates
+directly (as QUIVER and PyQuiver do), is the more reliable one.
+[docs/theory.md](docs/theory.md) (section 6) has the derivation and the
+full comparison; `scripts/compare_free_energy_route.py` reproduces it.
+
+- **It cancels errors in small numbers, not large ones.** Bigeleisen and
+  Mayer replace the translational and rotational partition-function ratios
+  by the product of vibrational frequency ratios (the Teller–Redlich
+  product rule). Every vibration then enters only as a ratio of the two
+  isotopologues' frequencies. A soft mode (hν ≪ kT) contributes a factor
+  that tends to exactly 1, however poorly its frequency is computed. In a
+  free-energy difference the same mode's isotope shift enters in full, and
+  it has to cancel against rotational terms computed from moments of
+  inertia.
+- **Computed frequencies obey the product rule only approximately.** On the
+  converged B3LYP Claisen files in this repository, the free-energy KIEs
+  differ from Bigeleisen–Mayer by up to 8 × 10⁻⁴. A 0.1 cm⁻¹ error in the
+  isotope shift of the reactant's 70.5 cm⁻¹ torsion moves the ¹³C KIEs by
+  1.4 × 10⁻³ to 1.5 × 10⁻³ through free energies and by less than 10⁻⁵
+  through Bigeleisen–Mayer.
+- **Printed free energies are not precise enough.** Gaussian prints six
+  decimals of a hartree. At 393 K an error of 10⁻⁶ hartree in one of the
+  four free energies changes a KIE by 8 × 10⁻⁴, and rounding alone moves
+  the Claisen C6 ¹³C KIE by 6.5 × 10⁻⁴. That is comparable to the
+  uncertainty of natural-abundance ¹³C measurements.
+- **Quasi-harmonic free energies are unusable for isotope effects.**
+  Raising soft modes to 100 cm⁻¹, as quasi-harmonic thermochemistry does
+  (GoodVibes included), removes their isotope shifts from the vibrational
+  term but not from the rotational one. The Claisen ¹⁸O KIE drops from
+  1.037 to 1.018 through free energies; the Bigeleisen–Mayer value moves by
+  10⁻⁴.
+- **Tunnelling belongs in heavy-atom KIEs.** A one-dimensional tunnelling
+  correction improves KIE predictions. With it, predicted and measured
+  heavy-atom KIEs agree to about the experimental uncertainty (Meyer,
+  DelMonte, Singleton, J. Am. Chem. Soc. 1999, 121, 10865). Kinisot applies
+  Bell's correction by default and prints the uncorrected KIE alongside.
+- **It is less work.** One frequency calculation per species gives every
+  isotopologue at every temperature in seconds. The free-energy route needs
+  a thermochemistry run for each set of isotopes and each temperature.
+
+When a predicted KIE disagrees with experiment, look first at the
+transition structure. Bigeleisen–Mayer KIE predictions for heavy atoms are
+accurate as long as the calculation gets the mechanism and the
+transition-state geometry right. Hirschi, Takeya, Hang and Singleton found
+a theory-independent relation between forming-bond distances and ¹³C KIEs
+(J. Am. Chem. Soc. 2009, 131, 2397). So the calculations that reproduce the
+measured KIEs share nearly the same transition-state geometry.
+[examples/mlip_claisen](examples/mlip_claisen/README.md) shows an extreme
+case: potentials whose saddle point is a different reaction.
+
 ## What Kinisot assumes
 
 - Harmonic frequencies from the program's Hessian; the scaling factor is

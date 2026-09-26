@@ -101,4 +101,24 @@ def test_benchmark_runner(tmp_path, monkeypatch):
     rows = module.run_case(cases[0])
     assert rows[3]["deviation"] == pytest.approx(1.032993 - 1.030, abs=1e-5)
     assert "Mean absolute deviation over 1 measured positions" in module.format_case(cases[0], rows)
+    # replicate measurements are compared through their mean; a per-entry reference overrides the case's
+    cases[0]["kies"][3].update(experimental=[1.030, 1.034], uncertainty=[0.002, 0.004], reference="5")
+    rows = module.run_case(cases[0])
+    reference = module.compute_kie(
+        rct=module.resolve(cases[0], "reactants"),
+        ts=module.resolve(cases[0], "transition_structure"),
+        iso="4",
+        temperature=393.0,
+        scale=0.961,
+        reference="5",
+    )
+    assert rows[3]["computed"] == pytest.approx(reference.kie_tunnel_relative, abs=1e-9)
+    assert rows[3]["deviation"] == pytest.approx(reference.kie_tunnel_relative - 1.032, abs=1e-9)
+    assert "1.030 ± 0.002, 1.034 ± 0.004" in module.format_case(cases[0], rows)
+    # a case with measurements but no structures yet (Baeyer-Villiger) is listed, not computed
+    (case,) = module.load_cases(["baeyer_villiger"])
+    rows = module.run_case(case)
+    assert all(r["computed"] is None and r["deviation"] is None for r in rows)
+    text = module.format_case(case, rows)
+    assert "Not computed yet" in text and "1.0096 ± 0.0006" in text and "1.001 ± 0.002, 1.000 ± 0.002" in text
     del sys, json

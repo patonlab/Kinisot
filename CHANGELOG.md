@@ -6,6 +6,25 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- README, "Why the Bigeleisen–Mayer equation rather than free energies", and
+  docs/theory.md section 6: the two routes differ exactly by the
+  Teller–Redlich product-rule violation of the computed frequencies. A soft
+  mode drops out of Bigeleisen–Mayer but not out of a free-energy
+  difference. `scripts/compare_free_energy_route.py` quantifies this on the
+  Claisen Hessians: printed-precision rounding, a 0.1 cm⁻¹ soft-mode error,
+  and quasi-harmonic free energies. `tests/test_free_energy_route.py` pins
+  the quoted numbers.
+- Baeyer–Villiger benchmarks (`benchmarks/baeyer_villiger`,
+  `benchmarks/baeyer_villiger_migration`) with measured intermolecular and
+  intramolecular ¹³C and ²H KIEs. They come from Singleton and Szymanski,
+  JACS 1999, 121, 9455 (Figure 1), and from the Crow, Hirschi, Clinton and
+  Hirschi preprint, ChemRxiv 2026 (SI Tables S3a, S3b and S8b). Structures
+  still need to be computed.
+- The benchmark runner lists cases without structures and accepts
+  replicate measurements, a reference position per KIE, several sources and
+  a notes paragraph. The Diels–Alder case cites Beno, Houk and Singleton,
+  JACS 1996, 118, 9984.
+
 - `--calc xtb[:method]`: GFN2-xTB (or GFN1-xTB) through `tblite`'s ASE
   calculator, with the SCF tightened to `accuracy=0.01`. With tblite's
   default the force noise shifts finite-difference isotope effects by up to

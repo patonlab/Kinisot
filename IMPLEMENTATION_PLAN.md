@@ -387,7 +387,17 @@ repository (Claisen, Diels–Alder) with **experimental values left null**:
 they must be entered from the papers, not from memory, and the report says
 so until they are. Items 1 (further reactions) and 2 (their frequency jobs)
 need a maintainer; item 3 is done apart from the plot and the CI job, which
-wait for the first measured values.
+wait for the first measured values. **Update 2026-09-26:** the first
+measured values are in. Two Baeyer–Villiger cases (intermolecular addition
+and intramolecular migration) take them from Singleton and Szymanski, JACS
+1999, 121, 9455, Figure 1, and from the Crow et al. preprint, ChemRxiv 2026,
+SI Tables S3a, S3b and S8b, both read from the PDFs. Their structures are
+still needed; Rzepa's blog (post 14112) links transition structures, but
+the host is outside this environment's network allowance. The runner now
+handles cases without structures, replicate measurements, per-KIE reference
+positions and several sources. The Diels–Alder values are plotted, not
+tabulated, in Beno, Houk, Singleton, JACS 1996. They still need the 1995
+paper or the 1996 SI.
 
 **Goal (requested 2026-09-25):** a `benchmarks/` directory that compares
 Kinisot's predictions with published experimental KIEs, primarily the

@@ -1,28 +1,131 @@
 {
   "name": "Diels-Alder reaction of isoprene with maleic anhydride",
-  "reference": {
-    "citation": "D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358",
-    "doi": "10.1021/ja00141a030",
-    "method": "13C and 2H KIEs by NMR at natural abundance, 25 C"
-  },
+  "reference": [
+    {
+      "citation": "D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358",
+      "doi": "10.1021/ja00141a030",
+      "method": "13C and 2H KIEs by NMR at natural abundance, 25 C"
+    },
+    {
+      "citation": "B. R. Beno, K. N. Houk, D. A. Singleton, J. Am. Chem. Soc. 1996, 118, 9984-9985",
+      "doi": "10.1021/ja9615278",
+      "method": "B3LYP/6-31G* and RHF/6-31G* KIEs (QUIVER, scaled by 0.963 and 0.8929, Bell tunnelling) compared with the 1995 measurements"
+    }
+  ],
   "temperature": 298.15,
   "scale": 0.963,
   "level_of_theory": "B3LYP/6-31G(d)",
   "tunneling": "bell",
   "project": false,
-  "reactants": ["../../tests/data/gaussian/dienophile.out", "../../tests/data/gaussian/diene.out"],
-  "transition_structure": ["../../tests/data/gaussian/DATS.out"],
+  "reactants": [
+    "../../tests/data/gaussian/dienophile.out",
+    "../../tests/data/gaussian/diene.out"
+  ],
+  "transition_structure": [
+    "../../tests/data/gaussian/DATS.out"
+  ],
   "product": null,
   "reference_isotopologue": null,
   "kies": [
-    {"position": "diene C6 (TS C15)", "iso": ["0", "6", "15"], "experimental": null, "uncertainty": null, "note": "diene terminus"},
-    {"position": "diene C10 (TS C19)", "iso": ["0", "10", "19"], "experimental": null, "uncertainty": null, "note": "diene terminus"},
-    {"position": "diene C1 (TS C10)", "iso": ["0", "1", "10"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "diene C2 (TS C11)", "iso": ["0", "2", "11"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "diene C4 (TS C13)", "iso": ["0", "4", "13"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "dienophile C1 (TS C1)", "iso": ["1", "0", "1"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "dienophile C1 (TS C2)", "iso": ["1", "0", "2"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "dienophile H5 (TS H7)", "iso": ["5", "0", "7"], "experimental": null, "uncertainty": null, "note": "secondary 2H KIE"},
-    {"position": "dienophile H5 (TS H5)", "iso": ["5", "0", "5"], "experimental": null, "uncertainty": null, "note": "secondary 2H KIE"}
-  ]
+    {
+      "position": "diene C6 (TS C15)",
+      "iso": [
+        "0",
+        "6",
+        "15"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": "diene terminus"
+    },
+    {
+      "position": "diene C10 (TS C19)",
+      "iso": [
+        "0",
+        "10",
+        "19"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": "diene terminus"
+    },
+    {
+      "position": "diene C1 (TS C10)",
+      "iso": [
+        "0",
+        "1",
+        "10"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "diene C2 (TS C11)",
+      "iso": [
+        "0",
+        "2",
+        "11"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "diene C4 (TS C13)",
+      "iso": [
+        "0",
+        "4",
+        "13"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "dienophile C1 (TS C1)",
+      "iso": [
+        "1",
+        "0",
+        "1"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "dienophile C1 (TS C2)",
+      "iso": [
+        "1",
+        "0",
+        "2"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "dienophile H5 (TS H7)",
+      "iso": [
+        "5",
+        "0",
+        "7"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": "secondary 2H KIE"
+    },
+    {
+      "position": "dienophile H5 (TS H5)",
+      "iso": [
+        "5",
+        "0",
+        "5"
+      ],
+      "experimental": null,
+      "uncertainty": null,
+      "note": "secondary 2H KIE"
+    }
+  ],
+  "notes": "The 1995 KIEs are relative to the methyl group (taken as 1.000). Beno, Houk and Singleton (1996) rescaled them assuming methyl 2H and 13C KIEs of 0.996 and 1.001, the B3LYP predictions, and found seven of nine sets within experimental error. Their measured values appear only in the plots of Figure 2 and in the Supporting Information, so they are still to be entered here from the 1995 paper or the 1996 SI (not read off the plots). The level of theory, scaling factor and tunnelling model here are those of the 1996 calculations."
 }
