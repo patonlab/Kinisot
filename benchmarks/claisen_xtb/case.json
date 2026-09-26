@@ -1,0 +1,72 @@
+{
+  "name": "Claisen rearrangement of allyl vinyl ether (GFN2-xTB)",
+  "reference": {
+    "citation": "M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874",
+    "doi": "10.1021/ja992372h",
+    "method": "13C, 2H and 17O KIEs by NMR at natural abundance, 120 C"
+  },
+  "temperature": 393.0,
+  "scale": null,
+  "level_of_theory": "GFN2-xTB (geometries and Hessians from scripts/make_xtb_claisen.py)",
+  "tunneling": "bell",
+  "project": null,
+  "reactants": [
+    "../../tests/data/xtb/claisen_gs.hessian.json"
+  ],
+  "transition_structure": [
+    "../../tests/data/xtb/claisen_ts.hessian.json"
+  ],
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "C1",
+      "iso": "1",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "bond-forming carbon"
+    },
+    {
+      "position": "C2",
+      "iso": "2",
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "O3 (17O)",
+      "iso": "3:17O",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "17O measured by NMR"
+    },
+    {
+      "position": "C4",
+      "iso": "4",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "bond-breaking carbon"
+    },
+    {
+      "position": "C5",
+      "iso": "5",
+      "experimental": null,
+      "uncertainty": null,
+      "note": ""
+    },
+    {
+      "position": "C6",
+      "iso": "6",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "bond-forming carbon"
+    },
+    {
+      "position": "H7,H8 (2H2)",
+      "iso": "7,8",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "secondary 2H KIE"
+    }
+  ]
+}

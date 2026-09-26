@@ -41,20 +41,19 @@ __all__ = [
     "CALCULATORS",
 ]
 
-# --calc names -> (module, callable, default kwargs, pip hint). Any other value is taken as "module:callable".
+# --calc names -> (module, callable, default kwargs, pip hint, keyword that receives ":model").
+# Any other value is taken as "module.path:callable".
 CALCULATORS = {
-    "emt": ("ase.calculators.emt", "EMT", {}, "ase (built in; a test potential, not for chemistry)"),
-    "mace_mp": ("mace.calculators", "mace_mp", {"default_dtype": "float64"}, "mace-torch"),
-    "mace_off": ("mace.calculators", "mace_off", {"default_dtype": "float64"}, "mace-torch"),
-    "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch"),
-    "orb": (
-        "orb_models.forcefield.pretrained",
-        "orb_v3_conservative_inf_omat",
-        {},
-        "orb-models (wrap with ORBCalculator)",
-    ),
-    "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn"),
-    "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc"),
+    "emt": ("ase.calculators.emt", "EMT", {}, "ase (built in; a test potential, not for chemistry)", "model"),
+    # accuracy=0.01 tightens tblite's SCF: with the default (1.0) the force noise corrupts
+    # finite-difference Hessians at the 1e-4 level in isotope effects
+    "xtb": ("tblite.ase", "TBLite", {"method": "GFN2-xTB", "verbosity": 0, "accuracy": 0.01}, "tblite", "method"),
+    "mace_mp": ("mace.calculators", "mace_mp", {"default_dtype": "float64"}, "mace-torch", "model"),
+    "mace_off": ("mace.calculators", "mace_off", {"default_dtype": "float64"}, "mace-torch", "model"),
+    "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch", "model"),
+    "orb": ("orb_models.forcefield.pretrained", "orb_v3_conservative_inf_omat", {}, "orb-models", "model"),
+    "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn", "model"),
+    "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc", "model"),
 }
 
 
@@ -72,14 +71,16 @@ def build_calculator(spec):
     """Instantiate an ASE calculator from a --calc specification.
 
     ``spec`` is a name from CALCULATORS, optionally followed by ``:model``
-    (e.g. ``mace_mp:medium``), or ``module.path:callable`` for anything else.
-    The callable is called with no positional arguments (plus ``model=`` when given).
+    (e.g. ``mace_mp:medium``, ``xtb:GFN1-xTB``), or ``module.path:callable``
+    for anything else. The callable is called with no positional arguments
+    (plus the model keyword, ``model=`` or ``method=``, when a model is given).
     """
     _require_ase()
     name, _, model = spec.partition(":")
     kwargs = {}
+    model_key = "model"
     if name in CALCULATORS:
-        module_name, attribute, kwargs, hint = CALCULATORS[name]
+        module_name, attribute, kwargs, hint, model_key = CALCULATORS[name]
         kwargs = dict(kwargs)
     elif "." in name and model:
         module_name, attribute, hint = name, model, name
@@ -99,7 +100,7 @@ def build_calculator(spec):
     except AttributeError:
         raise KinisotInputError("%s has no %s (--calc %s)" % (module_name, attribute, spec)) from None
     if model:
-        kwargs["model"] = model
+        kwargs[model_key] = model
     try:
         return factory(**kwargs)
     except TypeError:

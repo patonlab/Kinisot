@@ -130,8 +130,8 @@ def test_build_calculator_specs():
     assert isinstance(build_calculator("emt"), EMT)
     assert isinstance(build_calculator("ase.calculators.emt:EMT"), EMT)
     assert isinstance(load_hessian(GS_J, calculator="emt"), type(parse_ase_json(GS_J)))  # JSON wins over --calc
-    for name in ("mace_mp", "mace_off", "orb", "sevennet", "aimnet2"):
-        assert name in CALCULATORS
+    for name in ("xtb", "mace_mp", "mace_off", "orb", "sevennet", "aimnet2"):
+        assert name in CALCULATORS and len(CALCULATORS[name]) == 5
     with pytest.raises(KinisotInputError, match="unknown calculator"):
         build_calculator("not-a-calculator")
     with pytest.raises(KinisotInputError, match="install"):
@@ -166,3 +166,40 @@ def test_analytic_hessian_is_used_when_available():
 @pytest.mark.skipif(pytest.importorskip("importlib").util.find_spec("mace") is None, reason="mace-torch not installed")
 def test_mace_calculator_builds():
     build_calculator("mace_mp:small")
+
+
+XTB = datapath("xtb")
+
+
+def test_committed_xtb_claisen_reproduces():
+    # GFN2-xTB structures and Hessians from scripts/make_xtb_claisen.py; no tblite needed to read them
+    gs = load_hessian(os.path.join(XTB, "claisen_gs.hessian.json"))
+    ts = load_hessian(os.path.join(XTB, "claisen_ts.hessian.json"))
+    assert gs.level_of_theory == "GFN2-xTB" and gs.program.startswith("ase")
+    r = compute_kie(rct=gs, ts=ts, iso="4", temperature=393.0, scale=None)
+    assert r.project is True and r.scaling.factor == 1.0 and r.warnings == ()
+    assert r.other.light.imaginary == pytest.approx(494.0, abs=0.1)
+    assert r.kie_tunnel == pytest.approx(1.020858, abs=2e-6)
+    assert compute_kie(rct=gs, ts=ts, iso="7,8", temperature=393.0).kie_tunnel == pytest.approx(0.901029, abs=2e-6)
+    from kinisot.thermo import HARTREE_TO_KCAL_PER_MOL
+
+    assert (ts.energy - gs.energy) * HARTREE_TO_KCAL_PER_MOL == pytest.approx(20.56, abs=0.05)
+
+
+def test_xtb_calculator_spec():
+    pytest.importorskip("tblite")
+    from ase.build import molecule
+    from ase.optimize import BFGS
+
+    calc = build_calculator("xtb")
+    assert calc.parameters.get("method") == "GFN2-xTB" and calc.parameters.get("accuracy") == 0.01
+    assert build_calculator("xtb:GFN1-xTB").parameters.get("method") == "GFN1-xTB"
+    water = molecule("H2O")
+    water.calc = calc
+    BFGS(water, logfile=None).run(fmax=1e-5)
+    data = hessian_from_calculator(water, build_calculator("xtb"), delta=0.005)
+    assert len(data.program_frequencies) == 3 and min(data.program_frequencies) > 1000
+    # equivalent hydrogens: the EQE must be 1. With tblite's default SCF accuracy (1.0) it comes out
+    # 1e-4 off because of force noise, which is why the registry tightens it to 0.01.
+    r = compute_kie(rct=data, prd=data, iso=["2", "3"], temperature=298.15)
+    assert r.kie == pytest.approx(1.0, abs=5e-6)

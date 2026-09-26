@@ -2,6 +2,28 @@
 
 Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- `--calc xtb[:method]`: GFN2-xTB (or GFN1-xTB) through `tblite`'s ASE
+  calculator, with the SCF tightened to `accuracy=0.01`. With tblite's
+  default the force noise shifts finite-difference isotope effects by up to
+  a few 10⁻⁴ (an EQE between water's equivalent hydrogens came out 1.0001 or
+  0.9996 instead of 1); documented in `docs/file_formats.md`.
+- GFN2-xTB Claisen structures and Hessians (`tests/data/xtb/`, made by
+  `scripts/make_xtb_claisen.py`: reactant minimized with BFGS, transition
+  structure refined with Sella) and a B3LYP versus GFN2-xTB comparison in
+  `examples/mlip_claisen/`; a matching `benchmarks/claisen_xtb` case.
+- `tests/test_pyquiver.py`: cross-validation against PyQuiver on the same
+  Hessians (Claisen, all positions; Diels–Alder C15/C19): uncorrected, Bell
+  and Wigner KIEs agree to 2.3 × 10⁻⁶. `pyquiver-kie` joins the `test` extra.
+
+### Changed
+
+- The calculator registry records which keyword receives the `:model` part
+  of a `--calc` specification (`method` for tblite, `model` elsewhere).
+
 ## [2.5.0] - 2026-09-25
 
 The first release since 2.0.2. It contains everything developed as the

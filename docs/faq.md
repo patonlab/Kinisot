@@ -57,10 +57,12 @@ KIE). It is on by default for Hessians from ASE calculators, whose
 finite-difference residuals need it; use it for any file whose "discarded"
 modes are not all within a few tens of cm⁻¹ of zero.
 
-**Can I use a machine-learned potential?** Yes: optimize the reactant and
-locate the transition structure with the potential, then
-`kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc mace_mp:medium`. See
-`examples/mlip_claisen/`. There is no scaling factor for a potential, and
+**Can I use a machine-learned potential or xTB?** Yes: optimize the
+reactant and locate the transition structure with the same method, then
+`kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc mace_mp:medium` (or
+`--calc xtb` for GFN2-xTB). `examples/mlip_claisen/` compares GFN2-xTB and
+B3LYP for the Claisen rearrangement and `scripts/make_xtb_claisen.py` shows
+the whole workflow, including the transition-structure search with Sella. There is no scaling factor for a potential, and
 its accuracy for the curvature at the transition structure decides the
 KIE, so compare against a DFT reference where you can.
 

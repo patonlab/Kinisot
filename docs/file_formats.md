@@ -81,9 +81,18 @@ only identify elements). Projection of the external modes is on by default
 for these inputs, no scaling factor is applied unless `-s` is given, and
 imaginary modes below the cutoff are treated as real vibrations of the same
 magnitude with a warning. Calculator names: `emt` (ASE's test potential),
+`xtb[:method]` (GFN2-xTB through `tblite`, SCF accuracy tightened to 0.01),
 `mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb`, `sevennet`,
 `aimnet2`, or `module.path:callable`; each package must be installed
 separately.
+
+**Finite-difference Hessians need a tightly converged energy.** Noise in
+the forces becomes noise in the Hessian and then in the isotope effect:
+with tblite's default SCF accuracy, an EQE between water's two equivalent
+hydrogens (exactly 1 by symmetry) comes out 1.0001 or 0.9996; with
+`accuracy=0.01` it is 1 ± 3 × 10⁻⁷. Converge any calculator well beyond
+what a geometry optimization needs, and use a symmetric EQE of this kind as
+a quick check of a new setup.
 
 ## Frequency self-check
 

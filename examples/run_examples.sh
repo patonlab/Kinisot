@@ -58,6 +58,12 @@ cd "$DATA"
 cd "$HERE/../tests/data/ase"
 run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393 -s 0.961
 run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393 -s 0.961 --project
+# The same reaction re-optimized and re-computed with GFN2-xTB (tests/data/xtb, made by scripts/make_xtb_claisen.py);
+# no scaling factor, external modes projected (the default for Hessians from ASE calculators).
+cd "$HERE/../tests/data/xtb"
+for atoms in 1 4 6 7,8; do
+    run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso "$atoms" -t 393
+done
 cd "$DATA"
 
 # Equilibrium isotope effect: CD3 axial versus equatorial in 1,1,3,3-tetramethylcyclohexane,

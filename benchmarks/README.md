@@ -50,6 +50,7 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | Case | Structures | Experimental values |
 | --- | --- | --- |
 | claisen | in repo (B3LYP/6-31G(d)) | to be entered from Meyer, DelMonte, Singleton, JACS 1999, 121, 10865 |
+| claisen_xtb | in repo (GFN2-xTB, `scripts/make_xtb_claisen.py`) | same as claisen |
 | diels_alder | in repo (B3LYP/6-31G(d)) | to be entered from Singleton, Thomas, JACS 1995, 117, 9357 |
 
 Further cases (an SN2 reaction, an epoxidation, an ene reaction, a hydride

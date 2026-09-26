@@ -38,6 +38,9 @@ CI runs the same commands on Linux, macOS and Windows for Python 3.9–3.13.
 
 `python scripts/make_isotope_data.py` rebuilds `kinisot/isotope_data.py` from
 the `periodictable` package (AME 2020 masses); commit the result.
+`python scripts/make_xtb_claisen.py` (needs `tblite` and `sella`) rebuilds the
+GFN2-xTB Claisen structures and Hessians in `tests/data/xtb/`; if they change,
+update the numbers in `examples/mlip_claisen/README.md` and `tests/test_ase.py`.
 
 ## Adding a backend (ORCA, ASE, ...)
 

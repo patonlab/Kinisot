@@ -45,8 +45,11 @@ CI before the parser is replaced):
    kept modes must match the `Frequencies --` lines to 0.05 cm⁻¹ and the
    discarded modes must match `Low frequencies ---`. Catches any regression
    in mass weighting, unit conversion, or mode dropping, for any backend.
-5. ✅ (in `tests/test_orca.py`) mass-weighted Hessian from
-   `goodvibes.io.parse_hessian` equals Kinisot's parser to 1e-12; optional
+5. ✅ (in `tests/test_orca.py` and `tests/test_pyquiver.py`) mass-weighted
+   Hessian from `goodvibes.io.parse_hessian` equals Kinisot's parser to
+   1e-12; PyQuiver, given the same Hessians as `quiver.System` objects (no
+   `#p` output needed), agrees to 2.3e-6 on every Claisen and Diels–Alder
+   KIE (uncorrected, Bell, Wigner). The original text asked for an optional
    PyQuiver (`pyquiver-kie`) comparison on the Claisen and Diels–Alder KIEs
    to 2e-5 relative (skipped when PyQuiver is not installed; PyQuiver still
    carries the 1.660468e-27 amu typo, hence the loose tolerance).
@@ -323,9 +326,13 @@ machine-learned potential could be exercised in this environment (the model
 packages and weights are not installable here), so the tests use ASE's
 built-in EMT potential on water, ammonia and N₂, and the MACE test is skipped
 unless `mace-torch` is installed; the `examples/mlip_claisen` numbers come
-from the Gaussian Hessians written in ASE's JSON form. **Still wanted:** a
-run of the Claisen example with MACE-MP/MACE-OFF/UMA structures optimized
-with the same potential, recorded in the example and in the Phase 9 suite.
+from the Gaussian Hessians written in ASE's JSON form. **Update 2026-09-26:**
+the Claisen reactant and transition structure were re-optimized with
+GFN2-xTB through the ASE backend (`scripts/make_xtb_claisen.py`, Sella for
+the saddle point) and compared with B3LYP in `examples/mlip_claisen`; this
+exposed that finite-difference Hessians need a tight SCF, now the `--calc
+xtb` default. **Still wanted:** the same with MACE-OFF/UMA or another
+machine-learned potential, whose weights could not be downloaded here.
 
 Design in REVIEW §6; prototypes verified 2026-09-25 (unit conversion to
 1.6e-6 cm⁻¹, `with_new_masses` isotopologues, EMT finite-difference failure

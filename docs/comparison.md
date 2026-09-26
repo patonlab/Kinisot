@@ -7,8 +7,11 @@ Last checked 2026-09-25 (details and verification in [REVIEW.md](../REVIEW.md)).
 [PyQuiver](https://github.com/ekwan/PyQuiver) (`pip install pyquiver-kie`,
 Kwan group, Apache-2.0) is the closest peer: Kinisot is a rewrite of Rzepa's
 Fortran Kinisot, PyQuiver a Python port of QUIVER, and both implement the
-same Bigeleisen–Mayer treatment. On a Gaussian input the two agree to about
-1 part in 10⁵:
+same Bigeleisen–Mayer treatment. Fed the same Hessians, the two agree to
+2.3 × 10⁻⁶ or better on every Claisen and Diels–Alder KIE, uncorrected and
+with Bell or Wigner tunnelling; `tests/test_pyquiver.py` checks this in CI.
+The residual comes from PyQuiver's five-decimal isotope masses and its
+atomic mass unit:
 
 | Aspect | Kinisot 2.1 | PyQuiver |
 | --- | --- | --- |
