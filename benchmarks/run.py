@@ -71,14 +71,17 @@ def run_case(case):
     rows = []
     for entry in case["kies"]:
         semiclassical = computed = tunneling = None
-        if has_structures and entry.get("reference_average"):
-            # a reference group whose positions interconvert (a rotating methyl group): divide by the
-            # geometric mean of the isotopologues with the label on each of its positions
-            result = compute(case, entry["iso"])
-            references = [compute(case, label) for label in entry["reference_average"]]
-            computed = result.kie_tunnel / geometric_mean([r.kie_tunnel for r in references])
-            semiclassical = result.kie / geometric_mean([r.kie for r in references])
-            tunneling = result.tunneling
+        if has_structures and (entry.get("iso_average") or entry.get("reference_average")):
+            # positions that are equivalent in the experiment (a rotating methyl group, the two ortho or
+            # meta carbons of a phenyl ring) but not in the static structures: geometric mean over them
+            results = [compute(case, label) for label in entry.get("iso_average") or [entry["iso"]]]
+            computed = geometric_mean([r.kie_tunnel for r in results])
+            semiclassical = geometric_mean([r.kie for r in results])
+            references = [compute(case, label) for label in entry.get("reference_average", [])]
+            if references:
+                computed /= geometric_mean([r.kie_tunnel for r in references])
+                semiclassical /= geometric_mean([r.kie for r in references])
+            tunneling = results[0].tunneling
         elif has_structures:
             result = compute(case, entry["iso"], entry.get("reference", case.get("reference_isotopologue")))
             computed = result.kie_tunnel_relative if result.reference is not None else result.kie_tunnel
