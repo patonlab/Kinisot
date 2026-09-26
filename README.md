@@ -104,7 +104,7 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
 | `--tunneling` | `bell` (default), `wigner`, `skodje` (Skodje–Truhlar, needs the barrier: `--barrier KCAL` or the electronic energies in the files) or `none`. |
 | `--project` | project translations and rotations out of the Hessian (Eckart) instead of discarding the six lowest modes. On by default for `--calc`/ASE inputs, off for Gaussian and ORCA (`--no-project` forces it off). |
-| `--calc SPEC`, `--delta` | compute the Hessians of geometry inputs with an ASE calculator (`mace_mp:medium`, `emt`, `module:callable`, ...); finite-difference step in Å. |
+| `--calc SPEC`, `--delta` | compute the Hessians of geometry inputs with an ASE calculator (`xtb`, `mace_mp:medium`, `module:callable`, ...); finite-difference step in Å. |
 | `--reference ATOMS` | a second isotopologue; the KIE is also reported divided by its KIE (natural-abundance NMR style). |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
 | `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
@@ -132,7 +132,7 @@ one.
 | --- | --- | --- |
 | Gaussian 09/16 | supported | a normally terminated `freq` job: atom masses and the force constants in the archive entry (`opt freq` jobs are fine) |
 | ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
-| ASE / machine-learned potentials | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (MACE, ORB, SevenNet, AIMNet2, any ASE calculator); the Hessian is computed and cached next to the geometry, external modes are projected out |
+| ASE: machine-learned potentials, GFN2-xTB, any ASE calculator | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (`xtb`, `mace_mp`, `mace_off`, `orb`, `sevennet`, `aimnet2`, `module:callable`); the Hessian is computed and cached next to the geometry, external modes are projected out |
 
 Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
 

@@ -111,6 +111,9 @@ def test_calc_from_geometry_with_cache(tmp_path, monkeypatch):
     stamp = os.path.getmtime(cached)
     again = hessian_for_geometry(geometry, "emt")  # reused, not recomputed
     assert os.path.getmtime(cached) == stamp and np.abs(again.hessian - data.hessian).max() == 0
+    finer = hessian_for_geometry(geometry, "emt", delta=0.005)  # a different step recomputes
+    assert 0 < np.abs(finer.hessian - data.hessian).max() < 1e-3
+    assert np.abs(hessian_for_geometry(geometry, "emt", delta=0.005).hessian - finer.hessian).max() == 0
     other = hessian_for_geometry(geometry, "ase.calculators.emt:EMT")  # a different --calc spec recomputes
     assert np.abs(other.hessian - data.hessian).max() < 1e-8
     # command line: deuterium on one or another of the equivalent hydrogens, the EQE must be 1
@@ -130,12 +133,55 @@ def test_build_calculator_specs():
     assert isinstance(build_calculator("emt"), EMT)
     assert isinstance(build_calculator("ase.calculators.emt:EMT"), EMT)
     assert isinstance(load_hessian(GS_J, calculator="emt"), type(parse_ase_json(GS_J)))  # JSON wins over --calc
-    for name in ("mace_mp", "mace_off", "orb", "sevennet", "aimnet2"):
-        assert name in CALCULATORS
+    for name in ("xtb", "mace_mp", "mace_off", "orb", "sevennet", "aimnet2"):
+        assert name in CALCULATORS and len(CALCULATORS[name]) == 5
     with pytest.raises(KinisotInputError, match="unknown calculator"):
         build_calculator("not-a-calculator")
     with pytest.raises(KinisotInputError, match="install"):
         build_calculator("no_such.module_kinisot:thing")
+
+
+@pytest.mark.parametrize("returns_adapter", [False, True])
+def test_orb_calculator_wraps_the_model(monkeypatch, returns_adapter):
+    # orb-models loaders return the network (0.5) or (network, atoms adapter) (0.6+), never an ASE
+    # calculator; --calc orb must wrap them. Fake modules stand in for orb-models.
+    import sys
+    import types
+
+    loaded = []
+
+    class ORBCalculator:
+        def __init__(self, network, atoms_adapter=None):
+            self.network, self.atoms_adapter = network, atoms_adapter
+
+    def loader(precision):
+        loaded.append(precision)
+        return ("network", "adapter") if returns_adapter else "network"
+
+    pretrained = types.SimpleNamespace(ORB_PRETRAINED_MODELS={"orb-v3-conservative-inf-omat": loader, "other": loader})
+    forcefield = types.ModuleType("orb_models.forcefield")
+    forcefield.pretrained = pretrained
+    calculator = types.ModuleType("orb_models.forcefield.calculator")
+    calculator.ORBCalculator = ORBCalculator
+    for name, module in (
+        ("orb_models", types.ModuleType("orb_models")),
+        ("orb_models.forcefield", forcefield),
+        ("orb_models.forcefield.pretrained", pretrained),
+        ("orb_models.forcefield.calculator", calculator),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+    if returns_adapter:  # 0.6+ moved the calculator
+        monkeypatch.setitem(sys.modules, "orb_models.forcefield.inference", types.ModuleType("inference"))
+        monkeypatch.setitem(sys.modules, "orb_models.forcefield.inference.calculator", calculator)
+    else:
+        monkeypatch.setitem(sys.modules, "orb_models.forcefield.inference", None)
+
+    calc = build_calculator("orb")
+    assert isinstance(calc, ORBCalculator) and calc.network == "network" and loaded == ["float64"]
+    assert calc.atoms_adapter == ("adapter" if returns_adapter else None)
+    assert isinstance(build_calculator("orb:other"), ORBCalculator)
+    with pytest.raises(KinisotInputError, match="unknown ORB model"):
+        build_calculator("orb:orb-v9")
 
 
 def test_analytic_hessian_is_used_when_available():
@@ -166,3 +212,68 @@ def test_analytic_hessian_is_used_when_available():
 @pytest.mark.skipif(pytest.importorskip("importlib").util.find_spec("mace") is None, reason="mace-torch not installed")
 def test_mace_calculator_builds():
     build_calculator("mace_mp:small")
+
+
+XTB = datapath("xtb")
+
+
+def test_committed_xtb_claisen_reproduces():
+    # GFN2-xTB structures and Hessians from scripts/make_claisen_structures.py; no tblite needed to read them
+    gs = load_hessian(os.path.join(XTB, "claisen_gs.hessian.json"))
+    ts = load_hessian(os.path.join(XTB, "claisen_ts.hessian.json"))
+    assert gs.level_of_theory == "GFN2-xTB" and gs.program.startswith("ase")
+    r = compute_kie(rct=gs, ts=ts, iso="4", temperature=393.0, scale=None)
+    assert r.project is True and r.scaling.factor == 1.0 and r.warnings == ()
+    assert r.other.light.imaginary == pytest.approx(494.0, abs=0.1)
+    assert r.kie_tunnel == pytest.approx(1.020858, abs=2e-6)
+    assert compute_kie(rct=gs, ts=ts, iso="7,8", temperature=393.0).kie_tunnel == pytest.approx(0.901029, abs=2e-6)
+    from kinisot.thermo import HARTREE_TO_KCAL_PER_MOL
+
+    assert (ts.energy - gs.energy) * HARTREE_TO_KCAL_PER_MOL == pytest.approx(20.56, abs=0.05)
+
+
+def test_xtb_calculator_spec():
+    pytest.importorskip("tblite")
+    from ase.build import molecule
+    from ase.optimize import BFGS
+
+    calc = build_calculator("xtb")
+    assert calc.parameters.get("method") == "GFN2-xTB" and calc.parameters.get("accuracy") == 0.01
+    assert build_calculator("xtb:GFN1-xTB").parameters.get("method") == "GFN1-xTB"
+    water = molecule("H2O")
+    water.calc = calc
+    BFGS(water, logfile=None).run(fmax=1e-5)
+    data = hessian_from_calculator(water, build_calculator("xtb"), delta=0.005)
+    assert len(data.program_frequencies) == 3 and min(data.program_frequencies) > 1000
+    # equivalent hydrogens: the EQE must be 1. With tblite's default SCF accuracy (1.0) it comes out
+    # 1e-4 off because of force noise, which is why the registry tightens it to 0.01.
+    r = compute_kie(rct=data, prd=data, iso=["2", "3"], temperature=298.15)
+    assert r.kie == pytest.approx(1.0, abs=5e-6)
+
+
+def test_claisen_structure_checks():
+    # scripts/make_claisen_structures.py refuses to write a saddle point that is not the Claisen transition structure
+    import importlib.util
+
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "make_claisen_structures.py")
+    spec = importlib.util.spec_from_file_location("make_claisen_structures", path)
+    script = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(script)
+    check = script.check_structure
+
+    b3lyp_gs, b3lyp_ts = (parse_gaussian(datapath("gaussian/claisen_%s.out" % name)) for name in ("gs", "ts"))
+    xtb_gs, xtb_ts = (load_hessian(os.path.join(XTB, "claisen_%s.hessian.json" % name)) for name in ("gs", "ts"))
+    assert check(b3lyp_gs, saddle=False) == [] and check(b3lyp_ts, saddle=True) == []
+    assert check(xtb_gs, saddle=False) == [] and check(xtb_ts, saddle=True) == []
+    assert check(b3lyp_ts, saddle=False) == ["reactant has imaginary modes [-482.7]"]
+    problems = check(b3lyp_gs, saddle=True)
+    assert len(problems) == 3 and problems[0].startswith("0 imaginary modes") and "C1-C6 is 5.10 A" in problems[1]
+
+    # MACE-MP-0 (medium): Sella started from the B3LYP transition structure converges to a C1-C6 ring
+    # closure with C4-O3 intact, and the reactant "minimum" keeps a 42i cm-1 mode (examples/mlip_claisen)
+    rejected = datapath("mace_mp0_rejected")
+    mace_gs, mace_ts = (load_hessian(os.path.join(rejected, "claisen_%s.hessian.json" % name)) for name in ("gs", "ts"))
+    assert check(mace_gs, saddle=False) == ["reactant has imaginary modes [-41.9]"]
+    problems = check(mace_ts, saddle=True)
+    assert len(problems) == 2 and "breaking C4-O3 is 1.46 A" in problems[0]
+    assert "dominated by C1-C6 (0.63), C2-C6 (0.37)" in problems[1]

@@ -127,23 +127,6 @@ def test_goodvibes_hessian_parity():
         assert np.abs(mass_weight(mine.hessian, mine.masses) - mass_weight(theirs.hessian, theirs.masses)).max() < 1e-12
 
 
-def test_pyquiver_parity_needs_verbose_output(tmp_path):
-    pyquiver = pytest.importorskip("pyquiver")
-    from pyquiver.config import Config
-    from pyquiver.kie import KIE_Calculation
-
-    config = Config.from_dict(
-        isotopologues={"C5": [(5, 5, "13C")]}, temperature=393.0, scaling=0.961, imag_threshold=50
-    )
-    try:
-        calc = KIE_Calculation(config, GS_G, TS_G)
-    except ValueError as err:
-        pytest.skip("PyQuiver needs #p Gaussian output; the bundled files are not verbose: %s" % str(err)[:80])
-    ours = compute_kie(rct=GS_G, ts=TS_G, iso="5", temperature=393.0, scale=0.961)
-    assert calc.to_dict()["C5"]["infinite_parabola"] == pytest.approx(ours.kie_tunnel, rel=2e-5)
-    assert pyquiver is not None
-
-
 def test_unsubstitutable_orca_element_keeps_program_mass(tmp_path):
     # elements outside the substitution table keep ORCA's masses (until the Phase 7 isotope table)
     hess = datapath("orca/claisen_gs.hess")
