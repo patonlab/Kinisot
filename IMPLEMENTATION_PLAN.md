@@ -397,7 +397,8 @@ the host is outside this environment's network allowance. The runner now
 handles cases without structures, replicate measurements, per-KIE reference
 positions and several sources. The Diels–Alder values came from the 1995
 paper (Figure 1b): nine positions, mean absolute deviation 0.003, the first
-measured comparison. A Shi epoxidation case (Singleton, Wang, JACS 2005)
+measured comparison. The Claisen values came from Meyer et al. 1999
+(Table 4): mean absolute deviation 0.0009 at B3LYP and 0.0089 at GFN2-xTB. A Shi epoxidation case (Singleton, Wang, JACS 2005)
 records its ¹³C KIEs and the paper's own predictions; its structures are in
 that paper's SI.
 

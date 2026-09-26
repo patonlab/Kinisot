@@ -20,6 +20,11 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   JACS 1999, 121, 9455 (Figure 1), and from the Crow, Hirschi, Clinton and
   Hirschi preprint, ChemRxiv 2026 (SI Tables S3a, S3b and S8b). Structures
   still need to be computed.
+- The Claisen cases hold the measured ¹³C and ¹⁷O KIEs of Meyer, DelMonte
+  and Singleton, JACS 1999, 121, 10865 (Table 4, 120 °C, relative to C5).
+  The mean absolute deviation is 0.0009 over five positions for the B3LYP
+  structures and 0.0089 for GFN2-xTB, so experiment favours the B3LYP
+  transition structure.
 - The first measured benchmark: the Diels–Alder case now holds the nine
   ¹³C and ²H KIEs of Singleton and Thomas, JACS 1995, 117, 9357 (Figure 1b),
   relative to the methyl group as measured. The B3LYP structures in the

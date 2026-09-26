@@ -61,8 +61,8 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 
 | Case | Structures | Experimental values |
 | --- | --- | --- |
-| claisen | in repo (B3LYP/6-31G(d)) | to be entered from Meyer, DelMonte, Singleton, JACS 1999, 121, 10865 |
-| claisen_xtb | in repo (GFN2-xTB, `scripts/make_claisen_structures.py`) | same as claisen |
+| claisen | in repo (B3LYP/6-31G(d)) | entered: Meyer, DelMonte, Singleton, JACS 1999, 121, 10865, Table 4 (5 positions; mean absolute deviation 0.0009) |
+| claisen_xtb | in repo (GFN2-xTB, `scripts/make_claisen_structures.py`) | same as claisen (mean absolute deviation 0.0089) |
 | diels_alder | in repo (B3LYP/6-31G(d)) | entered: Singleton, Thomas, JACS 1995, 117, 9357, Figure 1b (9 positions; mean absolute deviation 0.003) |
 | baeyer_villiger | needed (addition of m-CPBA to cyclohexanone) | entered: Singleton, Szymanski, JACS 1999, 121, 9455, Figure 1a; Crow, Hirschi, Clinton, Hirschi, ChemRxiv 2026 (preprint), SI Tables S3a/S3b |
 | baeyer_villiger_migration | needed (migration step of the Criegee intermediate) | entered: same papers, 1999 Figure 1c and 2026 SI Table S8b |

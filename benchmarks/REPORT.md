@@ -37,35 +37,37 @@ No structures yet: add the frequency calculations and their paths to `case.json`
 
 ## Claisen rearrangement of allyl vinyl ether
 
-M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874 (doi:[10.1021/ja992372h](https://doi.org/10.1021/ja992372h)); 13C, 2H and 17O KIEs by NMR at natural abundance, 120 C. Computed at B3LYP/6-31G(d), 393.0 K, scale 0.961, tunnelling bell.
+M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874 (doi:[10.1021/ja992372h](https://doi.org/10.1021/ja992372h)); 13C and 17O KIEs by NMR at natural abundance, 120 C, two reactions taken to 86.5(8)% and 86.7(1.1)% completion; values and standard deviations from Table 4, relative to C5 (1.0 assumed). Computed at B3LYP/6-31G(d), 393.0 K, scale 0.961, tunnelling bell, relative to isotopologue 5.
+
+The KIEs are relative to C5, so they are computed relative to C5 (footnote 30 of the paper: the assumption of a negligible C5 KIE is doubtful, so predictions are normalized to it). Each position lists the two experiments; the deviation is taken from their mean. The paper's own B3LYP/6-31G* predictions (Table 4, also relative to C5) are given in the notes column. No 2H KIEs were measured for allyl vinyl ether in this work; the literature values in Table 2 are for C4-d2 and C6-d2 at 100 and 160 C, so the H7,H8 row has no experimental value.
 
 | Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
 | --- | --- | --- | --- | --- | --- |
-| C1 | 1.0127 | 1.0147 | no experimental value |  | bond-forming carbon |
-| C2 | 1.0019 | 1.0020 | no experimental value |  |  |
-| O3 (17O) | 1.0188 | 1.0206 | no experimental value |  | 17O measured by NMR |
-| C4 | 1.0297 | 1.0330 | no experimental value |  | bond-breaking carbon |
-| C5 | 1.0019 | 1.0019 | no experimental value |  |  |
-| C6 | 1.0148 | 1.0168 | no experimental value |  | bond-forming carbon |
-| H7,H8 (2H2) | 0.9549 | 0.9566 | no experimental value |  | secondary 2H KIE |
+| C1 | 1.0108 | 1.0128 | 1.014 ± 0.002, 1.013 ± 0.001 | -0.0007 | bond-forming carbon; paper's B3LYP/6-31G* prediction 1.012 |
+| C2 | 1.0000 | 1.0000 | 1.000 ± 0.002, 1.001 ± 0.001 | -0.0005 | paper's B3LYP/6-31G* prediction 0.999 |
+| O3 (17O) | 1.0169 | 1.0186 | 1.017 ± 0.005, 1.021 ± 0.005 | -0.0004 | 17O measured by NMR; paper's B3LYP/6-31G* prediction 1.017 |
+| C4 | 1.0278 | 1.0310 | 1.035 ± 0.002, 1.033 ± 0.002 | -0.0030 | bond-breaking carbon; paper's B3LYP/6-31G* prediction 1.029 |
+| C6 | 1.0129 | 1.0149 | 1.015 ± 0.001, 1.015 ± 0.001 | -0.0001 | bond-forming carbon; paper's B3LYP/6-31G* prediction 1.014 |
+| H7,H8 (2H2) | 0.9531 | 0.9548 | no experimental value |  | secondary 2H KIE |
 
-No experimental values entered yet: enter them in `case.json` from the paper.
+Mean absolute deviation over 5 measured positions: 0.0009
 
 ## Claisen rearrangement of allyl vinyl ether (GFN2-xTB)
 
-M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874 (doi:[10.1021/ja992372h](https://doi.org/10.1021/ja992372h)); 13C, 2H and 17O KIEs by NMR at natural abundance, 120 C. Computed at GFN2-xTB (geometries and Hessians from scripts/make_claisen_structures.py --calc xtb), 393.0 K, scale none, tunnelling bell.
+M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874 (doi:[10.1021/ja992372h](https://doi.org/10.1021/ja992372h)); 13C and 17O KIEs by NMR at natural abundance, 120 C, two reactions taken to 86.5(8)% and 86.7(1.1)% completion; values and standard deviations from Table 4, relative to C5 (1.0 assumed). Computed at GFN2-xTB (geometries and Hessians from scripts/make_claisen_structures.py --calc xtb), 393.0 K, scale none, tunnelling bell, relative to isotopologue 5.
+
+The KIEs are relative to C5, so they are computed relative to C5 (footnote 30 of the paper: the assumption of a negligible C5 KIE is doubtful, so predictions are normalized to it). Each position lists the two experiments; the deviation is taken from their mean. The paper's own B3LYP/6-31G* predictions (Table 4, also relative to C5) are given in the notes column. No 2H KIEs were measured for allyl vinyl ether in this work; the literature values in Table 2 are for C4-d2 and C6-d2 at 100 and 160 C, so the H7,H8 row has no experimental value.
 
 | Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
 | --- | --- | --- | --- | --- | --- |
-| C1 | 1.0215 | 1.0259 | no experimental value |  | bond-forming carbon |
-| C2 | 1.0059 | 1.0060 | no experimental value |  |  |
-| O3 (17O) | 1.0136 | 1.0143 | no experimental value |  | 17O measured by NMR |
-| C4 | 1.0195 | 1.0209 | no experimental value |  | bond-breaking carbon |
-| C5 | 1.0044 | 1.0045 | no experimental value |  |  |
-| C6 | 1.0238 | 1.0282 | no experimental value |  | bond-forming carbon |
-| H7,H8 (2H2) | 0.8992 | 0.9010 | no experimental value |  | secondary 2H KIE |
+| C1 | 1.0170 | 1.0213 | 1.014 ± 0.002, 1.013 ± 0.001 | +0.0078 | bond-forming carbon; paper's B3LYP/6-31G* prediction 1.012 |
+| C2 | 1.0014 | 1.0015 | 1.000 ± 0.002, 1.001 ± 0.001 | +0.0010 | paper's B3LYP/6-31G* prediction 0.999 |
+| O3 (17O) | 1.0092 | 1.0098 | 1.017 ± 0.005, 1.021 ± 0.005 | -0.0092 | 17O measured by NMR; paper's B3LYP/6-31G* prediction 1.017 |
+| C4 | 1.0150 | 1.0163 | 1.035 ± 0.002, 1.033 ± 0.002 | -0.0177 | bond-breaking carbon; paper's B3LYP/6-31G* prediction 1.029 |
+| C6 | 1.0193 | 1.0236 | 1.015 ± 0.001, 1.015 ± 0.001 | +0.0086 | bond-forming carbon; paper's B3LYP/6-31G* prediction 1.014 |
+| H7,H8 (2H2) | 0.8952 | 0.8970 | no experimental value |  | secondary 2H KIE |
 
-No experimental values entered yet: enter them in `case.json` from the paper.
+Mean absolute deviation over 5 measured positions: 0.0089
 
 ## Diels-Alder reaction of isoprene with maleic anhydride
 
@@ -104,4 +106,4 @@ All KIEs are relative to the meta carbons (1.000 assumed). The two values per po
 
 No structures yet: add the frequency calculations and their paths to `case.json`.
 
-Overall mean absolute deviation over 9 measured positions: 0.0031
+Overall mean absolute deviation over 19 measured positions: 0.0041

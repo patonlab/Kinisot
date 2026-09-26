@@ -261,8 +261,11 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
   (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).
 - [benchmarks/](benchmarks/README.md): computed versus experimental KIEs,
   one directory per reaction, with a runner that regenerates the report.
-  The Diels–Alder reaction of isoprene with maleic anhydride reproduces the
-  nine measured ¹³C and ²H KIEs with a mean absolute deviation of 0.003.
+  At B3LYP/6-31G(d), Kinisot reproduces the measured KIEs of two reactions:
+  - the Claisen rearrangement of allyl vinyl ether (five ¹³C and ¹⁷O KIEs,
+    mean absolute deviation 0.0009);
+  - the Diels–Alder reaction of isoprene with maleic anhydride (nine ¹³C
+    and ²H KIEs, mean absolute deviation 0.003).
 - [CHANGELOG.md](CHANGELOG.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
   for what changed and what is coming.
 - A [video guide](http://www.youtube.com/watch?v=r4x2gmkc0U8) to an older
