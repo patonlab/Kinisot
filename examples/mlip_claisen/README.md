@@ -37,9 +37,11 @@ committed in `tests/data/xtb/`, so the KIEs can be reproduced without
 ```
 cd tests/data/xtb
 kinisot --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393
+cd ../../..
 ```
 
-To recompute the Hessians with tblite, copy the geometries elsewhere first.
+To recompute the Hessians with tblite, copy the geometries elsewhere first
+(from the repository root).
 Kinisot caches each Hessian next to its geometry as `<name>.hessian.json`,
 which here would overwrite the committed files:
 
@@ -116,7 +118,7 @@ kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc my_package.calculators:make_cal
 
 `--calc` accepts `emt` (ASE's built-in test potential, not for chemistry),
 `xtb[:method]` (GFN2-xTB by default, `xtb:GFN1-xTB` for GFN1; needs
-`tblite`), `mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb`,
+`tblite`), `mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb[:model]`,
 `sevennet`, `aimnet2`, or `module.path:callable` for anything else; the callable is
 called without arguments (plus `model=` when given) and must return an ASE
 calculator. The geometries must be stationary points **of the same

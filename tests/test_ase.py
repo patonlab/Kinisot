@@ -141,6 +141,49 @@ def test_build_calculator_specs():
         build_calculator("no_such.module_kinisot:thing")
 
 
+@pytest.mark.parametrize("returns_adapter", [False, True])
+def test_orb_calculator_wraps_the_model(monkeypatch, returns_adapter):
+    # orb-models loaders return the network (0.5) or (network, atoms adapter) (0.6+), never an ASE
+    # calculator; --calc orb must wrap them. Fake modules stand in for orb-models.
+    import sys
+    import types
+
+    loaded = []
+
+    class ORBCalculator:
+        def __init__(self, network, atoms_adapter=None):
+            self.network, self.atoms_adapter = network, atoms_adapter
+
+    def loader(precision):
+        loaded.append(precision)
+        return ("network", "adapter") if returns_adapter else "network"
+
+    pretrained = types.SimpleNamespace(ORB_PRETRAINED_MODELS={"orb-v3-conservative-inf-omat": loader, "other": loader})
+    forcefield = types.ModuleType("orb_models.forcefield")
+    forcefield.pretrained = pretrained
+    calculator = types.ModuleType("orb_models.forcefield.calculator")
+    calculator.ORBCalculator = ORBCalculator
+    for name, module in (
+        ("orb_models", types.ModuleType("orb_models")),
+        ("orb_models.forcefield", forcefield),
+        ("orb_models.forcefield.pretrained", pretrained),
+        ("orb_models.forcefield.calculator", calculator),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+    if returns_adapter:  # 0.6+ moved the calculator
+        monkeypatch.setitem(sys.modules, "orb_models.forcefield.inference", types.ModuleType("inference"))
+        monkeypatch.setitem(sys.modules, "orb_models.forcefield.inference.calculator", calculator)
+    else:
+        monkeypatch.setitem(sys.modules, "orb_models.forcefield.inference", None)
+
+    calc = build_calculator("orb")
+    assert isinstance(calc, ORBCalculator) and calc.network == "network" and loaded == ["float64"]
+    assert calc.atoms_adapter == ("adapter" if returns_adapter else None)
+    assert isinstance(build_calculator("orb:other"), ORBCalculator)
+    with pytest.raises(KinisotInputError, match="unknown ORB model"):
+        build_calculator("orb:orb-v9")
+
+
 def test_analytic_hessian_is_used_when_available():
     from ase.build import molecule
     from ase.calculators.emt import EMT

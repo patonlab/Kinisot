@@ -51,7 +51,7 @@ CALCULATORS = {
     "mace_mp": ("mace.calculators", "mace_mp", {"default_dtype": "float64"}, "mace-torch", "model"),
     "mace_off": ("mace.calculators", "mace_off", {"default_dtype": "float64"}, "mace-torch", "model"),
     "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch", "model"),
-    "orb": ("orb_models.forcefield.pretrained", "orb_v3_conservative_inf_omat", {}, "orb-models", "model"),
+    "orb": ("kinisot.backends.ase", "orb_calculator", {}, "orb-models", "model"),
     "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn", "model"),
     "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc", "model"),
 }
@@ -65,6 +65,32 @@ def _require_ase():
         raise KinisotInputError(
             "this input needs the Atomic Simulation Environment: pip install ase (or pip install kinisot[ase])"
         ) from None
+
+
+def orb_calculator(model="orb-v3-conservative-inf-omat", precision="float64"):
+    """ORB calculator for ``--calc orb[:model]``; ``model`` is a key of ORB_PRETRAINED_MODELS.
+
+    orb-models' loaders return the network (0.5) or the network and an atoms
+    adapter (0.6 and later), not an ASE calculator, so wrap them in ORBCalculator.
+    """
+    try:
+        from orb_models.forcefield import pretrained
+
+        try:
+            from orb_models.forcefield.inference.calculator import ORBCalculator
+        except ImportError:
+            from orb_models.forcefield.calculator import ORBCalculator
+    except ImportError as err:
+        raise KinisotInputError("cannot import orb_models for --calc orb (%s); install orb-models" % err) from None
+    if model not in pretrained.ORB_PRETRAINED_MODELS:
+        raise KinisotInputError(
+            "unknown ORB model %r: use one of %s" % (model, ", ".join(pretrained.ORB_PRETRAINED_MODELS))
+        )
+    loaded = pretrained.ORB_PRETRAINED_MODELS[model](precision=precision)
+    if isinstance(loaded, tuple):
+        network, adapter = loaded
+        return ORBCalculator(network, atoms_adapter=adapter)
+    return ORBCalculator(loaded)
 
 
 def build_calculator(spec):

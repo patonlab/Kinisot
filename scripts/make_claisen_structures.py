@@ -24,8 +24,9 @@ imaginary mode, C1-C6 and C4-O3 both partial bonds, and those two stretches
 dominating the imaginary mode). A saddle search can otherwise wander onto a
 different reaction (C-O dissociation, ring closure) and yield plausible
 looking but meaningless isotope effects; see examples/mlip_claisen/README.md.
-The script then exits with status 1 and writes nothing for that structure
-(``--keep-invalid`` writes it anyway, for inspection).
+If either structure fails, the script exits with status 1 and writes
+neither, so an old file cannot end up paired with a new one
+(``--keep-invalid`` writes both anyway, for inspection).
 """
 
 import argparse
@@ -129,8 +130,7 @@ def main(argv=None):
     def calculator():
         return build_calculator(spec)
 
-    os.makedirs(options.out, exist_ok=True)
-    failed = False
+    results = []
     for structure, saddle in (("claisen_gs", False), ("claisen_ts", True)):
         atoms = dft_geometry(structure)
         atoms.calc = calculator()
@@ -148,16 +148,20 @@ def main(argv=None):
         summary = "%s %s: max force %.1e eV/A, energy %.6f Eh, %d imaginary, lowest %s cm-1" % (
             label, structure, fmax, data.energy, int((freqs < -IMAGINARY).sum()), np.round(freqs[:3], 1),
         )  # fmt: skip
-        if problems:
-            failed = True
-            print(summary + "\n  REJECTED: " + "; ".join(problems))
-            if not options.keep_invalid:
-                continue
+        print(summary + ("\n  REJECTED: " + "; ".join(problems) if problems else ""))
+        results.append((structure, atoms, data, problems))
+
+    failed = any(problems for *_, problems in results)
+    if failed and not options.keep_invalid:
+        print("nothing written to %s" % options.out)
+        return 1
+    os.makedirs(options.out, exist_ok=True)
+    for structure, atoms, data, _ in results:
         write(os.path.join(options.out, structure + ".xyz"), atoms)
         path = save_hessian_json(
             data, os.path.join(options.out, structure + ".hessian.json"), atoms=atoms, calc_spec=options.calc
         )
-        print(summary + " -> " + path)
+        print("wrote " + path)
     return 1 if failed else 0
 
 

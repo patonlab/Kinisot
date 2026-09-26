@@ -83,7 +83,8 @@ for these inputs, no scaling factor is applied unless `-s` is given, and
 imaginary modes below the cutoff are treated as real vibrations of the same
 magnitude with a warning. Calculator names: `emt` (ASE's test potential),
 `xtb[:method]` (GFN2-xTB through `tblite`, SCF accuracy tightened to 0.01),
-`mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb`, `sevennet`,
+`mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb[:model]` (an orb-models
+`ORB_PRETRAINED_MODELS` name, default `orb-v3-conservative-inf-omat`), `sevennet`,
 `aimnet2`, or `module.path:callable`; each package must be installed
 separately.
 

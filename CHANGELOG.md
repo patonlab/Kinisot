@@ -33,6 +33,10 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Fixed
 
+- `--calc orb` returned orb-models' network instead of an ASE calculator and
+  could not compute anything. It now wraps the network in `ORBCalculator`
+  (orb-models 0.5 and 0.6+ APIs), in float64, and accepts any
+  `ORB_PRETRAINED_MODELS` name as `orb:<model>`.
 - A Hessian cached next to a geometry (`--calc`) was reused after
   `--delta` changed. The cache now records the finite-difference step and
   the number of displacements and recomputes when either differs; caches
