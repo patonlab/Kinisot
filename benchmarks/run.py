@@ -5,7 +5,8 @@
 Each case directory holds a case.json (format in benchmarks/README.md).
 Rows whose experimental value is null are computed and listed, but do not
 enter the deviation statistics. Cases without structures yet (null
-"transition_structure") are listed with their experimental values only.
+"reactants", or null "transition_structure" and "product"), and entries
+without an "iso" label, are listed with their experimental values only.
 """
 
 import argparse
@@ -66,12 +67,18 @@ def geometric_mean(values):
     return math.exp(sum(math.log(v) for v in values) / len(values))
 
 
+def has_structures(case):
+    """Reactants and a transition structure (or product) are both given: the case can be computed."""
+    return bool(case.get("reactants") and (case.get("transition_structure") or case.get("product")))
+
+
 def run_case(case):
-    has_structures = bool(case.get("transition_structure") or case.get("product"))
     rows = []
     for entry in case["kies"]:
         semiclassical = computed = tunneling = None
-        if has_structures and (entry.get("iso_average") or entry.get("reference_average")):
+        # an entry without an isotopologue label yet is listed with its measurement only
+        computable = has_structures(case) and (entry.get("iso") is not None or bool(entry.get("iso_average")))
+        if computable and (entry.get("iso_average") or entry.get("reference_average")):
             # positions that are equivalent in the experiment (a rotating methyl group, the two ortho or
             # meta carbons of a phenyl ring) but not in the static structures: geometric mean over them
             results = [compute(case, label) for label in entry.get("iso_average") or [entry["iso"]]]
@@ -82,7 +89,7 @@ def run_case(case):
                 computed /= geometric_mean([r.kie_tunnel for r in references])
                 semiclassical /= geometric_mean([r.kie for r in references])
             tunneling = results[0].tunneling
-        elif has_structures:
+        elif computable:
             result = compute(case, entry["iso"], entry.get("reference", case.get("reference_isotopologue")))
             computed = result.kie_tunnel_relative if result.reference is not None else result.kie_tunnel
             semiclassical = result.kie_relative if result.reference is not None else result.kie
@@ -126,7 +133,7 @@ def format_case(case, rows):
         "%s (doi:[%s](https://doi.org/%s)); %s." % (r["citation"], r["doi"], r["doi"], r.get("method", ""))
         for r in references
     )
-    if case.get("transition_structure") or case.get("product"):
+    if has_structures(case):
         source += " Computed at %s, %s K, scale %s, tunnelling %s%s." % (
             case.get("level_of_theory", "?"),
             case["temperature"],

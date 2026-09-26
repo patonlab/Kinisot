@@ -173,7 +173,12 @@ the two routes then differ by exactly the violation:
     ln(KIE_FE / KIE_BM) = −(δ_R − δ‡),   δ = ln ∏ ν_H/ν_L − ln[(M_H/M_L)^{3/2} (I_H/I_L)^{1/2} ∏ (m_L/m_H)^{3/2}]
 
 with the product over all 3N−6 modes (the imaginary one included) and I the
-product of the principal moments of inertia.
+product of the principal moments of inertia. Rotational symmetry numbers
+are left out of both routes here, as Kinisot leaves them out (section 3).
+A program that includes them adds ln[(σ_H/σ_L)‡ / (σ_H/σ_L)_R] to the right-hand
+side; the term vanishes when no substitution changes a symmetry number, or
+when it changes those of the reactant and the transition structure by the
+same ratio, as in the Claisen example.
 
 The Bigeleisen–Mayer form is the robust one because of what happens to a
 soft vibration. For a mode with u = hcν/kT ≪ 1 its TRPF, ZPE and EXC

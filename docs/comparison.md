@@ -48,7 +48,9 @@ Teller–Redlich product-rule violation of the computed frequencies: up to
 free energies: 8 × 10⁻⁴ per 10⁻⁶ hartree at 393 K. It is also far more
 sensitive to errors in soft modes; see
 [theory.md, section 6](theory.md#6-bigeleisenmayer-versus-free-energy-differences).
-Kinisot also saves a new Gaussian job for every position and temperature.
+The `freq=readisotopes` route also needs a new Gaussian job for every
+position and temperature; Kinisot reuses one Hessian per structure and
+only changes the masses.
 
 ## GoodVibes
 

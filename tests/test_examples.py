@@ -127,4 +127,12 @@ def test_benchmark_runner(tmp_path, monkeypatch):
     assert all(r["computed"] is None and r["deviation"] is None for r in rows)
     text = module.format_case(case, rows)
     assert "Not computed yet" in text and "1.0096 ± 0.0006" in text and "1.001 ± 0.002, 1.000 ± 0.002" in text
+    # a partly filled case (transition structure but no reactants, or no iso labels) is still only listed
+    case["transition_structure"] = ["ts.out"]
+    assert all(r["computed"] is None for r in module.run_case(case))
+    assert "Not computed yet" in module.format_case(case, rows)
+    (case,) = module.load_cases(["claisen"])
+    case["kies"][0]["iso"] = None
+    rows = module.run_case(case)
+    assert rows[0]["computed"] is None and rows[1]["computed"] is not None
     del sys, json
