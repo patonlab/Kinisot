@@ -170,7 +170,12 @@ trained on inorganic materials (the Materials Project). It happens to give
 a reasonable ΔE at the B3LYP geometries, but its surface has no concerted
 saddle point nearby. Sella reaches a C1–C6 ring closure with the C4–O3 bond
 intact, 9 kcal/mol above a reactant that is not a minimum either (a 42i cm⁻¹
-mode).
+mode). A climbing-image NEB between MACE-MP-0's reactant and product,
+seeded through the B3LYP transition structure, relaxes onto a path through
+ring-closed structures (C1–C6 1.56–1.66 Å with C4–O3 still 1.48–1.89 Å).
+MACE-MP-0 puts these 9–12 kcal/mol *below* the reactant. The highest image
+on that path is a conformational change of 5 kcal/mol, not the
+rearrangement.
 
 These saddle points are real stationary points of the potentials, and KIEs
 computed from them would look plausible. They would still describe a
