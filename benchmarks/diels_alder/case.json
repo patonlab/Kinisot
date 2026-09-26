@@ -1,28 +1,236 @@
 {
   "name": "Diels-Alder reaction of isoprene with maleic anhydride",
-  "reference": {
-    "citation": "D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358",
-    "doi": "10.1021/ja00141a030",
-    "method": "13C and 2H KIEs by NMR at natural abundance, 25 C"
-  },
+  "reference": [
+    {
+      "citation": "D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358",
+      "doi": "10.1021/ja00141a030",
+      "method": "13C and 2H KIEs by NMR at natural abundance on isoprene recovered from a reaction taken to 98.9(1)% conversion, 25 C in xylenes; values and standard deviations from Figure 1b (13C n = 11, 3 samples; 2H n = 5, 2 samples)"
+    },
+    {
+      "citation": "B. R. Beno, K. N. Houk, D. A. Singleton, J. Am. Chem. Soc. 1996, 118, 9984-9985",
+      "doi": "10.1021/ja9615278",
+      "method": "B3LYP/6-31G* and RHF/6-31G* KIEs (QUIVER, scaled by 0.963 and 0.8929, Bell tunnelling) compared with the 1995 measurements"
+    }
+  ],
   "temperature": 298.15,
   "scale": 0.963,
   "level_of_theory": "B3LYP/6-31G(d)",
   "tunneling": "bell",
   "project": false,
-  "reactants": ["../../tests/data/gaussian/dienophile.out", "../../tests/data/gaussian/diene.out"],
-  "transition_structure": ["../../tests/data/gaussian/DATS.out"],
+  "reactants": [
+    "../../tests/data/gaussian/dienophile.out",
+    "../../tests/data/gaussian/diene.out"
+  ],
+  "transition_structure": [
+    "../../tests/data/gaussian/DATS.out"
+  ],
   "product": null,
   "reference_isotopologue": null,
   "kies": [
-    {"position": "diene C6 (TS C15)", "iso": ["0", "6", "15"], "experimental": null, "uncertainty": null, "note": "diene terminus"},
-    {"position": "diene C10 (TS C19)", "iso": ["0", "10", "19"], "experimental": null, "uncertainty": null, "note": "diene terminus"},
-    {"position": "diene C1 (TS C10)", "iso": ["0", "1", "10"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "diene C2 (TS C11)", "iso": ["0", "2", "11"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "diene C4 (TS C13)", "iso": ["0", "4", "13"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "dienophile C1 (TS C1)", "iso": ["1", "0", "1"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "dienophile C1 (TS C2)", "iso": ["1", "0", "2"], "experimental": null, "uncertainty": null, "note": ""},
-    {"position": "dienophile H5 (TS H7)", "iso": ["5", "0", "7"], "experimental": null, "uncertainty": null, "note": "secondary 2H KIE"},
-    {"position": "dienophile H5 (TS H5)", "iso": ["5", "0", "5"], "experimental": null, "uncertainty": null, "note": "secondary 2H KIE"}
-  ]
+    {
+      "position": "C1",
+      "iso": [
+        "0",
+        "6",
+        "15"
+      ],
+      "experimental": 1.022,
+      "uncertainty": 0.003,
+      "note": "terminus: forming bond; relative to the methyl carbon",
+      "reference": [
+        "0",
+        "10",
+        "19"
+      ]
+    },
+    {
+      "position": "C2",
+      "iso": [
+        "0",
+        "1",
+        "10"
+      ],
+      "experimental": 1.001,
+      "uncertainty": 0.002,
+      "note": "relative to the methyl carbon",
+      "reference": [
+        "0",
+        "10",
+        "19"
+      ]
+    },
+    {
+      "position": "C3",
+      "iso": [
+        "0",
+        "2",
+        "11"
+      ],
+      "experimental": 1.0,
+      "uncertainty": 0.003,
+      "note": "relative to the methyl carbon",
+      "reference": [
+        "0",
+        "10",
+        "19"
+      ]
+    },
+    {
+      "position": "C4",
+      "iso": [
+        "0",
+        "4",
+        "13"
+      ],
+      "experimental": 1.017,
+      "uncertainty": 0.002,
+      "note": "terminus: forming bond; relative to the methyl carbon",
+      "reference": [
+        "0",
+        "10",
+        "19"
+      ]
+    },
+    {
+      "position": "H1E (outside)",
+      "iso": [
+        "0",
+        "8",
+        "17"
+      ],
+      "experimental": 0.956,
+      "uncertainty": 0.005,
+      "note": "secondary 2H KIE; relative to the methyl hydrogens",
+      "reference_average": [
+        [
+          "0",
+          "11",
+          "20"
+        ],
+        [
+          "0",
+          "12",
+          "21"
+        ],
+        [
+          "0",
+          "13",
+          "22"
+        ]
+      ]
+    },
+    {
+      "position": "H1Z (inside)",
+      "iso": [
+        "0",
+        "7",
+        "16"
+      ],
+      "experimental": 0.908,
+      "uncertainty": 0.005,
+      "note": "secondary 2H KIE; relative to the methyl hydrogens",
+      "reference_average": [
+        [
+          "0",
+          "11",
+          "20"
+        ],
+        [
+          "0",
+          "12",
+          "21"
+        ],
+        [
+          "0",
+          "13",
+          "22"
+        ]
+      ]
+    },
+    {
+      "position": "H3",
+      "iso": [
+        "0",
+        "3",
+        "12"
+      ],
+      "experimental": 0.99,
+      "uncertainty": 0.006,
+      "note": "secondary 2H KIE; relative to the methyl hydrogens",
+      "reference_average": [
+        [
+          "0",
+          "11",
+          "20"
+        ],
+        [
+          "0",
+          "12",
+          "21"
+        ],
+        [
+          "0",
+          "13",
+          "22"
+        ]
+      ]
+    },
+    {
+      "position": "H4E (outside)",
+      "iso": [
+        "0",
+        "9",
+        "18"
+      ],
+      "experimental": 0.968,
+      "uncertainty": 0.005,
+      "note": "secondary 2H KIE; relative to the methyl hydrogens",
+      "reference_average": [
+        [
+          "0",
+          "11",
+          "20"
+        ],
+        [
+          "0",
+          "12",
+          "21"
+        ],
+        [
+          "0",
+          "13",
+          "22"
+        ]
+      ]
+    },
+    {
+      "position": "H4Z (inside)",
+      "iso": [
+        "0",
+        "5",
+        "14"
+      ],
+      "experimental": 0.938,
+      "uncertainty": 0.004,
+      "note": "secondary 2H KIE; relative to the methyl hydrogens",
+      "reference_average": [
+        [
+          "0",
+          "11",
+          "20"
+        ],
+        [
+          "0",
+          "12",
+          "21"
+        ],
+        [
+          "0",
+          "13",
+          "22"
+        ]
+      ]
+    }
+  ],
+  "notes": "Isoprene numbering of the paper: C1 is the CH2 on the methyl-bearing C2, C4 the other terminus; E/Z hydrogens are outside/inside the s-cis diene. The KIEs are relative to the methyl group (1.00 assumed), so they are computed relative to it: 13C to the methyl carbon, 2H to the geometric mean over the three methyl hydrogens (the rotating methyl group averages them; in the static structures their individual KIEs are 1.024, 0.954 and 1.008, a geometric mean of 0.995). Footnote 13 of the paper gives consistent KIEs at lower conversions. Beno, Houk and Singleton (1996) compared B3LYP/6-31G* predictions with these values after rescaling them for methyl KIEs of 0.996 (2H) and 1.001 (13C), their predictions, and found the inside hydrogens the only significant misses. Maleic anhydride was not analysed. File atoms: diene.out C1 6, C2 1, C3 2, C4 4, methyl C 10, H1E 8, H1Z 7, H3 3, H4E 9, H4Z 5, methyl H 11-13; DATS.out adds 9 to each."
 }

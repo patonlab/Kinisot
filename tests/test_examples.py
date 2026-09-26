@@ -92,13 +92,47 @@ def test_benchmark_runner(tmp_path, monkeypatch):
     assert len(cases) == 1 and cases[0]["reference"]["doi"] == "10.1021/ja992372h"
     rows = module.run_case(cases[0])
     assert [r["position"] for r in rows][:2] == ["C1", "C2"]
-    assert rows[3]["computed"] == pytest.approx(1.032993, abs=1e-6)  # C4, Bell-corrected, from the Claisen example
-    assert all(r["experimental"] is None for r in rows)  # placeholders until entered from the paper
+    # Meyer, DelMonte & Singleton 1999, Table 4: relative to C5, two experiments compared through their mean
+    reference = module.compute_kie(
+        rct=module.resolve(cases[0], "reactants"),
+        ts=module.resolve(cases[0], "transition_structure"),
+        iso="4",
+        temperature=393.0,
+        scale=0.961,
+        reference="5",
+    )
+    assert rows[3]["position"] == "C4" and rows[3]["experimental"] == [1.035, 1.033]
+    assert rows[3]["computed"] == pytest.approx(reference.kie_tunnel_relative, abs=1e-9)
+    assert rows[3]["computed"] == pytest.approx(1.0310, abs=1e-4)
+    assert rows[3]["deviation"] == pytest.approx(reference.kie_tunnel_relative - 1.034, abs=1e-9)
+    measured = [r for r in rows if r["deviation"] is not None]
+    assert len(measured) == 5 and sum(abs(r["deviation"]) for r in measured) / 5 == pytest.approx(0.0009, abs=1e-4)
     text = module.format_case(cases[0], rows)
-    assert "no experimental value" in text and "enter them in `case.json`" in text
-    # a filled-in value produces a deviation and a mean absolute deviation
-    cases[0]["kies"][3]["experimental"], cases[0]["kies"][3]["uncertainty"] = 1.030, 0.002
-    rows = module.run_case(cases[0])
-    assert rows[3]["deviation"] == pytest.approx(1.032993 - 1.030, abs=1e-5)
-    assert "Mean absolute deviation over 1 measured positions" in module.format_case(cases[0], rows)
+    assert "1.035 ± 0.002, 1.033 ± 0.002" in text and "Mean absolute deviation over 5 measured positions" in text
+    assert "no experimental value" in text  # H7,H8: no 2H KIE was measured at 120 C
+    # a per-entry reference overrides the case's
+    cases[0]["kies"][3]["reference"] = "6"
+    assert module.run_case(cases[0])[3]["computed"] != pytest.approx(rows[3]["computed"], abs=1e-4)
+    # the Diels-Alder case against Singleton & Thomas 1995 (relative to the methyl group; 2H to the mean of its Hs)
+    (case,) = module.load_cases(["diels_alder"])
+    rows = {r["position"]: r for r in module.run_case(case)}
+    assert rows["C1"]["computed"] == pytest.approx(1.0216, abs=1e-4) and rows["C1"]["experimental"] == 1.022
+    assert rows["C4"]["computed"] == pytest.approx(1.0172, abs=1e-4)
+    assert rows["H1Z (inside)"]["deviation"] == pytest.approx(0.018, abs=0.001)
+    deviations = [abs(r["deviation"]) for r in rows.values()]
+    assert len(deviations) == 9 and sum(deviations) / 9 == pytest.approx(0.0031, abs=1e-4)
+    # a case with measurements but no structures yet (Baeyer-Villiger) is listed, not computed
+    (case,) = module.load_cases(["baeyer_villiger"])
+    rows = module.run_case(case)
+    assert all(r["computed"] is None and r["deviation"] is None for r in rows)
+    text = module.format_case(case, rows)
+    assert "Not computed yet" in text and "1.0096 ± 0.0006" in text and "1.001 ± 0.002, 1.000 ± 0.002" in text
+    # a partly filled case (transition structure but no reactants, or no iso labels) is still only listed
+    case["transition_structure"] = ["ts.out"]
+    assert all(r["computed"] is None for r in module.run_case(case))
+    assert "Not computed yet" in module.format_case(case, rows)
+    (case,) = module.load_cases(["claisen"])
+    case["kies"][0]["iso"] = None
+    rows = module.run_case(case)
+    assert rows[0]["computed"] is None and rows[1]["computed"] is not None
     del sys, json

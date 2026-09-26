@@ -1,0 +1,77 @@
+{
+  "name": "Baeyer-Villiger oxidation of cyclohexanone with m-CPBA: intramolecular KIEs of the migration step",
+  "reference": [
+    {
+      "citation": "D. A. Singleton, M. J. Szymanski, J. Am. Chem. Soc. 1999, 121, 9455-9456",
+      "doi": "10.1021/ja992016z",
+      "method": "13C and 2H composition of the product caprolactone by NMR at natural abundance, same two reactions as baeyer_villiger; values from Figure 1c (the reciprocals of the compositions in Figure 1b)"
+    },
+    {
+      "citation": "J. D. Crow, W. J. Hirschi, C. D. Clinton, J. S. Hirschi, ChemRxiv 2026 (preprint, not peer reviewed)",
+      "doi": "10.26434/chemrxiv.15002341/v1",
+      "method": "intramolecular 13C KIE from the product caprolactone of 17 reactions at 20-99% conversion; overall average, standard deviation and 95% confidence interval from SI Table S8b"
+    }
+  ],
+  "notes": "Intramolecular KIEs of the alkyl migration in the Criegee intermediate: the migrating alpha methylene group against the enantiotopic one that stays, whose positions are assigned 1.00. As the paper notes (ref 10), these are relative values that also contain any isotope effect of a label on the non-migrating side; compute them from the migration transition structure with the label on the migrating position and `reference` set to the same position on the non-migrating side. The beta-carbon value is the paper's internal check (a negligible KIE is expected for any mechanism). The 2026 reactions ran at 0 C for 5 h and then at room temperature overnight (SI); the 1999 communication does not state the temperature. 298.15 K is used. Structures are still needed.",
+  "temperature": 298.15,
+  "scale": null,
+  "level_of_theory": null,
+  "tunneling": "bell",
+  "project": false,
+  "reactants": null,
+  "transition_structure": null,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "migrating alpha carbon 13C, 2026",
+      "iso": null,
+      "reference": null,
+      "experimental": 1.046,
+      "uncertainty": 0.003,
+      "note": "standard deviation over the reactions; 95% CI 0.0007"
+    },
+    {
+      "position": "migrating alpha carbon 13C, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        1.045,
+        1.041
+      ],
+      "uncertainty": [
+        0.004,
+        0.003
+      ],
+      "note": "relative to the non-migrating alpha carbon"
+    },
+    {
+      "position": "migrating alpha hydrogens 2H, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        1.01,
+        1.02
+      ],
+      "uncertainty": [
+        0.01,
+        0.01
+      ],
+      "note": "relative to the non-migrating alpha hydrogens"
+    },
+    {
+      "position": "beta carbon on the migrating side 13C, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        0.996,
+        0.997
+      ],
+      "uncertainty": [
+        0.005,
+        0.003
+      ],
+      "note": "internal check"
+    }
+  ]
+}

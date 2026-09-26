@@ -156,7 +156,93 @@ or `fund` selects the harmonic or fundamental factor. The factor multiplies all 
 only the temperature-dependent terms (ZPE, EXC, tunnelling) are affected;
 TRPF and V-ratio are ratios of frequencies and cancel it.
 
-## 6. Constants (CODATA 2018)
+## 6. Bigeleisen–Mayer versus free-energy differences
+
+A KIE can also be computed as exp(ΔΔG‡/RT) from the free energies a
+quantum chemistry program prints for each isotopologue (the "Sum of
+electronic and thermal Free Energies" of Gaussian, for instance). There the
+translational and rotational partition functions come from the masses and
+moments of inertia. Bigeleisen and Mayer instead replace their isotope
+ratios by the product of the vibrational frequency ratios (the
+Teller–Redlich product rule, the TRPF and V-ratio terms of section 3).
+
+For exact harmonic frequencies at an exact stationary point the two are
+identical. Real frequencies obey the product rule only approximately, and
+the two routes then differ by exactly the violation:
+
+    ln(KIE_FE / KIE_BM) = −(δ_R − δ‡),   δ = ln ∏ ν_H/ν_L − ln[(M_H/M_L)^{3/2} (I_H/I_L)^{1/2} ∏ (m_L/m_H)^{3/2}]
+
+with the product over all 3N−6 modes (the imaginary one included) and I the
+product of the principal moments of inertia. Rotational symmetry numbers
+are left out of both routes here, as Kinisot leaves them out (section 3).
+A program that includes them adds ln[(σ_H/σ_L)‡ / (σ_H/σ_L)_R] to the right-hand
+side; the term vanishes when no substitution changes a symmetry number, or
+when it changes those of the reactant and the transition structure by the
+same ratio, as in the Claisen example.
+
+The Bigeleisen–Mayer form is the robust one because of what happens to a
+soft vibration. For a mode with u = hcν/kT ≪ 1 its TRPF, ZPE and EXC
+factors tend to (ν_H/ν_L) · 1 · (ν_L/ν_H) = 1, so the mode drops out however
+poorly its frequency is computed. In the free-energy route the same mode
+contributes ln(ν_H/ν_L) in full. That contribution cancels only against
+rotational terms computed from moments of inertia, so an error in a soft
+mode's isotope shift goes straight into the KIE. Beno, Houk and Singleton
+reported for the Diels–Alder reaction of isoprene with maleic anhydride
+that errors in the low frequencies of a floppy transition structure cause
+little error in Bigeleisen–Mayer KIEs (J. Am. Chem. Soc. 1996, 118, 9984,
+[doi:10.1021/ja9615278](https://doi.org/10.1021/ja9615278)). Hirschi,
+Takeya, Hang and Singleton give the same argument for constrained,
+non-stationary structures (J. Am. Chem. Soc. 2009, 131, 2397,
+[doi:10.1021/ja8088636](https://doi.org/10.1021/ja8088636)).
+
+`scripts/compare_free_energy_route.py` computes both routes from the same
+projected frequencies of the Claisen example, B3LYP/6-31G(d), at 393 K,
+unscaled and without tunnelling. `tests/test_free_energy_route.py` checks
+the numbers quoted here.
+
+| Site | Kinisot (BM) | FE | FE, 6 decimals | BM, +0.1 cm⁻¹ | FE, +0.1 cm⁻¹ | BM, quasi-harmonic | FE, quasi-harmonic |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| C1 | 1.01296 | 1.01269 | 1.01294 | 1.01296 | 1.01123 | 1.01292 | 1.00418 |
+| C2 | 1.00192 | 1.00194 | 1.00161 | 1.00191 | 1.00051 | 1.00192 | 1.00184 |
+| O3 (¹⁸O) | 1.03768 | 1.03737 | 1.03765 | 1.03768 | 1.03587 | 1.03758 | 1.01845 |
+| C4 | 1.03106 | 1.03097 | 1.03100 | 1.03106 | 1.02950 | 1.03104 | 1.02697 |
+| C5 | 1.00192 | 1.00192 | 1.00161 | 1.00191 | 1.00049 | 1.00192 | 1.00182 |
+| C6 | 1.01511 | 1.01555 | 1.01620 | 1.01510 | 1.01409 | 1.01506 | 1.00726 |
+| H7,H8 (²H₂) | 0.95064 | 0.94981 | 0.95064 | 0.95063 | 0.94841 | 0.95047 | 0.91856 |
+
+The columns:
+
+- **FE**: exact arithmetic. The files are converged (maximum force below
+  10⁻⁴ hartree/bohr), yet the product rule is violated by up to 1 × 10⁻³ in
+  ln (H7,H8 in the reactant). That is equivalent to an error of 0.07 cm⁻¹
+  in the reactant's 70.5 cm⁻¹ torsion, and it moves the free-energy KIEs by
+  up to 8 × 10⁻⁴.
+- **FE, 6 decimals**: each free energy rounded to the six decimals Gaussian
+  prints. At 393 K an error of 10⁻⁶ hartree in one of the four free
+  energies changes a KIE by 8 × 10⁻⁴. Rounding shifts C6 by 6.5 × 10⁻⁴, and
+  the worst case, four values each half a unit off, is 1.6 × 10⁻³. That is
+  as large as the uncertainty of many natural-abundance ¹³C measurements.
+- **+0.1 cm⁻¹**: the heavy isotopologue's 70.5 cm⁻¹ reactant torsion
+  shifted by 0.1 cm⁻¹. The Bigeleisen–Mayer KIEs change by at most
+  8 × 10⁻⁶; the free-energy KIEs change by 1.4 × 10⁻³ to 1.5 × 10⁻³, about
+  180 times more.
+- **Quasi-harmonic**: every real mode below 100 cm⁻¹ raised to 100 cm⁻¹
+  (Truhlar's quasi-harmonic free energies; Grimme's entropy interpolation
+  has the same effect). Bigeleisen–Mayer changes by at most 2 × 10⁻⁴. The
+  free-energy ¹⁸O KIE drops from 1.037 to 1.018, because the soft mode's
+  isotope shift leaves the vibrational term but not the rotational one.
+  Quasi-harmonic free energies, such as those GoodVibes prints for
+  thermochemistry, must not be used for isotope effects.
+
+Tunnelling matters as much as the choice of equation. Meyer, DelMonte and
+Singleton found that a one-dimensional tunnelling correction improves
+heavy-atom KIE predictions. With it, the difference from experiment fell to
+about the experimental uncertainty in the reactions they studied (J. Am.
+Chem. Soc. 1999, 121, 10865,
+[doi:10.1021/ja992372h](https://doi.org/10.1021/ja992372h)). Kinisot
+applies Bell's correction by default.
+
+## 7. Constants (CODATA 2018)
 
 | Constant | Value |
 | --- | --- |

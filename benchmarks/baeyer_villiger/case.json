@@ -1,0 +1,113 @@
+{
+  "name": "Baeyer-Villiger oxidation of cyclohexanone with m-CPBA: intermolecular KIEs",
+  "reference": [
+    {
+      "citation": "D. A. Singleton, M. J. Szymanski, J. Am. Chem. Soc. 1999, 121, 9455-9456",
+      "doi": "10.1021/ja992016z",
+      "method": "13C and 2H KIEs by NMR at natural abundance on recovered cyclohexanone, two reactions in CH2Cl2 taken to 79 ± 3% and 63 ± 3% conversion; values from Figure 1a"
+    },
+    {
+      "citation": "J. D. Crow, W. J. Hirschi, C. D. Clinton, J. S. Hirschi, ChemRxiv 2026 (preprint, not peer reviewed)",
+      "doi": "10.26434/chemrxiv.15002341/v1",
+      "method": "13C KIEs on recovered cyclohexanone from 14 reactions at 14-80% conversion (600 MHz), weighted fit of R/R0 against calibrated conversion, averaged over three conversion methods; values and 95% confidence intervals from SI Tables S3a and S3b"
+    }
+  ],
+  "notes": "Addition of the peracid to the carbonyl is rate limiting, so these KIEs probe that step; the alkyl migration comes after it (see baeyer_villiger_migration). All 13C KIEs are relative to the beta carbon (C3/C5), which both papers take as 1.000 (Figure 1a of the 1999 paper, whose text calls the C4 methylene group the internal standard; the 2026 text names C3); the 2H KIEs are relative to the C4 hydrogens. The 1999 rows list the two reactions' KIEs with their standard deviations, as in the paper, and are compared through their mean. The 2026 preprint's Scheme 1c prints 1.008(1) for the alpha carbon, which matches its fit with uncalibrated conversions (1.0087, SI Table S3d); the calibrated value the authors recommend is used here. The 2026 reactions ran at 0 C for 5 h and then at room temperature overnight (SI); the 1999 communication does not state the temperature. 298.15 K is used. Structures are still needed; the proton transfers accompanying the addition are not defined by the experiment (ref 12 of the 1999 paper).",
+  "temperature": 298.15,
+  "scale": null,
+  "level_of_theory": null,
+  "tunneling": "bell",
+  "project": false,
+  "reactants": null,
+  "transition_structure": null,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "C1 (carbonyl) 13C, 2026",
+      "iso": null,
+      "reference": null,
+      "experimental": 1.045,
+      "uncertainty": 0.002,
+      "note": "95% CI of the weighted fit"
+    },
+    {
+      "position": "C2 (alpha) 13C, 2026",
+      "iso": null,
+      "reference": null,
+      "experimental": 1.0096,
+      "uncertainty": 0.0006,
+      "note": "95% CI of the weighted fit"
+    },
+    {
+      "position": "C1 (carbonyl) 13C, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        1.046,
+        1.051
+      ],
+      "uncertainty": [
+        0.005,
+        0.004
+      ],
+      "note": "relative to the beta carbon"
+    },
+    {
+      "position": "C2 (alpha) 13C, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        1.005,
+        1.001
+      ],
+      "uncertainty": [
+        0.004,
+        0.001
+      ],
+      "note": "relative to the beta carbon"
+    },
+    {
+      "position": "C4 (gamma) 13C, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        1.001,
+        1.0
+      ],
+      "uncertainty": [
+        0.002,
+        0.002
+      ],
+      "note": "relative to the beta carbon"
+    },
+    {
+      "position": "H on C2 (alpha) 2H, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        0.95,
+        0.96
+      ],
+      "uncertainty": [
+        0.01,
+        0.01
+      ],
+      "note": "relative to the C4 hydrogens"
+    },
+    {
+      "position": "H on C3 (beta) 2H, 1999",
+      "iso": null,
+      "reference": null,
+      "experimental": [
+        0.97,
+        0.97
+      ],
+      "uncertainty": [
+        0.01,
+        0.01
+      ],
+      "note": "relative to the C4 hydrogens"
+    }
+  ]
+}

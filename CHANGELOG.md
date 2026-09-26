@@ -6,6 +6,40 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- README, "Why the Bigeleisen–Mayer equation rather than free energies", and
+  docs/theory.md section 6: the two routes differ exactly by the
+  Teller–Redlich product-rule violation of the computed frequencies. A soft
+  mode drops out of Bigeleisen–Mayer but not out of a free-energy
+  difference. `scripts/compare_free_energy_route.py` quantifies this on the
+  Claisen Hessians: printed-precision rounding, a 0.1 cm⁻¹ soft-mode error,
+  and quasi-harmonic free energies. `tests/test_free_energy_route.py` pins
+  the quoted numbers.
+- Baeyer–Villiger benchmarks (`benchmarks/baeyer_villiger`,
+  `benchmarks/baeyer_villiger_migration`) with measured intermolecular and
+  intramolecular ¹³C and ²H KIEs. They come from Singleton and Szymanski,
+  JACS 1999, 121, 9455 (Figure 1), and from the Crow, Hirschi, Clinton and
+  Hirschi preprint, ChemRxiv 2026 (SI Tables S3a, S3b and S8b). Structures
+  still need to be computed.
+- The Claisen cases hold the measured ¹³C and ¹⁷O KIEs of Meyer, DelMonte
+  and Singleton, JACS 1999, 121, 10865 (Table 4, 120 °C, relative to C5).
+  The mean absolute deviation is 0.0009 over five positions for the B3LYP
+  structures and 0.0089 for GFN2-xTB, so experiment favours the B3LYP
+  transition structure.
+- The first measured benchmark: the Diels–Alder case now holds the nine
+  ¹³C and ²H KIEs of Singleton and Thomas, JACS 1995, 117, 9357 (Figure 1b),
+  relative to the methyl group as measured. The B3LYP structures in the
+  repository reproduce them with a mean absolute deviation of 0.003. Only
+  the inside hydrogen on C1 is off by more than the experimental error;
+  Beno, Houk and Singleton (JACS 1996, 118, 9984) likewise found the inside
+  hydrogens the only misses.
+- A Shi epoxidation case (Singleton and Wang, JACS 2005, 127, 6679,
+  Figure 1: ¹³C KIEs at 0 °C, with the paper's QUIVER predictions for
+  comparison). Structures are still needed.
+- The benchmark runner lists cases without structures. It also accepts
+  replicate measurements, a reference position per KIE, an averaged
+  reference (a rotating methyl group), several sources and a notes
+  paragraph.
+
 - `--calc xtb[:method]`: GFN2-xTB (or GFN1-xTB) through `tblite`'s ASE
   calculator, with the SCF tightened to `accuracy=0.01`. With tblite's
   default the force noise shifts finite-difference isotope effects by up to
@@ -33,6 +67,11 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Fixed
 
+- The Diels–Alder example and benchmark called TS atom 19 (diene atom 10) a
+  diene terminus, and concluded from its KIE of 1.001 that the transition
+  structure is markedly asynchronous. Atom 19 is the methyl carbon. The
+  termini are C1 (TS 15, 1.022) and C4 (TS 13, 1.018), a moderately
+  asynchronous transition structure, as measured.
 - `--calc orb` returned orb-models' network instead of an ASE calculator and
   could not compute anything. It now wraps the network in `ORBCalculator`
   (orb-models 0.5 and 0.6+ APIs), in float64, and accepts any

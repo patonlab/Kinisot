@@ -40,10 +40,17 @@ Kinisot's [eqe_cyclohexane](../examples/eqe_cyclohexane/README.md) example.
 
 ## Gaussian `freq=readisotopes`
 
-Gaussian can print the thermochemistry of an isotopologue directly. This
-projects external modes and uses Gaussian's own constants; the resulting
-KIEs agree with Kinisot to the printed precision. Kinisot exists so that
-every position and temperature does not need a new Gaussian job.
+Gaussian can print the thermochemistry of an isotopologue directly, and a
+KIE can be built from those free energies. That route differs from
+Kinisot's Bigeleisen–Mayer evaluation in two ways. First, by the
+Teller–Redlich product-rule violation of the computed frequencies: up to
+8 × 10⁻⁴ for the Claisen example. Second, by the rounding of the printed
+free energies: 8 × 10⁻⁴ per 10⁻⁶ hartree at 393 K. It is also far more
+sensitive to errors in soft modes; see
+[theory.md, section 6](theory.md#6-bigeleisenmayer-versus-free-energy-differences).
+The `freq=readisotopes` route also needs a new Gaussian job for every
+position and temperature; Kinisot reuses one Hessian per structure and
+only changes the masses.
 
 ## GoodVibes
 
@@ -52,4 +59,7 @@ quasi-harmonic thermochemistry, not isotope effects, but from version 4.4 it
 parses Cartesian Hessians (Gaussian, ORCA) and program-independent levels
 of theory and scaling factors. Kinisot depends on it since 2.3: the Truhlar
 factors, the ORCA `$hessian` reader and ORCA level-of-theory detection come
-from GoodVibes.
+from GoodVibes. Its quasi-harmonic free energies are meant for
+thermochemistry and must not be used to compute isotope effects: raising
+soft modes to 100 cm⁻¹ turns the Claisen ¹⁸O KIE of 1.037 into 1.018
+([theory.md, section 6](theory.md#6-bigeleisenmayer-versus-free-energy-differences)).

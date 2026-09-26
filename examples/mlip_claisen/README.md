@@ -80,9 +80,14 @@ vinyl CH₂ that forms the new bond). The geometries agree: the forming C1–C6
 bond is 1.94 Å in the GFN2-xTB transition structure against 2.31 Å for
 B3LYP, and the breaking C4–O3 bond 1.59 Å against 1.90 Å, a tighter
 transition structure further along the C1–C6 bond formation and less far
-along the C–O cleavage, consistent with its lower barrier. Which description matches experiment is the
-question the benchmark suite (`benchmarks/claisen` and
-`benchmarks/claisen_xtb`) will answer once the measured KIEs are entered.
+along the C–O cleavage, consistent with its lower barrier. Experiment
+favours B3LYP. Meyer, DelMonte and Singleton measured these KIEs at 120 °C
+relative to C5 (J. Am. Chem. Soc. 1999, 121, 10865, Table 4). Computed the
+same way, the B3LYP structures reproduce the five measured ¹³C and ¹⁷O KIEs
+with a mean absolute deviation of 0.0009. The GFN2-xTB structures give
+0.0089: C4 comes out at 1.016 against 1.034, C1 and C6 at 1.021 and 1.024
+against 1.014 and 1.015. See `benchmarks/claisen` and
+`benchmarks/claisen_xtb`.
 Projection of the external modes changes these KIEs by less than
 3 × 10⁻⁷ because the geometries are converged to 10⁻⁴ eV/Å; with looser
 geometries it matters more.
