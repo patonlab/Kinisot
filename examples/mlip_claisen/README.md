@@ -23,19 +23,35 @@ C4 (P) KIE @ 393.0 K  1.012716   1.036593   1.001955   0.979004   1.029742   1.0
 
 ## A worked example with GFN2-xTB
 
-`scripts/make_xtb_claisen.py` starts from the B3LYP geometries, minimizes
-the reactant and refines the transition structure (with the Sella saddle
-point optimizer) using GFN2-xTB through its ASE calculator (`tblite`), and
-computes the Hessians exactly as `--calc xtb` would (central differences,
-0.005 Å, with tblite's SCF tightened to `accuracy=0.01`, see below). The
-results are committed in `tests/data/xtb/`, so the KIEs can be reproduced
-without `tblite`:
+`scripts/make_claisen_structures.py --calc xtb --out tests/data/xtb` starts
+from the B3LYP geometries, minimizes the reactant and refines the transition
+structure (with the Sella saddle point optimizer) using GFN2-xTB through its
+ASE calculator (`tblite`), checks that the result is the Claisen transition
+structure (see [below](#machine-learned-potentials-check-the-transition-structure-first)), and
+computes the Hessians with the calculator `--calc xtb` builds (tblite's SCF
+tightened to `accuracy=0.01`, see below) by central differences with a
+0.005 Å step and four displacements per coordinate. The results are
+committed in `tests/data/xtb/`, so the KIEs can be reproduced without
+`tblite`:
 
 ```
 cd tests/data/xtb
 kinisot --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393
-kinisot --rct claisen_gs.xyz --ts claisen_ts.xyz --iso 4 -t 393 --calc xtb      # recomputes with tblite
 ```
+
+To recompute the Hessians with tblite, copy the geometries elsewhere first.
+Kinisot caches each Hessian next to its geometry as `<name>.hessian.json`,
+which here would overwrite the committed files:
+
+```
+mkdir xtb_rerun && cp tests/data/xtb/*.xyz xtb_rerun && cd xtb_rerun
+kinisot --rct claisen_gs.xyz --ts claisen_ts.xyz --iso 4 -t 393 --calc xtb --delta 0.005
+```
+
+The command line uses two displacements per coordinate, so the recomputed
+Hessian differs slightly from the committed one. The corrected C4 KIE is
+the same to the printed six decimals (1.020858). With the default 0.01 Å
+step it is 1.020857.
 
 The reactant is a minimum (lowest mode 58 cm⁻¹) and the transition
 structure has one imaginary mode (494i cm⁻¹; B3LYP 483i unscaled). The
@@ -125,7 +141,69 @@ r = compute_kie(rct=gs, ts=ts, iso="4", temperature=393.0)   # projection on by 
 print(r.kie_tunnel, r.other.light.imaginary)
 ```
 
-Machine-learned potential weights could not be downloaded where this
-example was prepared, so the potential-optimized structures in the
-repository are the GFN2-xTB ones above; the same script works with any
-calculator (replace `calculator()` in `scripts/make_xtb_claisen.py`).
+## Machine-learned potentials: check the transition structure first
+
+`scripts/make_claisen_structures.py` runs the GFN2-xTB workflow above with
+any `--calc`. It was run with four MACE foundation models (mace-torch
+0.3.16, float64, analytic Hessians). With none of them does the saddle point
+search, started from the B3LYP transition structure, find the concerted
+Claisen transition structure. The script rejects every one of these saddle
+points, so the repository has no MACE structures or KIEs for this reaction:
+
+| Potential | ΔE at the B3LYP geometries (kcal/mol) | Saddle point reached | C1–C6 / C4–O3 (Å) | Imaginary modes (cm⁻¹) | Barrier (kcal/mol) |
+| --- | --- | --- | --- | --- | --- |
+| B3LYP/6-31G(d) | 28.9 | concerted [3,3] shift | 2.31 / 1.90 | 483i | 28.9 |
+| GFN2-xTB | 28.4 | concerted [3,3] shift | 1.94 / 1.59 | 494i | 20.6 |
+| MACE-OFF23 small | 60.4 | C4–O3 cleavage, no C1–C6 bond | 3.81 / 2.38 | 229i | 50.4 |
+| MACE-OFF23 medium | 70.7 | C4–O3 cleavage, no C1–C6 bond | 3.56 / 2.16 | 158i | 59.3 |
+| MACE-OFF23 large | 65.6 | none (not converged, two imaginary modes) | 2.03 / 1.47 | 337i, 117i | – |
+| MACE-MP-0 medium | 25.1 | C1–C6 ring closure, C4–O3 intact | 2.42 / 1.46 | 355i | 9.2 |
+
+"ΔE at the B3LYP geometries" is the energy of the B3LYP transition structure
+above the B3LYP reactant, both evaluated with the potential without
+re-optimizing. MACE-OFF23 was trained on near-equilibrium organic molecules
+(SPICE), and it places the pericyclic region 30 to 40 kcal/mol too high,
+so the saddle search slides into C–O dissociation instead. MACE-MP-0 was
+trained on inorganic materials (the Materials Project). It happens to give
+a reasonable ΔE at the B3LYP geometries, but its surface has no concerted
+saddle point nearby. Sella reaches a C1–C6 ring closure with the C4–O3 bond
+intact, 9 kcal/mol above a reactant that is not a minimum either (a 42i cm⁻¹
+mode).
+
+These saddle points are real stationary points of the potentials, and KIEs
+computed from them would look plausible. They would still describe a
+different reaction. So before trusting isotope effects from a potential:
+
+- **Validate the transition structure.** The script requires exactly one
+  imaginary mode, both partial bonds inside generous windows (C1–C6
+  1.75–2.90 Å, C4–O3 1.50–2.50 Å), and the two stretches of those bonds
+  dominating the imaginary mode. It exits with status 1 and writes nothing
+  otherwise (`--keep-invalid` writes the structures for inspection). For
+  your own reaction, look at the imaginary mode and connect the transition
+  structure to its reactant and product (IRC or NEB).
+- **Try single points first.** The potential's energies at the DFT
+  reactant and transition structure are cheap to compute. A ΔE far from the
+  DFT barrier, like MACE-OFF23's, means the potential does not describe that
+  region. A close ΔE, like MACE-MP-0's, is necessary but not sufficient.
+- **Prefer potentials trained on reactive data.** A general-purpose
+  foundation model cannot be assumed to know transition-structure regions.
+  Fine-tuning on reaction-path data for the reaction class, or GFN2-xTB or
+  DFT, is the safer route. `mace_omol`, `orb`, `sevennet`, `aimnet2` and UMA
+  were not tested here.
+
+To reproduce the rejections:
+
+```
+pip install "kinisot[ase]" sella mace-torch
+python scripts/make_claisen_structures.py --calc mace_mp:medium --out mace_mp0 --label MACE-MP-0-medium
+python scripts/make_claisen_structures.py --calc mace_off:medium --out mace_off23_medium
+```
+
+`--keep-invalid` writes the rejected structures anyway. The MACE-MP-0 ones
+are kept in `tests/data/mace_mp0_rejected/` as the regression test for
+these checks.
+
+MACE-MP-0 is MIT licensed. The MACE-OFF23 weights are distributed under the
+Academic Software License, which does not allow commercial use. Kinisot
+does not ship or download any weights itself. `mace-torch` fetches them on
+first use.

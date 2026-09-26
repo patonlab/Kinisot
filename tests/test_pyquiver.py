@@ -24,7 +24,8 @@ from pyquiver import quiver  # noqa: E402
 from pyquiver.config import Config  # noqa: E402
 from pyquiver.kie import KIE_Calculation  # noqa: E402
 
-TOLERANCE = 5e-6
+# Largest observed difference 2.29e-6 (PyQuiver's five-decimal isotope masses and its atomic mass unit)
+TOLERANCE = 3e-6
 
 
 def as_pyquiver_system(data):
@@ -85,5 +86,7 @@ def test_diels_alder_matches_pyquiver():
     reference = pyquiver_kies(gs, ts, {"C15": [(15, 15, "13C")], "C19": [(19, 19, "13C")]}, 298.15, 0.963)
     for name, label in (("C15", "15"), ("C19", "19")):
         r = compute_kie(rct=gs, ts=ts, iso=label, temperature=298.15, scale=0.963)
+        wigner = compute_kie(rct=gs, ts=ts, iso=label, temperature=298.15, scale=0.963, tunneling="wigner")
         assert r.kie == pytest.approx(reference[name]["uncorrected"], rel=TOLERANCE)
         assert r.kie_tunnel == pytest.approx(reference[name]["infinite_parabola"], rel=TOLERANCE)
+        assert wigner.kie_tunnel == pytest.approx(reference[name]["wigner"], rel=TOLERANCE)

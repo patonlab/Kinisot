@@ -12,12 +12,31 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   a few 10⁻⁴ (an EQE between water's equivalent hydrogens came out 1.0001 or
   0.9996 instead of 1); documented in `docs/file_formats.md`.
 - GFN2-xTB Claisen structures and Hessians (`tests/data/xtb/`, made by
-  `scripts/make_xtb_claisen.py`: reactant minimized with BFGS, transition
-  structure refined with Sella) and a B3LYP versus GFN2-xTB comparison in
-  `examples/mlip_claisen/`; a matching `benchmarks/claisen_xtb` case.
+  `scripts/make_claisen_structures.py --calc xtb`: reactant minimized with
+  BFGS, transition structure refined with Sella) and a B3LYP versus GFN2-xTB
+  comparison in `examples/mlip_claisen/`; a matching `benchmarks/claisen_xtb`
+  case.
+- `scripts/make_claisen_structures.py` takes any `--calc` and validates what
+  it finds: the reactant must be a minimum, and the saddle point must have
+  one imaginary mode, both the C1–C6 and C4–O3 partial bonds, and those two
+  stretches dominating the imaginary mode. Otherwise it writes nothing and
+  exits with status 1.
+- MACE results in `examples/mlip_claisen/`. None of MACE-OFF23 (small,
+  medium, large) or MACE-MP-0 (medium) has the concerted Claisen transition
+  structure. Their saddle points describe C–O cleavage or a ring closure
+  with C–O intact, so no MACE KIEs are reported. The rejected MACE-MP-0
+  structures (`tests/data/mace_mp0_rejected/`) are the regression test for
+  the checks.
 - `tests/test_pyquiver.py`: cross-validation against PyQuiver on the same
   Hessians (Claisen, all positions; Diels–Alder C15/C19): uncorrected, Bell
   and Wigner KIEs agree to 2.3 × 10⁻⁶. `pyquiver-kie` joins the `test` extra.
+
+### Fixed
+
+- A Hessian cached next to a geometry (`--calc`) was reused after
+  `--delta` changed. The cache now records the finite-difference step and
+  the number of displacements and recomputes when either differs; caches
+  written by 2.5.0 are recomputed once.
 
 ### Changed
 

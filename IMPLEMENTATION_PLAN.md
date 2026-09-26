@@ -331,11 +331,21 @@ built-in EMT potential on water, ammonia and N₂, and the MACE test is skipped
 unless `mace-torch` is installed; the `examples/mlip_claisen` numbers come
 from the Gaussian Hessians written in ASE's JSON form. **Update 2026-09-26:**
 the Claisen reactant and transition structure were re-optimized with
-GFN2-xTB through the ASE backend (`scripts/make_xtb_claisen.py`, Sella for
-the saddle point) and compared with B3LYP in `examples/mlip_claisen`; this
-exposed that finite-difference Hessians need a tight SCF, now the `--calc
-xtb` default. **Still wanted:** the same with MACE-OFF/UMA or another
-machine-learned potential, whose weights could not be downloaded here.
+GFN2-xTB through the ASE backend (`scripts/make_claisen_structures.py`, Sella
+for the saddle point) and compared with B3LYP in `examples/mlip_claisen`;
+this exposed that finite-difference Hessians need a tight SCF, now the
+`--calc xtb` default. **Update 2026-09-26 (MACE):** the same script was run
+with MACE-OFF23 (small, medium, large) and MACE-MP-0 (medium), with weights
+from GitHub releases. The analytic MACE Hessian (`get_hessian`) matches
+finite differences to 1.5 × 10⁻⁷. None of the four has the concerted
+Claisen transition structure. MACE-OFF23 puts the pericyclic region 30 to
+40 kcal/mol too high and its saddle points are C–O cleavage. MACE-MP-0's is
+a C1–C6 ring closure with C–O intact. The script now validates every
+structure (one imaginary mode, partial-bond windows, bonds dominating the
+imaginary mode) and refuses these. No MACE KIEs are reported; the
+diagnostics are in the example. **Still wanted:** a potential trained on
+reactive data that passes the checks. `mace_omol`, `orb`, `sevennet`,
+`aimnet2` and UMA have not been tried.
 
 Design in REVIEW §6; prototypes verified 2026-09-25 (unit conversion to
 1.6e-6 cm⁻¹, `with_new_masses` isotopologues, EMT finite-difference failure

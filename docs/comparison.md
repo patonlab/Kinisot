@@ -9,7 +9,8 @@ Kwan group, Apache-2.0) is the closest peer: Kinisot is a rewrite of Rzepa's
 Fortran Kinisot, PyQuiver a Python port of QUIVER, and both implement the
 same Bigeleisen–Mayer treatment. Fed the same Hessians, the two agree to
 2.3 × 10⁻⁶ or better on every Claisen and Diels–Alder KIE, uncorrected and
-with Bell or Wigner tunnelling; `tests/test_pyquiver.py` checks this in CI.
+with Bell or Wigner tunnelling; `tests/test_pyquiver.py` asserts agreement
+within 3 × 10⁻⁶ for all of these in CI.
 The residual comes from PyQuiver's five-decimal isotope masses and its
 atomic mass unit:
 

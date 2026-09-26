@@ -264,17 +264,22 @@ def save_hessian_json(data, path, atoms=None, calc_spec=None):
 
 
 def hessian_for_geometry(path, calc_spec, delta=0.01, nfree=2, cache=True, recompute=False):
-    """Hessian of the geometry file ``path`` with the calculator ``calc_spec``, cached as ``<stub>.hessian.json``."""
+    """Hessian of the geometry file ``path`` with the calculator ``calc_spec``, cached as ``<stub>.hessian.json``.
+
+    The cache is reused only when it is newer than the geometry and was made
+    with the same ``calc_spec``, ``delta`` and ``nfree``.
+    """
     _require_ase()
     from ase.io import read
     from ase.io.jsonio import decode
 
     stub = os.path.splitext(path)[0]
     cached = stub + ".hessian.json"
+    stencil = {"delta": float(delta), "nfree": int(nfree)}
     if cache and not recompute and os.path.exists(cached) and os.path.getmtime(cached) >= os.path.getmtime(path):
         with open(cached, encoding="utf-8") as handle:
             info = decode(handle.read())["atoms"].info
-        if info.get("kinisot_calc") == calc_spec:
+        if info.get("kinisot_calc") == calc_spec and info.get("kinisot_stencil") == stencil:
             return parse_ase_json(cached)
     try:
         atoms = read(path)
@@ -284,6 +289,7 @@ def hessian_for_geometry(path, calc_spec, delta=0.01, nfree=2, cache=True, recom
         atoms = atoms[-1]
     data = hessian_from_calculator(atoms, build_calculator(calc_spec), delta=delta, nfree=nfree, source=path)
     if cache:
+        atoms.info["kinisot_stencil"] = stencil
         save_hessian_json(data, cached, atoms=atoms, calc_spec=calc_spec)
         data = parse_ase_json(cached)
     return data

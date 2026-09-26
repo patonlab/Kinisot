@@ -111,6 +111,9 @@ def test_calc_from_geometry_with_cache(tmp_path, monkeypatch):
     stamp = os.path.getmtime(cached)
     again = hessian_for_geometry(geometry, "emt")  # reused, not recomputed
     assert os.path.getmtime(cached) == stamp and np.abs(again.hessian - data.hessian).max() == 0
+    finer = hessian_for_geometry(geometry, "emt", delta=0.005)  # a different step recomputes
+    assert 0 < np.abs(finer.hessian - data.hessian).max() < 1e-3
+    assert np.abs(hessian_for_geometry(geometry, "emt", delta=0.005).hessian - finer.hessian).max() == 0
     other = hessian_for_geometry(geometry, "ase.calculators.emt:EMT")  # a different --calc spec recomputes
     assert np.abs(other.hessian - data.hessian).max() < 1e-8
     # command line: deuterium on one or another of the equivalent hydrogens, the EQE must be 1
@@ -172,7 +175,7 @@ XTB = datapath("xtb")
 
 
 def test_committed_xtb_claisen_reproduces():
-    # GFN2-xTB structures and Hessians from scripts/make_xtb_claisen.py; no tblite needed to read them
+    # GFN2-xTB structures and Hessians from scripts/make_claisen_structures.py; no tblite needed to read them
     gs = load_hessian(os.path.join(XTB, "claisen_gs.hessian.json"))
     ts = load_hessian(os.path.join(XTB, "claisen_ts.hessian.json"))
     assert gs.level_of_theory == "GFN2-xTB" and gs.program.startswith("ase")
@@ -203,3 +206,31 @@ def test_xtb_calculator_spec():
     # 1e-4 off because of force noise, which is why the registry tightens it to 0.01.
     r = compute_kie(rct=data, prd=data, iso=["2", "3"], temperature=298.15)
     assert r.kie == pytest.approx(1.0, abs=5e-6)
+
+
+def test_claisen_structure_checks():
+    # scripts/make_claisen_structures.py refuses to write a saddle point that is not the Claisen transition structure
+    import importlib.util
+
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "make_claisen_structures.py")
+    spec = importlib.util.spec_from_file_location("make_claisen_structures", path)
+    script = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(script)
+    check = script.check_structure
+
+    b3lyp_gs, b3lyp_ts = (parse_gaussian(datapath("gaussian/claisen_%s.out" % name)) for name in ("gs", "ts"))
+    xtb_gs, xtb_ts = (load_hessian(os.path.join(XTB, "claisen_%s.hessian.json" % name)) for name in ("gs", "ts"))
+    assert check(b3lyp_gs, saddle=False) == [] and check(b3lyp_ts, saddle=True) == []
+    assert check(xtb_gs, saddle=False) == [] and check(xtb_ts, saddle=True) == []
+    assert check(b3lyp_ts, saddle=False) == ["reactant has imaginary modes [-482.7]"]
+    problems = check(b3lyp_gs, saddle=True)
+    assert len(problems) == 3 and problems[0].startswith("0 imaginary modes") and "C1-C6 is 5.10 A" in problems[1]
+
+    # MACE-MP-0 (medium): Sella started from the B3LYP transition structure converges to a C1-C6 ring
+    # closure with C4-O3 intact, and the reactant "minimum" keeps a 42i cm-1 mode (examples/mlip_claisen)
+    rejected = datapath("mace_mp0_rejected")
+    mace_gs, mace_ts = (load_hessian(os.path.join(rejected, "claisen_%s.hessian.json" % name)) for name in ("gs", "ts"))
+    assert check(mace_gs, saddle=False) == ["reactant has imaginary modes [-41.9]"]
+    problems = check(mace_ts, saddle=True)
+    assert len(problems) == 2 and "breaking C4-O3 is 1.46 A" in problems[0]
+    assert "dominated by C1-C6 (0.63), C2-C6 (0.37)" in problems[1]

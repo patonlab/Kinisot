@@ -73,7 +73,8 @@ Two forms of input:
    differences (`--delta`, default 0.01 Å) or with the calculator's
    `get_hessian` when it has one, and cached as `<name>.hessian.json` next
    to the geometry (reused while the geometry is unchanged and the `--calc`
-   specification matches). The geometry must be a stationary point of that
+   specification and `--delta` match; delete the file to force a
+   recomputation). The geometry must be a stationary point of that
    calculator.
 
 Masses come from Kinisot's isotope table (ASE's standard atomic weights

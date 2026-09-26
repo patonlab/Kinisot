@@ -61,10 +61,15 @@ modes are not all within a few tens of cm⁻¹ of zero.
 reactant and locate the transition structure with the same method, then
 `kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc mace_mp:medium` (or
 `--calc xtb` for GFN2-xTB). `examples/mlip_claisen/` compares GFN2-xTB and
-B3LYP for the Claisen rearrangement and `scripts/make_xtb_claisen.py` shows
-the whole workflow, including the transition-structure search with Sella. There is no scaling factor for a potential, and
-its accuracy for the curvature at the transition structure decides the
-KIE, so compare against a DFT reference where you can.
+B3LYP for the Claisen rearrangement and `scripts/make_claisen_structures.py`
+shows the whole workflow, including the transition-structure search with
+Sella. There is no scaling factor for a potential, and its accuracy for the
+curvature at the transition structure decides the KIE, so compare against a
+DFT reference where you can. Check that the saddle point is the reaction you
+mean: none of four MACE foundation models (MACE-OFF23 small, medium and
+large, MACE-MP-0) has the concerted Claisen transition structure, and their
+saddle points describe C–O cleavage or ring closure instead (details in the
+example).
 
 **Can I use several conformers?** Not in one run. Compute the KIE for
 each reactant/TS conformer pair and Boltzmann-average the rate constants,

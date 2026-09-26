@@ -7,7 +7,7 @@
   },
   "temperature": 393.0,
   "scale": null,
-  "level_of_theory": "GFN2-xTB (geometries and Hessians from scripts/make_xtb_claisen.py)",
+  "level_of_theory": "GFN2-xTB (geometries and Hessians from scripts/make_claisen_structures.py --calc xtb)",
   "tunneling": "bell",
   "project": null,
   "reactants": [
