@@ -225,7 +225,10 @@ needed.
 
 1. **Dependency**: `goodvibes>=4.4` in `pyproject.toml` and the conda
    recipe.
-2. **Upstream PR to GoodVibes (small, still to open)**: `FUNCTIONAL_ALIASES` for
+2. **Upstream PR to GoodVibes (prepared 2026-09-26: branch
+   `claude/scaling-factor-aliases` on patonlab/GoodVibes, commit 20a216b,
+   full GoodVibes suite passing; pull request to be opened by a maintainer)**:
+   `FUNCTIONAL_ALIASES` for
    `MN15-L`, `MN12-L`, `MN12-SX`, and hyphen handling for
    `M06-L(DKH2)/aug-cc-pwcVTZ-DK`, so the seven Kinisot rows in REVIEW §2.5
    resolve. Until merged, keep a five-line alias shim in Kinisot.
