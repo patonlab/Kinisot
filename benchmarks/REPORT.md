@@ -69,20 +69,39 @@ No experimental values entered yet: enter them in `case.json` from the paper.
 
 ## Diels-Alder reaction of isoprene with maleic anhydride
 
-D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358 (doi:[10.1021/ja00141a030](https://doi.org/10.1021/ja00141a030)); 13C and 2H KIEs by NMR at natural abundance, 25 C. B. R. Beno, K. N. Houk, D. A. Singleton, J. Am. Chem. Soc. 1996, 118, 9984-9985 (doi:[10.1021/ja9615278](https://doi.org/10.1021/ja9615278)); B3LYP/6-31G* and RHF/6-31G* KIEs (QUIVER, scaled by 0.963 and 0.8929, Bell tunnelling) compared with the 1995 measurements. Computed at B3LYP/6-31G(d), 298.15 K, scale 0.963, tunnelling bell.
+D. A. Singleton, A. A. Thomas, J. Am. Chem. Soc. 1995, 117, 9357-9358 (doi:[10.1021/ja00141a030](https://doi.org/10.1021/ja00141a030)); 13C and 2H KIEs by NMR at natural abundance on isoprene recovered from a reaction taken to 98.9(1)% conversion, 25 C in xylenes; values and standard deviations from Figure 1b (13C n = 11, 3 samples; 2H n = 5, 2 samples). B. R. Beno, K. N. Houk, D. A. Singleton, J. Am. Chem. Soc. 1996, 118, 9984-9985 (doi:[10.1021/ja9615278](https://doi.org/10.1021/ja9615278)); B3LYP/6-31G* and RHF/6-31G* KIEs (QUIVER, scaled by 0.963 and 0.8929, Bell tunnelling) compared with the 1995 measurements. Computed at B3LYP/6-31G(d), 298.15 K, scale 0.963, tunnelling bell.
 
-The 1995 KIEs are relative to the methyl group (taken as 1.000). Beno, Houk and Singleton (1996) rescaled them assuming methyl 2H and 13C KIEs of 0.996 and 1.001, the B3LYP predictions, and found seven of nine sets within experimental error. Their measured values appear only in the plots of Figure 2 and in the Supporting Information, so they are still to be entered here from the 1995 paper or the 1996 SI (not read off the plots). The level of theory, scaling factor and tunnelling model here are those of the 1996 calculations.
+Isoprene numbering of the paper: C1 is the CH2 on the methyl-bearing C2, C4 the other terminus; E/Z hydrogens are outside/inside the s-cis diene. The KIEs are relative to the methyl group (1.00 assumed), so they are computed relative to it: 13C to the methyl carbon, 2H to the geometric mean over the three methyl hydrogens (the rotating methyl group averages them; in the static structures their individual KIEs are 1.024, 0.954 and 1.008, a geometric mean of 0.995). Footnote 13 of the paper gives consistent KIEs at lower conversions. Beno, Houk and Singleton (1996) compared B3LYP/6-31G* predictions with these values after rescaling them for methyl KIEs of 0.996 (2H) and 1.001 (13C), their predictions, and found the inside hydrogens the only significant misses. Maleic anhydride was not analysed. File atoms: diene.out C1 6, C2 1, C3 2, C4 4, methyl C 10, H1E 8, H1Z 7, H3 3, H4E 9, H4Z 5, methyl H 11-13; DATS.out adds 9 to each.
 
 | Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
 | --- | --- | --- | --- | --- | --- |
-| diene C6 (TS C15) | 1.0186 | 1.0224 | no experimental value |  | diene terminus |
-| diene C10 (TS C19) | 1.0008 | 1.0008 | no experimental value |  | diene terminus |
-| diene C1 (TS C10) | 1.0036 | 1.0038 | no experimental value |  |  |
-| diene C2 (TS C11) | 1.0019 | 1.0019 | no experimental value |  |  |
-| diene C4 (TS C13) | 1.0151 | 1.0180 | no experimental value |  |  |
-| dienophile C1 (TS C1) | 1.0181 | 1.0216 | no experimental value |  |  |
-| dienophile C1 (TS C2) | 1.0215 | 1.0257 | no experimental value |  |  |
-| dienophile H5 (TS H7) | 0.9983 | 0.9984 | no experimental value |  | secondary 2H KIE |
-| dienophile H5 (TS H5) | 1.0003 | 1.0004 | no experimental value |  | secondary 2H KIE |
+| C1 | 1.0179 | 1.0216 | 1.022 ± 0.003 | -0.0004 | terminus: forming bond; relative to the methyl carbon |
+| C2 | 1.0028 | 1.0030 | 1.001 ± 0.002 | +0.0020 | relative to the methyl carbon |
+| C3 | 1.0011 | 1.0011 | 1.000 ± 0.003 | +0.0011 | relative to the methyl carbon |
+| C4 | 1.0143 | 1.0172 | 1.017 ± 0.002 | +0.0002 | terminus: forming bond; relative to the methyl carbon |
+| H1E (outside) | 0.9523 | 0.9541 | 0.956 ± 0.005 | -0.0019 | secondary 2H KIE; relative to the methyl hydrogens |
+| H1Z (inside) | 0.9256 | 0.9261 | 0.908 ± 0.005 | +0.0181 | secondary 2H KIE; relative to the methyl hydrogens |
+| H3 | 0.9904 | 0.9906 | 0.990 ± 0.006 | +0.0006 | secondary 2H KIE; relative to the methyl hydrogens |
+| H4E (outside) | 0.9657 | 0.9675 | 0.968 ± 0.005 | -0.0005 | secondary 2H KIE; relative to the methyl hydrogens |
+| H4Z (inside) | 0.9341 | 0.9345 | 0.938 ± 0.004 | -0.0035 | secondary 2H KIE; relative to the methyl hydrogens |
 
-No experimental values entered yet: enter them in `case.json` from the paper.
+Mean absolute deviation over 9 measured positions: 0.0031
+
+## Shi epoxidation of trans-beta-methylstyrene with the fructose-derived ketone and Oxone
+
+D. A. Singleton, Z. Wang, J. Am. Chem. Soc. 2005, 127, 6679-6685 (doi:[10.1021/ja0435788](https://doi.org/10.1021/ja0435788)); 13C KIEs by NMR at natural abundance on recovered alkene, two reactions at 0 C taken to 83% and 93% conversion, standard deviations from six determinations; values from Figure 1. Not computed yet.
+
+All KIEs are relative to the meta carbons (1.000 assumed). The two values per position are the two independent experiments; the deviation is taken from their mean. The paper notes that the para carbon's two values disagree slightly, possibly random error. Singleton and Wang predicted these KIEs from their lowest-energy transition structure 10 (B3LYP/6-31G*, QUIVER, frequencies scaled by 0.9614, Bell tunnelling); their predictions are given in the notes column and are the check for Kinisot once the structures from the paper's Supporting Information are added. Of their 18 transition structures, only 10, 12 and 13 reproduce the C-alpha and C-beta KIEs, which is what makes this case a test of the transition-state geometry.
+
+| Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
+| --- | --- | --- | --- | --- | --- |
+| C-beta (CH next to CH3) | – | – | 1.022 ± 0.002, 1.020 ± 0.002 |  | predicted 1.022 (TS 10) |
+| C-alpha (CH next to phenyl) | – | – | 1.005 ± 0.001, 1.006 ± 0.002 |  | predicted 1.006 (TS 10) |
+| CH3 | – | – | 1.002 ± 0.002, 1.001 ± 0.002 |  | predicted 0.998 (TS 10) |
+| ipso C | – | – | 0.999 ± 0.002, 1.001 ± 0.002 |  | predicted 1.001 (TS 10) |
+| ortho C | – | – | 1.001 ± 0.001, 1.001 ± 0.002 |  | predicted 1.000 (TS 10) |
+| para C | – | – | 0.998 ± 0.002, 1.001 ± 0.001 |  | predicted 1.000 (TS 10) |
+
+No structures yet: add the frequency calculations and their paths to `case.json`.
+
+Overall mean absolute deviation over 9 measured positions: 0.0031

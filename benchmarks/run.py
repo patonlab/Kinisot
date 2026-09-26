@@ -11,6 +11,7 @@ enter the deviation statistics. Cases without structures yet (null
 import argparse
 import glob
 import json
+import math
 import os
 import sys
 
@@ -47,23 +48,39 @@ def measured(entry):
     return value
 
 
+def compute(case, iso, reference=None):
+    return compute_kie(
+        rct=resolve(case, "reactants"),
+        ts=resolve(case, "transition_structure"),
+        prd=resolve(case, "product"),
+        iso=iso,
+        temperature=case["temperature"],
+        scale=case.get("scale"),
+        tunneling=case.get("tunneling", "bell"),
+        project=case.get("project"),
+        reference=reference,
+    )
+
+
+def geometric_mean(values):
+    return math.exp(sum(math.log(v) for v in values) / len(values))
+
+
 def run_case(case):
     has_structures = bool(case.get("transition_structure") or case.get("product"))
     rows = []
     for entry in case["kies"]:
         semiclassical = computed = tunneling = None
-        if has_structures:
-            result = compute_kie(
-                rct=resolve(case, "reactants"),
-                ts=resolve(case, "transition_structure"),
-                prd=resolve(case, "product"),
-                iso=entry["iso"],
-                temperature=case["temperature"],
-                scale=case.get("scale"),
-                tunneling=case.get("tunneling", "bell"),
-                project=case.get("project"),
-                reference=entry.get("reference", case.get("reference_isotopologue")),
-            )
+        if has_structures and entry.get("reference_average"):
+            # a reference group whose positions interconvert (a rotating methyl group): divide by the
+            # geometric mean of the isotopologues with the label on each of its positions
+            result = compute(case, entry["iso"])
+            references = [compute(case, label) for label in entry["reference_average"]]
+            computed = result.kie_tunnel / geometric_mean([r.kie_tunnel for r in references])
+            semiclassical = result.kie / geometric_mean([r.kie for r in references])
+            tunneling = result.tunneling
+        elif has_structures:
+            result = compute(case, entry["iso"], entry.get("reference", case.get("reference_isotopologue")))
             computed = result.kie_tunnel_relative if result.reference is not None else result.kie_tunnel
             semiclassical = result.kie_relative if result.reference is not None else result.kie
             tunneling = result.tunneling

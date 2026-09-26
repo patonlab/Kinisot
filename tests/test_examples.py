@@ -115,6 +115,14 @@ def test_benchmark_runner(tmp_path, monkeypatch):
     assert rows[3]["computed"] == pytest.approx(reference.kie_tunnel_relative, abs=1e-9)
     assert rows[3]["deviation"] == pytest.approx(reference.kie_tunnel_relative - 1.032, abs=1e-9)
     assert "1.030 ± 0.002, 1.034 ± 0.004" in module.format_case(cases[0], rows)
+    # the Diels-Alder case against Singleton & Thomas 1995 (relative to the methyl group; 2H to the mean of its Hs)
+    (case,) = module.load_cases(["diels_alder"])
+    rows = {r["position"]: r for r in module.run_case(case)}
+    assert rows["C1"]["computed"] == pytest.approx(1.0216, abs=1e-4) and rows["C1"]["experimental"] == 1.022
+    assert rows["C4"]["computed"] == pytest.approx(1.0172, abs=1e-4)
+    assert rows["H1Z (inside)"]["deviation"] == pytest.approx(0.018, abs=0.001)
+    deviations = [abs(r["deviation"]) for r in rows.values()]
+    assert len(deviations) == 9 and sum(deviations) / 9 == pytest.approx(0.0031, abs=1e-4)
     # a case with measurements but no structures yet (Baeyer-Villiger) is listed, not computed
     (case,) = module.load_cases(["baeyer_villiger"])
     rows = module.run_case(case)

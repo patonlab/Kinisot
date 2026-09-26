@@ -37,11 +37,11 @@ kinisot --rct dienophile.out --rct diene.out --ts DATS.out --iso 1 --iso 0 --iso
 ```
                                           V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE
 complex, TS C15        KIE @ 298.15 K   1.009798   1.003033   1.012514   0.992401   1.017743   1.003711   1.021520
-diene C6 -> TS C15     KIE @ 298.15 K   1.009798   1.001688   0.986484   1.020846   1.018631   1.003711   1.022412
-diene C10 -> TS C19    KIE @ 298.15 K   1.000073   0.995775   0.981489   1.023885   1.000760   1.000028   1.000787
-diene C1 -> TS C10     KIE @ 298.15 K   1.000449   0.999119   0.996041   1.008008   1.003583   1.000172   1.003756
-diene C2 -> TS C11     KIE @ 298.15 K   1.000209   0.994482   0.992761   1.014544   1.001851   1.000080   1.001931
-diene C4 -> TS C13     KIE @ 298.15 K   1.007607   1.000009   0.986061   1.021625   1.015057   1.002890   1.017990
+C1: diene 6 -> TS 15   KIE @ 298.15 K   1.009798   1.001688   0.986484   1.020846   1.018631   1.003711   1.022412
+Me: diene 10 -> TS 19  KIE @ 298.15 K   1.000073   0.995775   0.981489   1.023885   1.000760   1.000028   1.000787
+C2: diene 1 -> TS 10   KIE @ 298.15 K   1.000449   0.999119   0.996041   1.008008   1.003583   1.000172   1.003756
+C3: diene 2 -> TS 11   KIE @ 298.15 K   1.000209   0.994482   0.992761   1.014544   1.001851   1.000080   1.001931
+C4: diene 4 -> TS 13   KIE @ 298.15 K   1.007607   1.000009   0.986061   1.021625   1.015057   1.002890   1.017990
 dienophile C1 -> TS C1 KIE @ 298.15 K   1.008974   1.004699   0.996274   1.008113   1.018131   1.003403   1.021597
 dienophile C1 -> TS C2 KIE @ 298.15 K   1.010789   1.007034   0.996800   1.006756   1.021496   1.004081   1.025665
 dienophile H5 -> TS H7 KIE @ 298.15 K   1.000107   0.995021   0.996275   1.006985   0.998345   1.000041   0.998385
@@ -54,6 +54,15 @@ pre-reaction complex (one reactant file) and from the separated reactants
 and the free molecules have different low-frequency modes, but the KIE
 agrees to 0.001. Kinisot multiplies the partition-function terms of all
 files on a side, so a bimolecular reaction needs no complex. The two diene
-termini (TS atoms 15 and 19) show KIEs of 1.022 and 1.001: the two new
-bonds are formed to very different extents, i.e. the transition structure
-is markedly asynchronous, in line with the experimental picture.
+termini, C1 (TS atom 15) and C4 (TS atom 13) in the paper's isoprene
+numbering, show KIEs of 1.022 and 1.018: the bond to C1 is formed slightly
+further, a moderately asynchronous transition structure. (TS atom 19 is the
+methyl carbon, whose KIE of 1.001 serves as the experiment's internal
+reference.) Singleton and Thomas measured 1.022(3) and 1.017(2) relative to
+the methyl group; computed the same way, the values are 1.022 and 1.017.
+[benchmarks/diels_alder](../../benchmarks/README.md) compares all nine
+measured ¹³C and ²H KIEs. The mean absolute deviation is 0.003, and only
+the inside hydrogen H1Z is off by more than the experimental error; Beno,
+Houk and Singleton also found the inside hydrogens the only misses
+(J. Am. Chem. Soc. 1996, 118, 9984). Without the tunnelling correction
+(the KIE column) the two termini would be 1.019 and 1.015.

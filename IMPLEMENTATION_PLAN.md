@@ -395,9 +395,11 @@ SI Tables S3a, S3b and S8b, both read from the PDFs. Their structures are
 still needed; Rzepa's blog (post 14112) links transition structures, but
 the host is outside this environment's network allowance. The runner now
 handles cases without structures, replicate measurements, per-KIE reference
-positions and several sources. The Diels–Alder values are plotted, not
-tabulated, in Beno, Houk, Singleton, JACS 1996. They still need the 1995
-paper or the 1996 SI.
+positions and several sources. The Diels–Alder values came from the 1995
+paper (Figure 1b): nine positions, mean absolute deviation 0.003, the first
+measured comparison. A Shi epoxidation case (Singleton, Wang, JACS 2005)
+records its ¹³C KIEs and the paper's own predictions; its structures are in
+that paper's SI.
 
 **Goal (requested 2026-09-25):** a `benchmarks/` directory that compares
 Kinisot's predictions with published experimental KIEs, primarily the

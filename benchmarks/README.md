@@ -48,8 +48,11 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   deviation is taken from their mean.
 - Optional: `reference` in a `kies` entry overrides `reference_isotopologue`
   for that entry (13C and 2H KIEs are often measured against different
-  positions); `reference` at the top may be a list of sources; `notes`
-  is printed under the source line.
+  positions). `reference_average` gives several labels instead, for a
+  reference group whose positions interconvert (the three hydrogens of a
+  rotating methyl group); the KIE is divided by the geometric mean of theirs.
+  `reference` at the top may be a list of sources; `notes` is printed under
+  the source line.
 - A case whose structures do not exist yet sets `reactants` and
   `transition_structure` to `null` and each `iso` to `null`; the report
   lists its measurements and marks it "Not computed yet".
@@ -60,9 +63,10 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | --- | --- | --- |
 | claisen | in repo (B3LYP/6-31G(d)) | to be entered from Meyer, DelMonte, Singleton, JACS 1999, 121, 10865 |
 | claisen_xtb | in repo (GFN2-xTB, `scripts/make_claisen_structures.py`) | same as claisen |
-| diels_alder | in repo (B3LYP/6-31G(d)) | to be entered from Singleton, Thomas, JACS 1995, 117, 9357 (Beno, Houk, Singleton, JACS 1996, 118, 9984 plot them only) |
+| diels_alder | in repo (B3LYP/6-31G(d)) | entered: Singleton, Thomas, JACS 1995, 117, 9357, Figure 1b (9 positions; mean absolute deviation 0.003) |
 | baeyer_villiger | needed (addition of m-CPBA to cyclohexanone) | entered: Singleton, Szymanski, JACS 1999, 121, 9455, Figure 1a; Crow, Hirschi, Clinton, Hirschi, ChemRxiv 2026 (preprint), SI Tables S3a/S3b |
 | baeyer_villiger_migration | needed (migration step of the Criegee intermediate) | entered: same papers, 1999 Figure 1c and 2026 SI Table S8b |
+| shi_epoxidation | needed (in the paper's SI: transition structure 10, B3LYP/6-31G*) | entered: Singleton, Wang, JACS 2005, 127, 6679, Figure 1 |
 
 Further cases (an SN2 reaction, an epoxidation, an ene reaction, a hydride
 transfer, another EQE) need new frequency calculations at a documented

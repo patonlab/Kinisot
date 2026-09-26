@@ -175,8 +175,12 @@ full comparison; `scripts/compare_free_energy_route.py` reproduces it.
 - **Tunnelling belongs in heavy-atom KIEs.** A one-dimensional tunnelling
   correction improves KIE predictions. With it, predicted and measured
   heavy-atom KIEs agree to about the experimental uncertainty (Meyer,
-  DelMonte, Singleton, J. Am. Chem. Soc. 1999, 121, 10865). Kinisot applies
-  Bell's correction by default and prints the uncorrected KIE alongside.
+  DelMonte, Singleton, J. Am. Chem. Soc. 1999, 121, 10865). The Diels–Alder
+  benchmark in this repository shows it. At the two bond-forming carbons of
+  isoprene, Singleton and Thomas measured 1.022(3) and 1.017(2). The B3LYP
+  KIEs are 1.018 and 1.014 without tunnelling, and 1.022 and 1.017 with
+  Bell's correction. Kinisot applies Bell's correction by default and prints
+  the uncorrected KIE alongside.
 - **It is less work.** One frequency calculation per species gives every
   isotopologue at every temperature in seconds. The free-energy route needs
   a thermochemistry run for each set of isotopes and each temperature.
@@ -257,6 +261,8 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
   (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).
 - [benchmarks/](benchmarks/README.md): computed versus experimental KIEs,
   one directory per reaction, with a runner that regenerates the report.
+  The Diels–Alder reaction of isoprene with maleic anhydride reproduces the
+  nine measured ¹³C and ²H KIEs with a mean absolute deviation of 0.003.
 - [CHANGELOG.md](CHANGELOG.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
   for what changed and what is coming.
 - A [video guide](http://www.youtube.com/watch?v=r4x2gmkc0U8) to an older
