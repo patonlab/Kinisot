@@ -543,7 +543,8 @@ material. Hence
   of the equilibrium isotope effects of the steps before it and that
   step's own KIE, as Dale et al. note.
 - **Two steps give their eq 25:** KIE_obs = (KIE_TS2 + C_f·KIE_TS1)/(1 + C_f),
-  with the commitment factor C_f = k₂/k₋₁ = exp[(ΔG‡₂ − ΔG‡₁)/RT].
+  with the commitment factor C_f = k₂/k₋₁ = exp[(ΔG‡₁ − ΔG‡₂)/RT]. A large
+  C_f (TS2 below TS1) gives KIE_TS1; a small one gives KIE_TS2.
 - **The weights are exact.** As for conformers, weights from the light
   isotopologue alone are exact. A three-step check against the slowest
   eigenvalue of the full rate matrix agrees to 10⁻⁶.
