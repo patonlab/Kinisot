@@ -606,7 +606,9 @@ dependency.
       ensemble KIE over all of them tests the weighting.
     - **What that needs:** a B3LYP frequency job for each of the other 17
       transition structures. TS 10's took 10 minutes with Gaussian on a
-      16-core node.
+      16-core node. The inputs are in `benchmarks/shi_epoxidation/ensemble/`,
+      renumbered to TS 10's atom order. That directory also documents the
+      repair of a misprint in the SI's coordinates for TS AB.
 
 **Decisions needed**
 
