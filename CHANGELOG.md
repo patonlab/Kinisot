@@ -33,9 +33,10 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 - docs/comparison.md lists QUIVER, THERMISTP and ISOEFF. The README cites
   Rzepa's 2015 comparison of the two routes for the Baeyer–Villiger
   reaction: 1.023 against 1.0226 for ¹³C.
-- The Baeyer–Villiger cases record where Rzepa's ωB97XD/Def2-TZVPP models
-  and their force constants are deposited (data DOIs 10.14469/ch/1913xx).
-  They also record Singleton's rule for which reactant to compute from.
+- The Baeyer–Villiger cases cite Rzepa's ωB97XD/Def2-TZVPP models (data
+  DOIs 10.14469/ch/1913xx), whose files are no longer available, so the
+  structures have to be computed afresh. They also record Singleton's rule
+  for which reactant to compute from.
 - README, "Why the Bigeleisen–Mayer equation rather than free energies", and
   docs/theory.md section 6: the two routes differ exactly by the
   Teller–Redlich product-rule violation of the computed frequencies. A soft
