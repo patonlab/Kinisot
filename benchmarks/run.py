@@ -22,6 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def load_cases(names=None):
+    """Every */case.json (or only the directories in ``names``), with its name and directory attached."""
     cases = []
     for path in sorted(glob.glob(os.path.join(HERE, "*", "case.json"))):
         name = os.path.basename(os.path.dirname(path))
@@ -35,6 +36,7 @@ def load_cases(names=None):
 
 
 def resolve(case, key):
+    """The files listed under ``key`` as paths relative to the case directory, or None."""
     files = case.get(key)
     if not files:
         return None
@@ -50,6 +52,7 @@ def measured(entry):
 
 
 def compute(case, iso, reference=None):
+    """compute_kie for one isotope label with the case's structures, temperature, scaling and tunnelling."""
     return compute_kie(
         rct=resolve(case, "reactants"),
         ts=resolve(case, "transition_structure"),
@@ -64,6 +67,7 @@ def compute(case, iso, reference=None):
 
 
 def geometric_mean(values):
+    """Geometric mean, for positions that are equivalent in the experiment."""
     return math.exp(sum(math.log(v) for v in values) / len(values))
 
 
@@ -73,6 +77,7 @@ def has_structures(case):
 
 
 def run_case(case):
+    """One row per ``kies`` entry: semiclassical and tunnelling-corrected KIE, measurement and deviation."""
     rows = []
     for entry in case["kies"]:
         semiclassical = computed = tunneling = None
@@ -128,6 +133,7 @@ def format_measurement(value, uncertainty):
 
 
 def format_case(case, rows):
+    """The case's section of REPORT.md: sources, conditions, notes and the table of rows."""
     references = case["reference"] if isinstance(case["reference"], list) else [case["reference"]]
     source = " ".join(
         "%s (doi:[%s](https://doi.org/%s)); %s." % (r["citation"], r["doi"], r["doi"], r.get("method", ""))
@@ -173,6 +179,7 @@ def format_case(case, rows):
 
 
 def main(argv=None):
+    """Run the cases and write REPORT.md (and report.json with --json)."""
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--json", action="store_true", help="also write report.json")
     parser.add_argument("--cases", nargs="*", help="case directory names to run (default: all)")

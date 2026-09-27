@@ -121,6 +121,14 @@ def test_benchmark_runner(tmp_path, monkeypatch):
     assert rows["H1Z (inside)"]["deviation"] == pytest.approx(0.018, abs=0.001)
     deviations = [abs(r["deviation"]) for r in rows.values()]
     assert len(deviations) == 9 and sum(deviations) / 9 == pytest.approx(0.0031, abs=1e-4)
+    # Shi epoxidation (Singleton & Wang 2005): Gaussian jobs at the SI geometries reproduce the paper's six QUIVER
+    # predictions for TS 10 to the three decimals given (the note column), relative to the mean of the meta carbons
+    (case,) = module.load_cases(["shi_epoxidation"])
+    rows = module.run_case(case)
+    for row in rows:
+        assert round(row["computed"], 3) == float(row["note"].split()[1]), row["position"]
+    assert rows[0]["computed"] == pytest.approx(1.0221, abs=1e-4) and rows[0]["experimental"] == [1.022, 1.02]
+    assert sum(abs(r["deviation"]) for r in rows) / 6 == pytest.approx(0.0012, abs=1e-4)
     # a case with measurements but no structures yet (Baeyer-Villiger) is listed, not computed
     (case,) = module.load_cases(["baeyer_villiger"])
     rows = module.run_case(case)

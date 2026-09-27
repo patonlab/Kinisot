@@ -399,9 +399,16 @@ handles cases without structures, replicate measurements, per-KIE reference
 positions and several sources. The Diels–Alder values came from the 1995
 paper (Figure 1b): nine positions, mean absolute deviation 0.003, the first
 measured comparison. The Claisen values came from Meyer et al. 1999
-(Table 4): mean absolute deviation 0.0009 at B3LYP and 0.0089 at GFN2-xTB. A Shi epoxidation case (Singleton, Wang, JACS 2005)
-records its ¹³C KIEs and the paper's own predictions; its structures are in
-that paper's SI.
+(Table 4): mean absolute deviation 0.0009 at B3LYP and 0.0089 at GFN2-xTB. **Update 2026-09-27:**
+the Shi epoxidation case (Singleton, Wang, JACS 2005) is computed. It uses
+Gaussian 16 frequency jobs at the SI geometries of the alkene and
+transition structure 10, run by the maintainer; they reproduce the SI's
+energies and zero-point energies. Kinisot matches the paper's six QUIVER
+predictions to the three decimals given, and deviates from experiment by
+0.0012 on average. Overall: 25 measured positions, mean absolute deviation
+0.0034. The transition structure's Hessian needs about 13 hours with PySCF
+on this environment's four cores, against 10 minutes for Gaussian on a
+16-core node.
 
 **Goal (requested 2026-09-25):** a `benchmarks/` directory that compares
 Kinisot's predictions with published experimental KIEs, primarily the
@@ -597,9 +604,9 @@ dependency.
       trans-β-methylstyrene with the fructose-derived dioxirane. The paper
       finds only TS 10, 12 and 13 consistent with the measured KIEs, so an
       ensemble KIE over all of them tests the weighting.
-    - **What that needs:** a B3LYP Hessian for each transition structure.
-      One takes more than 10 hours on this environment's four cores, so the
-      set waits for cluster time.
+    - **What that needs:** a B3LYP frequency job for each of the other 17
+      transition structures. TS 10's took 10 minutes with Gaussian on a
+      16-core node.
 
 **Decisions needed**
 
@@ -628,7 +635,7 @@ dependency.
 - Single-conformer inputs give today's numbers bit for bit.
 - The ensemble formula is tested against hand-computed synthetic cases.
 - There is one worked example and the theory section.
-- The Shi ensemble is reported once its Hessians exist.
+- The Shi ensemble is reported once the other 17 frequency jobs exist.
 
 ---
 

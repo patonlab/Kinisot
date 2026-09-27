@@ -66,7 +66,7 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | diels_alder | in repo (B3LYP/6-31G(d)) | entered: Singleton, Thomas, JACS 1995, 117, 9357, Figure 1b (9 positions; mean absolute deviation 0.003) |
 | baeyer_villiger | needed (addition of m-CPBA to cyclohexanone) | entered: Singleton, Szymanski, JACS 1999, 121, 9455, Figure 1a; Crow, Hirschi, Clinton, Hirschi, ChemRxiv 2026 (preprint), SI Tables S3a/S3b |
 | baeyer_villiger_migration | needed (migration step of the Criegee intermediate) | entered: same papers, 1999 Figure 1c and 2026 SI Table S8b |
-| shi_epoxidation | needed (in the paper's SI: transition structure 10, B3LYP/6-31G*) | entered: Singleton, Wang, JACS 2005, 127, 6679, Figure 1 |
+| shi_epoxidation | in repo (Gaussian 16 B3LYP/6-31G(d) at the SI geometries of the alkene and transition structure 10) | entered: Singleton, Wang, JACS 2005, 127, 6679, Figure 1 (6 positions; mean absolute deviation 0.0012; the paper's six predictions reproduced) |
 
 Further cases (an SN2 reaction, an epoxidation, an ene reaction, a hydride
 transfer, another EQE) need new frequency calculations at a documented

@@ -91,19 +91,19 @@ Mean absolute deviation over 9 measured positions: 0.0031
 
 ## Shi epoxidation of trans-beta-methylstyrene with the fructose-derived ketone and Oxone
 
-D. A. Singleton, Z. Wang, J. Am. Chem. Soc. 2005, 127, 6679-6685 (doi:[10.1021/ja0435788](https://doi.org/10.1021/ja0435788)); 13C KIEs by NMR at natural abundance on recovered alkene, two reactions at 0 C taken to 83% and 93% conversion, standard deviations from six determinations; values from Figure 1. Not computed yet.
+D. A. Singleton, Z. Wang, J. Am. Chem. Soc. 2005, 127, 6679-6685 (doi:[10.1021/ja0435788](https://doi.org/10.1021/ja0435788)); 13C KIEs by NMR at natural abundance on recovered alkene, two reactions at 0 C taken to 83% and 93% conversion, standard deviations from six determinations; values from Figure 1. Computed at B3LYP/6-31G(d), Gaussian 16 frequency jobs (int=finegrid; methylstyrene.gjf, ts10.gjf) at the SI geometries of trans-beta-methylstyrene and transition structure 10 (SI structure A), 273.15 K, scale 0.9614, tunnelling bell.
 
-All KIEs are relative to the meta carbons (1.000 assumed). The two values per position are the two independent experiments; the deviation is taken from their mean. The paper notes that the para carbon's two values disagree slightly, possibly random error. Singleton and Wang predicted these KIEs from their lowest-energy transition structure 10 (B3LYP/6-31G*, QUIVER, frequencies scaled by 0.9614, Bell tunnelling); their predictions are given in the notes column and are the check on Kinisot: the structures are the paper's own (SI geometries), with Hessians recomputed at the same level. The dioxirane is left out of the reactant side: it carries no label, so its isotopologue partition-function ratio is exactly 1. The two ortho and the two meta carbons are one NMR signal each but distinct in the transition structure, so the ortho KIE and the meta reference are geometric means over the pair (reactant carbon matched to the transition-structure carbon on the same side, syn or anti to C-beta). Of their 18 transition structures, only 10, 12 and 13 reproduce the C-alpha and C-beta KIEs, which is what makes this case a test of the transition-state geometry. Hessians are being computed: until methylstyrene.hessian.json and ts10.hessian.json are added (reactants and transition_structure), the case lists the measurements only.
+All KIEs are relative to the meta carbons (1.000 assumed). The two values per position are the two independent experiments; the deviation is taken from their mean. The paper notes that the para carbon's two values disagree slightly, possibly random error. Singleton and Wang predicted these KIEs from their lowest-energy transition structure 10 (B3LYP/6-31G*, QUIVER, frequencies scaled by 0.9614, Bell tunnelling); their predictions are given in the notes column and are the check on Kinisot. The structures are the paper's own (SI geometries); the frequency jobs reproduce the SI's electronic energies (to 1e-8 hartree) and zero-point energies (0.161954 and 0.466153 hartree), and transition structure 10 has one imaginary mode (366.2i cm-1). The dioxirane is left out of the reactant side: it carries no label, so its isotopologue partition-function ratio is exactly 1. The two ortho and the two meta carbons are one NMR signal each but distinct in the transition structure, so the ortho KIE and the meta reference are geometric means over the pair (reactant carbon matched to the transition-structure carbon on the same side, syn or anti to C-beta). Of their 18 transition structures, only 10, 12 and 13 reproduce the C-alpha and C-beta KIEs, which is what makes this case a test of the transition-state geometry. External modes are projected out: the transition structure has a 9 cm-1 torsion that otherwise mixes with them (1.7 cm-1 away from Gaussian's projected frequencies), although the KIEs change by less than 4e-7.
 
 | Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
 | --- | --- | --- | --- | --- | --- |
-| C-beta (CH next to CH3) | – | – | 1.022 ± 0.002, 1.020 ± 0.002 |  | predicted 1.022 (TS 10) |
-| C-alpha (CH next to phenyl) | – | – | 1.005 ± 0.001, 1.006 ± 0.002 |  | predicted 1.006 (TS 10) |
-| CH3 | – | – | 1.002 ± 0.002, 1.001 ± 0.002 |  | predicted 0.998 (TS 10) |
-| ipso C | – | – | 0.999 ± 0.002, 1.001 ± 0.002 |  | predicted 1.001 (TS 10) |
-| ortho C | – | – | 1.001 ± 0.001, 1.001 ± 0.002 |  | predicted 1.000 (TS 10) |
-| para C | – | – | 0.998 ± 0.002, 1.001 ± 0.001 |  | predicted 1.000 (TS 10) |
+| C-beta (CH next to CH3) | 1.0187 | 1.0221 | 1.022 ± 0.002, 1.020 ± 0.002 | +0.0011 | predicted 1.022 (TS 10) |
+| C-alpha (CH next to phenyl) | 1.0056 | 1.0059 | 1.005 ± 0.001, 1.006 ± 0.002 | +0.0004 | predicted 1.006 (TS 10) |
+| CH3 | 0.9978 | 0.9978 | 1.002 ± 0.002, 1.001 ± 0.002 | -0.0037 | predicted 0.998 (TS 10) |
+| ipso C | 1.0007 | 1.0007 | 0.999 ± 0.002, 1.001 ± 0.002 | +0.0007 | predicted 1.001 (TS 10) |
+| ortho C | 0.9997 | 0.9997 | 1.001 ± 0.001, 1.001 ± 0.002 | -0.0013 | predicted 1.000 (TS 10) |
+| para C | 0.9998 | 0.9998 | 0.998 ± 0.002, 1.001 ± 0.001 | +0.0003 | predicted 1.000 (TS 10) |
 
-No structures yet: add the frequency calculations and their paths to `case.json`.
+Mean absolute deviation over 6 measured positions: 0.0012
 
-Overall mean absolute deviation over 19 measured positions: 0.0041
+Overall mean absolute deviation over 25 measured positions: 0.0034
