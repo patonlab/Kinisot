@@ -25,9 +25,10 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 - The benchmark runner accepts `imag_cutoff` for transition structures with
   a small reaction-coordinate frequency (45i cm⁻¹ in the biaryl case).
 - docs/theory.md, section 6: free energies and enthalpy–entropy partitions
-  must keep the translational term of every species, including an
-  unlabelled one that Bigeleisen–Mayer lets you leave out. PyQuiverHS's
-  enthalpy–entropy KIE for Cl⁻ + CH₃Br lacks it and is 1.3% low (0.877
+  must keep the translational terms, which do not cancel when an unlabelled
+  partner (the chloride of an SN2 reaction, which Bigeleisen–Mayer lets you
+  leave out) adds its mass to the transition structure. PyQuiverHS's
+  enthalpy–entropy KIE for Cl⁻ + CH₃Br lacks them and is 1.3% low (0.877
   against 0.888 at 300 K). The same point is in the README and
   docs/comparison.md.
 - docs/comparison.md lists QUIVER, THERMISTP and ISOEFF. The README cites

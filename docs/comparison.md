@@ -56,10 +56,11 @@ factors and imaginary-frequency thresholds, over their 10–1000 K scans:
   Kinisot stops with an error. PyQuiverHS prints a value there, negative
   for the 45i cm⁻¹ biaryl transition structure at 10 K.
 - **Enthalpy–entropy terms.** PyQuiverHS's H-S terms contain vibrational and
-  rotational entropy but no translational term. That cancels when the same
-  atoms are on both sides. It does not when an unlabelled reactant is left
-  out of the input, as the chloride is in the SN2 case: there the H-S KIE
-  is 1.3% below the Bigeleisen–Mayer one (0.877 against 0.888 at 300 K;
+  rotational entropy but no translational term. That cancels when the
+  reactant and the transition structure have the same total mass. It does
+  not in the SN2 case, where the transition structure also carries the
+  chloride's mass: there the H-S KIE is 1.3% below the Bigeleisen–Mayer one
+  (0.877 against 0.888 at 300 K;
   [theory.md, section 6](theory.md#6-bigeleisenmayer-versus-free-energy-differences)).
 
 ## Other programs

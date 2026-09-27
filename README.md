@@ -181,11 +181,14 @@ full comparison; `scripts/compare_free_energy_route.py` reproduces it.
   KIEs are 1.018 and 1.014 without tunnelling, and 1.022 and 1.017 with
   Bell's correction. Kinisot applies Bell's correction by default and prints
   the uncorrected KIE alongside.
-- **Unlabelled species can be left out.** An unlabelled reactant has a
-  reduced partition-function ratio of exactly 1, so Bigeleisen–Mayer does
-  not need it (the chloride of an SN2 reaction, say). A free-energy or
-  enthalpy–entropy treatment still needs its translational partition
-  function. Dropping it costs 1.3% for Cl⁻ + CH₃Br: the enthalpy–entropy KIE
+- **No translational terms to get wrong.** Bigeleisen–Mayer uses no
+  translational partition functions, and an unlabelled reactant has a
+  reduced ratio of exactly 1, so it can be left out of the input (the
+  chloride of an SN2 reaction, say). A free-energy or
+  enthalpy–entropy treatment can drop the chloride's own terms, which
+  cancel, but must keep the translational terms of methyl bromide and the
+  transition structure, whose masses differ by the chloride's. Dropping
+  them costs 1.3% for Cl⁻ + CH₃Br: the enthalpy–entropy KIE
   PyQuiverHS reports is 0.877 at 300 K, against 0.888 from Bigeleisen–Mayer
   ([docs/theory.md](docs/theory.md), section 6;
   [benchmarks/sn2_chloride_methyl_bromide](benchmarks/sn2_chloride_methyl_bromide/case.json)).
