@@ -75,6 +75,8 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | metaparacyclophane | in repo (PyQuiverHS SI; B3LYP/6-31G(d,p), scaled 0.97) | as quoted in their section 3.2 (Sherrod, Boekelheide, JACS 1972): 0.833 ± 0.04 at 308 K (deviation 0.0004) |
 | sn2_chloride_methyl_bromide | in repo (PyQuiverHS SI; HF/6-31+G(d)) | as quoted in their Table 7 (Viggiano, Truhlar et al., JACS 1991): 0.81 ± 0.03 at 300 K (deviation 0.08: harmonic TST misses this gas-phase KIE) |
 | tetramethylcyclohexane_eie | in repo (PyQuiverHS SI; B3LYP/6-311G(d)) | as quoted in their Table 8 (Anet et al., JACS 1980): EQE 1.042 ± 0.001 at 290.15 K (deviation 0.0003) |
+| nitroarene_phosphetane | needed (ORCA inputs at the SI geometries in the case directory; M06-2X/6-31G(d,p)) | entered: Kang, Radosevich, Tetrahedron 2025, 186, 134892, Tables 1 and 2: 18O KIEs 1.033 ± 0.003 (one oxygen) and 1.066 ± 0.003 (both), transition structure TS2 |
+| nitroarene_phosphetane_ts1b | needed (the same jobs) | same measurements, compared with the monotopic transition structure TS1B |
 
 The five cases from the PyQuiverHS SI also keep PyQuiverHS's input and its
 outputs for the same files (`pyquiverhs/`), from 10 to 1000 K;

@@ -131,6 +131,32 @@ Compound 3 of Grazioli et al.; the measured value is the one quoted in their sec
 
 Mean absolute deviation over 1 measured positions: 0.0004
 
+## Phosphetane-catalysed deoxygenation of nitrobenzene: 18O KIEs, [3+1] transition structure TS2
+
+B. Kang, A. T. Radosevich, Tetrahedron 2025, 186, 134892 (doi:[10.1016/j.tet.2025.134892](https://doi.org/10.1016/j.tet.2025.134892)); 18O KIEs by intermolecular competition of [15N]-, [15N,18O1]- and [15N,18O2]-nitrobenzene (51.1% 18O) in the PIII/PV=O-catalysed reductive N-arylation with PhB(OH)2 (15 mol% 1,2,2,3,4,4-hexamethylphosphetane 1-oxide, PhSiH3, CPME, 120 C); GC-MS of the recovered nitrobenzene at 0 and 5 h (F_T 0.83-0.87), three runs; values from Tables 1 and 2. Structures from SI section III.B (M06-2X/6-31G(d,p), gas phase, ORCA 6.0.1); the authors' PyQuiver predictions (393 K, scaled 0.9614) from Table 3 and SI Tables S2 and S3. Not computed yet.
+
+TS2 is the concerted [3+1] cheletropic transition structure the paper assigns (P-O 2.271 and 2.261 A): its two oxygen positions are almost equivalent. The alternative is in nitroarene_phosphetane_ts1b. Every isotopologue carries 15N, so each KIE is relative to [15N]-nitrobenzene (the reference label). The two nitro oxygens are equivalent in nitrobenzene, so the singly labelled substrate reacts through both transition-structure isotopomers and its KIE is averaged over the two positions (iso_average). The paper converts conversion and isotope ratios into KIEs with the exact competition equation of Bigeleisen and Wolfsberg (eq S38 of Dale, Leach, Lloyd-Jones, JACS 2021, 143, 21079); from their Tables 1 and 2 all six run values reproduce to the digits printed. Treating the three isotopologues in the flask together, rather than each labelled one against [15N]-1 alone, moves the mean singly labelled KIE by -0.0004 and the doubly labelled one by less than 0.0001, well inside the stated +/- 0.003. The experiments ran at 120 +/- 2 C; 393 K is the temperature of the authors' predictions. Structures are still needed: frequency jobs at the SI geometries, from the ORCA inputs phno2.inp, ts2.inp and ts1b.inp in benchmarks/nitroarene_phosphetane (see its README). In those files nitrobenzene's nitrogen is atom 12 and its oxygens 13 and 14; in TS2 the nitrogen is atom 14 and the oxygens 12 and 13.
+
+| Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
+| --- | --- | --- | --- | --- | --- |
+| [15N,18O1]: one nitro oxygen | – | – | 1.033 ± 0.003 |  | PyQuiver 1.0321 (Wigner 1.0342, inverted parabola 1.0343) |
+| [15N,18O2]: both nitro oxygens | – | – | 1.066 ± 0.003 |  | PyQuiver 1.0657 (Wigner 1.0700, inverted parabola 1.0703) |
+
+No structures yet: add the frequency calculations and their paths to `case.json`.
+
+## Phosphetane-catalysed deoxygenation of nitrobenzene: 18O KIEs, monotopic transition structure TS1B
+
+B. Kang, A. T. Radosevich, Tetrahedron 2025, 186, 134892 (doi:[10.1016/j.tet.2025.134892](https://doi.org/10.1016/j.tet.2025.134892)); 18O KIEs by intermolecular competition of [15N]-, [15N,18O1]- and [15N,18O2]-nitrobenzene (51.1% 18O) in the PIII/PV=O-catalysed reductive N-arylation with PhB(OH)2 (15 mol% 1,2,2,3,4,4-hexamethylphosphetane 1-oxide, PhSiH3, CPME, 120 C); GC-MS of the recovered nitrobenzene at 0 and 5 h (F_T 0.83-0.87), three runs; values from Tables 1 and 2. Structures from SI section III.B (M06-2X/6-31G(d,p), gas phase, ORCA 6.0.1); the authors' PyQuiver predictions (393 K, scaled 0.9614) from Table 3 and SI Tables S2 and S3. Not computed yet.
+
+TS1B is the monotopic frontside transition structure the paper rejects (50.4 kcal/mol): phosphorus attacks one oxygen (O2 here, P-O 2.223 A) and not the other (O3, 2.727 A). A singly labelled substrate reacts through both isotopomers, so the observed KIE is 2/(1/KIE_attacked + 1/KIE_spectator), which the runner approximates by their geometric mean (Phase 10 makes it exact). The paper's 1.0468 may be one position rather than this average; if the doubly labelled KIE is the product of the two positions, the average is close to 1.030, which the frequency jobs will show. The structure files are shared with nitroarene_phosphetane. Every isotopologue carries 15N, so each KIE is relative to [15N]-nitrobenzene (the reference label). The two nitro oxygens are equivalent in nitrobenzene, so the singly labelled substrate reacts through both transition-structure isotopomers and its KIE is averaged over the two positions (iso_average). The paper converts conversion and isotope ratios into KIEs with the exact competition equation of Bigeleisen and Wolfsberg (eq S38 of Dale, Leach, Lloyd-Jones, JACS 2021, 143, 21079); from their Tables 1 and 2 all six run values reproduce to the digits printed. Treating the three isotopologues in the flask together, rather than each labelled one against [15N]-1 alone, moves the mean singly labelled KIE by -0.0004 and the doubly labelled one by less than 0.0001, well inside the stated +/- 0.003. The experiments ran at 120 +/- 2 C; 393 K is the temperature of the authors' predictions. Structures are still needed: frequency jobs at the SI geometries, from the ORCA inputs phno2.inp, ts2.inp and ts1b.inp in benchmarks/nitroarene_phosphetane (see its README). In those files nitrobenzene's nitrogen is atom 12 and its oxygens 13 and 14; in TS1B the nitrogen is atom 1 and the oxygens 2 and 3.
+
+| Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
+| --- | --- | --- | --- | --- | --- |
+| [15N,18O1]: one nitro oxygen | – | – | 1.033 ± 0.003 |  | PyQuiver 1.0468 (Wigner 1.0495, inverted parabola 1.0498) |
+| [15N,18O2]: both nitro oxygens | – | – | 1.066 ± 0.003 |  | PyQuiver 1.0612 (Wigner 1.0640, inverted parabola 1.0643) |
+
+No structures yet: add the frequency calculations and their paths to `case.json`.
+
 ## Shi epoxidation of trans-beta-methylstyrene with the fructose-derived ketone and Oxone
 
 D. A. Singleton, Z. Wang, J. Am. Chem. Soc. 2005, 127, 6679-6685 (doi:[10.1021/ja0435788](https://doi.org/10.1021/ja0435788)); 13C KIEs by NMR at natural abundance on recovered alkene, two reactions at 0 C taken to 83% and 93% conversion, standard deviations from six determinations; values from Figure 1. Computed at B3LYP/6-31G(d), Gaussian 16 frequency jobs (int=finegrid; methylstyrene.gjf, ts10.gjf) at the SI geometries of trans-beta-methylstyrene and transition structure 10 (SI structure A), 273.15 K, scale 0.9614, tunnelling bell.

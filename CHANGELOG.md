@@ -24,6 +24,16 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   Bell tunnelling. Every term agrees within 0.01 K / T (3 × 10⁻⁵ at 300 K).
 - The benchmark runner accepts `imag_cutoff` for transition structures with
   a small reaction-coordinate frequency (45i cm⁻¹ in the biaryl case).
+- Benchmark cases `nitroarene_phosphetane` and `nitroarene_phosphetane_ts1b`
+  hold the ¹⁸O KIEs of Kang and Radosevich (Tetrahedron 2025, 186, 134892)
+  for the phosphetane-catalysed deoxygenation of nitrobenzene: 1.033 ± 0.003
+  for one oxygen and 1.066 ± 0.003 for both. They also hold ORCA inputs at
+  the SI geometries of nitrobenzene and the two candidate transition
+  structures. The frequency jobs are still to be run.
+- IMPLEMENTATION_PLAN.md, Phase 10: transition structures in series
+  (commitment factors) and parallel channels with their own labels or
+  reactants, following Dale, Leach and Lloyd-Jones (J. Am. Chem. Soc. 2021,
+  143, 21079).
 - docs/theory.md, section 6: free energies and enthalpy–entropy partitions
   must keep the translational terms, which do not cancel when an unlabelled
   partner (the chloride of an SN2 reaction, which Bigeleisen–Mayer lets you

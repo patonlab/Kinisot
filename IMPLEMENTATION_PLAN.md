@@ -15,7 +15,8 @@ earlier ones.
   moves into that phase. New Phase 7 (isotope table, projection, tunnelling
   options) and Phase 8 (ASE / machine-learned interatomic potentials).
   Evidence for every change is in REVIEW.md §2.
-- 2026-09-27: Phase 10 (conformer ensembles) planned.
+- 2026-09-27: Phase 10 (conformer ensembles) planned; extended the same day to
+  transition structures in series and parallel channels (Dale et al. 2021).
 
 **Guiding decisions**
 
@@ -515,6 +516,91 @@ Two variants follow from the same formula:
 When the reactant side has several species (a bimolecular reaction), their
 ensemble ratios multiply.
 
+Dale, Leach and Lloyd-Jones (J. Am. Chem. Soc. 2021, 143, 21079) propose
+the same treatment for flexible systems: Boltzmann-weight the reduced
+isotopic partition-function ratios of all low-lying reactant and
+transition-structure conformers, then compute a single KIE from the
+weighted ratios.
+
+**Transition structures in series (added 2026-09-27).** A reaction may pass
+through several transition structures in sequence (R ⇌ I₁ ⇌ I₂ … → P),
+none of which alone commits the substrate. Its observed KIE is then a
+weighted mean of the KIEs of the individual steps (Dale et al. 2021, eq 25
+and SI eqs S69–S81; Paneth, J. Am. Chem. Soc. 1985, 107, 7070). For an
+unbranched sequence whose last step is irreversible, the steady-state
+approximation makes inverse rate constants add like resistances in series:
+
+    1/k_obs = Σ_n 1/k_n,   k_n = (k_B T/h) exp(−ΔG‡_n/RT)
+
+with ΔG‡_n the free energy of transition structure n above the starting
+material. Hence
+
+    KIE_obs = Σ_n w_n KIE_n,   w_n ∝ exp(+ΔG‡_n/RT), for the light isotopologue
+
+- **KIE_n is an ordinary KIE.** It runs from the starting material to
+  transition structure n, which Kinisot computes today, so the
+  intermediates need no frequencies. For a later step it is the product
+  of the equilibrium isotope effects of the steps before it and that
+  step's own KIE, as Dale et al. note.
+- **Two steps give their eq 25:** KIE_obs = (KIE_TS2 + C_f·KIE_TS1)/(1 + C_f),
+  with the commitment factor C_f = k₂/k₋₁ = exp[(ΔG‡₂ − ΔG‡₁)/RT].
+- **The weights are exact.** As for conformers, weights from the light
+  isotopologue alone are exact. A three-step check against the slowest
+  eigenvalue of the full rate matrix agrees to 10⁻⁶.
+- **It is the opposite average.** The series form is an arithmetic mean
+  dominated by the highest transition structure. The parallel form above is
+  a harmonic mean dominated by the lowest.
+- **The free-energy gap no longer cancels.** The result depends directly on
+  ΔΔG‡ between the transition structures, and it matters most when they
+  are within about 5 kJ/mol (Dale et al.). The output therefore reports:
+  - both limiting KIEs;
+  - KIE_obs as a function of ΔΔG‡ (or C_f);
+  - the C_f that reproduces a measured value.
+
+  The Wittig analysis in Dale et al. (Case Study III) is of this kind:
+  the experiment fits C_f ≈ 1, while each transition structure alone
+  misses it.
+- **Each step can be a conformer ensemble.** Its KIE_n is then the
+  ensemble KIE, and its weight uses the ensemble's effective free energy,
+  −RT ln Σ_j exp(−G_j/RT).
+
+**Parallel channels with their own labels or reactants (added
+2026-09-27).** The formula above assumes one reactant ensemble in
+equilibrium and the same label in every structure. Two kinds of
+measurement need more.
+
+- **A different label in each channel.** In the Rh-catalysed arylation of
+  racemic 3-chlorocyclohexene (van Dijk et al., Nat. Catal. 2021, 4, 284;
+  Case Study IV of Dale et al.), the two enantiomers react through
+  diastereomeric transition structures, TS-2R and TS-2S. Both converge on
+  one η³-allyl intermediate, so the product carbon that is measured came
+  from C-1 of one enantiomer and from C-3 of the other.
+- **Reactants that do not interconvert.** The two enantiomers are separate
+  species in fixed proportion, not conformers in equilibrium.
+
+At low conversion both reduce to
+
+    1/KIE = Σ_c y_c / KIE_c
+
+- KIE_c is the pairwise KIE of channel c, with its own reactant,
+  transition structure and label.
+- y_c is the channel's share of the light isotopologue's rate. For two
+  channels with selectivity s = k_S/k_R this is eq S111 of Dale et al.,
+  KIE = (1 + s)·KIE_R·KIE_S/(KIE_S + s·KIE_R). The measured KIEs fit
+  s = 3.3.
+- **The shares** come from computed free energies, including the
+  concentrations of reactants that do not interconvert. They can also be
+  given directly, since s is often better known from experiment.
+- **Equivalent positions are a special case.** They are one reactant with
+  permuted labels (consequence 4). The singly ¹⁸O-labelled nitrobenzene of
+  Kang and Radosevich (benchmarks/nitroarene_phosphetane_ts1b) is another:
+  its two oxygens are equivalent, and a transition structure that attacks
+  one of them makes the observed KIE an average of the attacked and
+  spectator positions.
+- **Only low conversion.** Shares that drift with conversion, as the faster
+  enantiomer is depleted, are left out. The arylation KIEs were measured
+  at F_T ≤ 0.17, where that drift is small.
+
 **Populations.** The isotope ratios stay harmonic Bigeleisen–Mayer, because
 quasi-harmonic treatments break the product rule (theory.md section 6). The
 weights, however, are free energies of the light isotopologue only, and for
@@ -554,6 +640,13 @@ dependency.
    - **Duplicates** found by energy and RMSD after alignment, mirror images
      included. They are a warning, because a duplicate doubles its weight.
    - **One level of theory and one scaling factor** for every file.
+
+   Two further wrappers:
+   - `Series([ts_1, ts_2, ...], free_energies=None)`, accepted as `ts`.
+     Each member is a file or a `Conformers`.
+   - `channels([dict(rct=..., ts=..., iso=...), ...], shares=None)`, a
+     function returning the combined result, with the pairwise results
+     kept.
 3. **Evaluation**:
    - The light isotopologue of every conformer is diagonalized once per
      temperature. That pass gives the weights, ν‡ and κ_L, and is reused
@@ -592,7 +685,9 @@ dependency.
    - `--weight-uncertainty 0.5`.
 
    The text output prints the conformer table, then `KIE (ensemble) @ T`
-   lines. The JSON and CSV outputs carry the table.
+   lines. The JSON and CSV outputs carry the table. Series and channels
+   need more structure than flags carry, so on the command line they come
+   from a JSON job file (`kinisot --job job.json`).
 8. **Benchmarks**: `case.json` accepts a list of conformer files per
    species. `iso_average` and `reference_average` move from the geometric
    mean to the exact equal-weight ensemble. That shifts the Diels–Alder
@@ -608,6 +703,11 @@ dependency.
    - A mismatched element order raises an error, and a duplicate triggers
      the warning.
    - `--reference`, temperature scans and EQE ensembles work.
+   - **Series.** A kinetic scheme integrated for both isotopologues
+     reproduces the series formula. So does the rate-matrix check above,
+     with its limits C_f → 0 and C_f → ∞.
+   - **Channels.** s → 0 and s → ∞ each return one channel's KIE, and
+     eq S111 is reproduced.
 10. **Example and validation**:
     - **Worked example** (`examples/conformers/`), cheap enough to
       regenerate in the repository. GFN2-xTB through the ASE backend,
@@ -637,6 +737,21 @@ dependency.
       dominant structure, but it cannot tell the weighting schemes apart.
       A reaction whose transition structures share the rate more evenly is
       still wanted for that.
+    - **Channels: the nitroarene deoxygenation** (Kang and Radosevich,
+      Tetrahedron 2025). ¹⁸O KIEs of 1.033 for one oxygen and 1.066 for
+      both. The ORCA inputs at the SI geometries are in
+      `benchmarks/nitroarene_phosphetane/`, and the frequency jobs are
+      still to be run. The monotopic TS1B tests the equivalent-oxygen
+      average.
+    - **Channels: the DyKAT arylation** (van Dijk et al. 2021). This is a
+      real 23:77 split (s = 3.3), which Shi cannot provide. It needs the
+      group's structures: 3-chlorocyclohexene, TS-2R and TS-2S, plus the
+      measured values from the paper.
+    - **Series: the Wittig reaction** (Chen, Nieves-Quinones, Waas and
+      Singleton, J. Am. Chem. Soc. 2014, 136, 13122). This needs
+      structures for TS-1 and TS-2, if its SI gives coordinates. The
+      Baeyer–Villiger cases (addition, then migration) are a second
+      candidate, once their structures are computed.
 
 **Decisions needed**
 
@@ -649,11 +764,18 @@ dependency.
    form (recommended; a 4 × 10⁻⁵ shift).
 4. Symmetry numbers: degeneracies supplied by the user only, or detected
    with `pymsym`.
+5. Scope of the first release: parallel ensembles first, with series and
+   channels in a following release (recommended, since they reuse its
+   evaluation and result objects), or all three together.
+6. Input for series and channels on the command line: a JSON job file
+   (recommended) or new flags.
 
 **Out of scope for the first release**:
 
 - **Channel-specific KIEs.** Some experiments measure KIEs in a product, and
-  different transition structures lead to different products. The Singleton
+  different transition structures lead to different products. Channels
+  that converge on one product, like the DyKAT arylation, are in scope
+  (above). The Singleton
   group's recovered-starting-material experiments measure total consumption,
   which the sum over all transition structures describes. A product-specific
   measurement would need an ensemble per channel.
@@ -664,6 +786,8 @@ dependency.
 
 - Single-conformer inputs give today's numbers bit for bit.
 - The ensemble formula is tested against hand-computed synthetic cases.
+- The series and channel formulas are tested against kinetic schemes and
+  eq S111.
 - There is one worked example and the theory section.
 - The Shi ensemble is reported (done with the prototype; the implementation
   must reproduce it).
@@ -684,7 +808,7 @@ dependency.
 | 7 | Isotope table + syntax, projection, tunnelling, reference ✅ | v2.4.0 | ¹⁸O default change documented |
 | 8 | ASE / MLIP backend ✅ | v2.5.0 | new code path, optional extra |
 | 9 | Experimental validation suite (Singleton KIEs), scaffold ✅ | v2.5.x | needs new QC calculations and transcribed experimental values |
-| 10 | Conformer-ensemble KIEs and EQEs | v2.7.0 | none for single-conformer inputs; equivalent-position averaging shifts by 4 × 10⁻⁵ |
+| 10 | Conformer-ensemble KIEs and EQEs; transition structures in series; parallel channels | v2.7.0 | none for single-conformer inputs; equivalent-position averaging shifts by 4 × 10⁻⁵ |
 
 Phases 0–1 are done; 2–3 are a few days and unlock adoption; 4 is the
 largest single chunk (one reviewed PR per module move); 5 is now small
