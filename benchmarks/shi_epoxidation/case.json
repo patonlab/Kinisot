@@ -5,14 +5,18 @@
     "doi": "10.1021/ja0435788",
     "method": "13C KIEs by NMR at natural abundance on recovered alkene, two reactions at 0 C taken to 83% and 93% conversion, standard deviations from six determinations; values from Figure 1"
   },
-  "notes": "All KIEs are relative to the meta carbons (1.000 assumed). The two values per position are the two independent experiments; the deviation is taken from their mean. The paper notes that the para carbon's two values disagree slightly, possibly random error. Singleton and Wang predicted these KIEs from their lowest-energy transition structure 10 (B3LYP/6-31G*, QUIVER, frequencies scaled by 0.9614, Bell tunnelling); their predictions are given in the notes column and are the check on Kinisot: the structures are the paper's own (SI geometries), with Hessians recomputed at the same level. The dioxirane is left out of the reactant side: it carries no label, so its isotopologue partition-function ratio is exactly 1. The two ortho and the two meta carbons are one NMR signal each but distinct in the transition structure, so the ortho KIE and the meta reference are geometric means over the pair (reactant carbon matched to the transition-structure carbon on the same side, syn or anti to C-beta). Of their 18 transition structures, only 10, 12 and 13 reproduce the C-alpha and C-beta KIEs, which is what makes this case a test of the transition-state geometry. Hessians are being computed: until methylstyrene.hessian.json and ts10.hessian.json are added (reactants and transition_structure), the case lists the measurements only.",
+  "notes": "All KIEs are relative to the meta carbons (1.000 assumed). The two values per position are the two independent experiments; the deviation is taken from their mean. The paper notes that the para carbon's two values disagree slightly, possibly random error. Singleton and Wang predicted these KIEs from their lowest-energy transition structure 10 (B3LYP/6-31G*, QUIVER, frequencies scaled by 0.9614, Bell tunnelling); their predictions are given in the notes column and are the check on Kinisot. The structures are the paper's own (SI geometries); the frequency jobs reproduce the SI's electronic energies (to 1e-8 hartree) and zero-point energies (0.161954 and 0.466153 hartree), and transition structure 10 has one imaginary mode (366.2i cm-1). The dioxirane is left out of the reactant side: it carries no label, so its isotopologue partition-function ratio is exactly 1. The two ortho and the two meta carbons are one NMR signal each but distinct in the transition structure, so the ortho KIE and the meta reference are geometric means over the pair (reactant carbon matched to the transition-structure carbon on the same side, syn or anti to C-beta). Of their 18 transition structures, only 10, 12 and 13 reproduce the C-alpha and C-beta KIEs, which is what makes this case a test of the transition-state geometry. External modes are projected out: the transition structure has a 9 cm-1 torsion that otherwise mixes with them (1.7 cm-1 away from Gaussian's projected frequencies), although the KIEs change by less than 4e-7.",
   "temperature": 273.15,
   "scale": 0.9614,
-  "level_of_theory": "B3LYP/6-31G(d), Hessians computed with PySCF (Gaussian's B3LYP with VWN3, Cartesian d functions) at the SI geometries of trans-beta-methylstyrene and transition structure 10 (SI structure A)",
+  "level_of_theory": "B3LYP/6-31G(d), Gaussian 16 frequency jobs (int=finegrid; methylstyrene.gjf, ts10.gjf) at the SI geometries of trans-beta-methylstyrene and transition structure 10 (SI structure A)",
   "tunneling": "bell",
   "project": true,
-  "reactants": null,
-  "transition_structure": null,
+  "reactants": [
+    "methylstyrene.log"
+  ],
+  "transition_structure": [
+    "ts10.log"
+  ],
   "product": null,
   "reference_isotopologue": null,
   "kies": [
