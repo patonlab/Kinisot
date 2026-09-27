@@ -1,10 +1,46 @@
-# Shi epoxidation: the other 17 transition structures
+# Shi epoxidation: all 18 transition structures
 
-Gaussian inputs for the 17 transition structures of Singleton and Wang
-(J. Am. Chem. Soc. 2005, 127, 6679) other than TS 10, which is
-`../ts10.gjf`. They are the data for the conformer-ensemble validation
-planned in IMPLEMENTATION_PLAN.md, Phase 10. Each input is a B3LYP/6-31G(d)
-frequency job (`int=finegrid`, no optimization) at the SI geometry.
+These are Gaussian 16 frequency jobs (inputs and logs) for the 17
+transition structures of Singleton and Wang (J. Am. Chem. Soc. 2005, 127,
+6679) other than TS 10, which is `../ts10.gjf` and `../ts10.log`. Each is a
+B3LYP/6-31G(d) job (`int=finegrid`, no optimization) at the SI geometry.
+They are the validation data for the conformer ensembles planned in
+IMPLEMENTATION_PLAN.md, Phase 10.
+
+`python benchmarks/shi_epoxidation/ensemble/analyze.py` prints the checks
+and results below, and `tests/test_shi_ensemble.py` checks them.
+
+## Results
+
+- **Every job reproduces the SI.** Each has one imaginary mode, and its
+  energy and zero-point energy agree with the SI to 2 × 10⁻⁷ hartree and
+  1 × 10⁻⁵ hartree; most energies agree to 1 × 10⁻⁸. That includes TS AB,
+  whose coordinates were repaired (below).
+- **Kinisot reproduces the authors' predictions.** SI Table 1 lists QUIVER
+  predictions for all 18 structures, as absolute KIEs, not relative to the
+  meta carbons. Of the 108 values, 102 match Kinisot exactly at the three
+  decimals printed, and the other six differ by at most 0.0008. The table's
+  rows 6–13 are the paper's structures 10–17 (A, B, EA, DA, EB, D, BD, DD);
+  the computed values confirm that mapping row by row.
+- **The ensemble is dominated by TS 10.** Its KIE uses the formula of
+  Phase 10, weighted by the light isotopologue's rate through each
+  structure. TS 10 (A) carries 85–90% of the rate under every weighting and
+  TS 11 (B) most of the rest:
+  - B3LYP/6-31G(d) energies;
+  - those energies plus zero-point energy;
+  - quasi-harmonic free energies at 273 K from GoodVibes;
+  - the SI's 6-311+G** single points plus zero-point energy (only the
+    eight structures numbered in the paper).
+
+  The ensemble KIEs therefore differ from TS 10's alone by at most 0.0004,
+  and the mean absolute deviation from experiment stays at 0.0012–0.0013.
+
+  This case confirms the ensemble machinery reduces to the dominant
+  structure when it should. It cannot tell the weighting schemes apart;
+  that needs a reaction whose competing transition structures carry
+  comparable shares of the rate.
+
+## Files
 
 - **Names** follow the SI: A (TS 10 in the paper), B (11), EA (12), DA (13),
   EB (14), D (15), BD (16), DD (17), then AA, G, CA, H, E, C, AD, CD, AB and
@@ -12,6 +48,8 @@ frequency job (`int=finegrid`, no optimization) at the SI geometry.
 - **Titles** carry each structure's SI electronic energy and zero-point
   energy. A job at the correct geometry reproduces both, as `../ts10.log`
   does for TS A (E to 1 × 10⁻⁸ hartree, ZPE exactly).
+- **`analyze.py`** prints the checks and results above; `si_atom_order.json`
+  maps each file's atoms back to the SI's numbering.
 
 ## Atom numbering
 
@@ -60,5 +98,6 @@ value its three hydrogens place 1.53 Å from its neighbouring carbon; the
 other two coordinates agree with the hydrogens to 2 × 10⁻⁴ Å. These atom
 numbers are the SI's.
 
-`ts_AB.gjf` contains the corrected geometry. If the repair is exact, its
-job reproduces the SI energy of −1343.48585457 hartree.
+`ts_AB.gjf` contains the corrected geometry. Its job gives
+−1343.48585458 hartree against the SI's −1343.48585457, which confirms
+the repair.

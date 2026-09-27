@@ -609,6 +609,20 @@ dependency.
       16-core node. The inputs are in `benchmarks/shi_epoxidation/ensemble/`,
       renumbered to TS 10's atom order. That directory also documents the
       repair of a misprint in the SI's coordinates for TS AB.
+    - **Update 2026-09-27: the jobs are done.** Their logs are in that
+      directory, and `analyze.py` there prototypes the ensemble formula
+      (`tests/test_shi_ensemble.py` checks it).
+      - All 18 structures reproduce the SI's energies and zero-point
+        energies.
+      - Kinisot matches the authors' per-structure predictions (SI Table 1)
+        exactly for 102 of 108 values, the others within 0.0008.
+      - TS 10 carries 85–90% of the rate under all four weightings, so the
+        ensemble KIEs stay within 0.0004 of TS 10's.
+
+      The Shi case therefore checks that the ensemble reduces to the
+      dominant structure, but it cannot tell the weighting schemes apart.
+      A reaction whose transition structures share the rate more evenly is
+      still wanted for that.
 
 **Decisions needed**
 
@@ -637,7 +651,8 @@ dependency.
 - Single-conformer inputs give today's numbers bit for bit.
 - The ensemble formula is tested against hand-computed synthetic cases.
 - There is one worked example and the theory section.
-- The Shi ensemble is reported once the other 17 frequency jobs exist.
+- The Shi ensemble is reported (done with the prototype; the implementation
+  must reproduce it).
 
 ---
 

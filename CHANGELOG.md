@@ -42,6 +42,16 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   - The mean absolute deviation from experiment is 0.0012. The largest miss
     is the methyl carbon (0.998 predicted, 1.001 and 1.002 measured), which
     the paper's prediction shares.
+- `benchmarks/shi_epoxidation/ensemble`: frequency jobs for the other 17
+  transition structures in the Shi SI. They are renumbered to TS 10's atom
+  order, and TS AB includes the repair of a misprint in the SI's
+  coordinates. `analyze.py` there prototypes the ensemble KIE of
+  IMPLEMENTATION_PLAN.md, Phase 10.
+  - Kinisot reproduces the authors' per-structure predictions for all 18
+    structures: 102 of 108 values exactly at three decimals, the rest
+    within 0.0008.
+  - TS 10 carries 85–90% of the rate, so the ensemble KIEs differ from
+    TS 10's by at most 0.0004.
 - The benchmark runner lists cases without structures. It also accepts
   replicate measurements, a reference position per KIE, an averaged
   reference (a rotating methyl group), several sources and a notes

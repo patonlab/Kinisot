@@ -267,9 +267,9 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
   - the Diels–Alder reaction of isoprene with maleic anhydride (nine ¹³C
     and ²H KIEs, mean absolute deviation 0.003);
   - the Shi epoxidation of trans-β-methylstyrene (six ¹³C KIEs at 0 °C,
-    mean absolute deviation 0.0012). From the published transition
-    structure, Kinisot also matches all six of the authors' own QUIVER
-    predictions to the three decimals they give.
+    mean absolute deviation 0.0012). Kinisot also matches the authors' own
+    QUIVER predictions for all 18 published transition structures: 102 of
+    108 values exactly at three decimals, the rest within 0.0008.
 - [CHANGELOG.md](CHANGELOG.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
   for what changed and what is coming.
 - A [video guide](http://www.youtube.com/watch?v=r4x2gmkc0U8) to an older
