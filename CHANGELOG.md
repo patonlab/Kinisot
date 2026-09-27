@@ -6,6 +6,36 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- Five benchmark cases from the SI of the PyQuiverHS paper (Grazioli, Ly,
+  Sabetnejad, Mattapalli, Nguyen and O'Leary, ChemRxiv 2026), included with
+  the authors' agreement. Each has its Gaussian files, the PyQuiverHS input
+  and PyQuiverHS's output for 10–1000 K:
+  - `dihydrophenanthrene`, `biaryl_diketone` and `metaparacyclophane`:
+    conformational KIEs;
+  - `sn2_chloride_methyl_bromide`: a gas-phase α-secondary KIE;
+  - `tetramethylcyclohexane_eie`: a CD₃ axial/equatorial EQE.
+
+  Six of the seven measured values are reproduced within 0.016. The SN2 KIE
+  is 0.08 too high, a limit of harmonic transition-state theory at
+  HF/6-31+G(d) that PyQuiverHS shares. The benchmarks now cover 32 measured
+  positions, with a mean absolute deviation of 0.0060.
+- `tests/test_pyquiverhs.py` checks Kinisot against those outputs for all
+  11 isotopologues at every temperature, uncorrected and with Wigner and
+  Bell tunnelling. Every term agrees within 0.01 K / T (3 × 10⁻⁵ at 300 K).
+- The benchmark runner accepts `imag_cutoff` for transition structures with
+  a small reaction-coordinate frequency (45i cm⁻¹ in the biaryl case).
+- docs/theory.md, section 6: free energies and enthalpy–entropy partitions
+  must keep the translational term of every species, including an
+  unlabelled one that Bigeleisen–Mayer lets you leave out. PyQuiverHS's
+  enthalpy–entropy KIE for Cl⁻ + CH₃Br lacks it and is 1.3% low (0.877
+  against 0.888 at 300 K). The same point is in the README and
+  docs/comparison.md.
+- docs/comparison.md lists QUIVER, THERMISTP and ISOEFF. The README cites
+  Rzepa's 2015 comparison of the two routes for the Baeyer–Villiger
+  reaction: 1.023 against 1.0226 for ¹³C.
+- The Baeyer–Villiger cases record where Rzepa's ωB97XD/Def2-TZVPP models
+  and their force constants are deposited (data DOIs 10.14469/ch/1913xx).
+  They also record Singleton's rule for which reactant to compute from.
 - README, "Why the Bigeleisen–Mayer equation rather than free energies", and
   docs/theory.md section 6: the two routes differ exactly by the
   Teller–Redlich product-rule violation of the computed frequencies. A soft
@@ -84,6 +114,17 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Fixed
 
+- A Gaussian log with more than one block of printed frequencies, such as
+  an `opt=(calcall,ts) freq` job, gave a false "frequencies differ from the
+  program's" warning. The self-check took the last 3N−5 printed values,
+  one of them from the earlier block. It now takes 3N−6, or 3N−5 for a
+  linear molecule. The Hessian and the KIEs were not affected.
+- docs/theory.md, section 3, gave the exchange equilibrium behind an EQE in
+  the wrong direction. EQE = (s/s')f_R / (s/s')f_P is the constant of
+  R(light) + P(heavy) ⇌ R(heavy) + P(light): above 1, the heavy isotope
+  accumulates in R. The eqe_cyclohexane example's reading was reversed to
+  match. Its 1.038 means CD₃ prefers the axial methyl group, as measured,
+  not the equatorial one. The numbers were right.
 - The Diels–Alder example and benchmark called TS atom 19 (diene atom 10) a
   diene terminus, and concluded from its KIE of 1.001 that the transition
   structure is markedly asynchronous. Atom 19 is the methyl carbon. The

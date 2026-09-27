@@ -409,6 +409,20 @@ predictions to the three decimals given, and deviates from experiment by
 0.0034. The transition structure's Hessian needs about 13 hours with PySCF
 on this environment's four cores, against 10 minutes for Gaussian on a
 16-core node.
+**Update 2026-09-27 (PyQuiverHS SI):** five more cases come from the SI of
+Grazioli et al.: three conformational KIEs, a gas-phase SN2 α-secondary KIE
+and a CD₃ axial/equatorial EQE. They are included with the authors'
+agreement, together with PyQuiverHS's outputs for the same files, and
+`tests/test_pyquiverhs.py` cross-checks Kinisot against those outputs.
+- **Against experiment:** six of the seven measured values within 0.016;
+  the SN2 KIE is 0.08 too high (harmonic TST at HF/6-31+G(d)).
+- **Overall:** 11 cases, 32 measured positions, mean absolute deviation
+  0.0060.
+- **Findings along the way:**
+  - PyQuiverHS's enthalpy–entropy terms omit translation (docs/theory.md,
+    section 6);
+  - a false self-check warning for multi-block Gaussian logs;
+  - the EQE direction was stated backwards in the docs.
 
 **Goal (requested 2026-09-25):** a `benchmarks/` directory that compares
 Kinisot's predictions with published experimental KIEs, primarily the

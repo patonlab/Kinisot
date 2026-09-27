@@ -1,0 +1,71 @@
+{
+  "name": "Racemization of 9,10-dihydro-4,5-dimethylphenanthrene (conformational KIEs)",
+  "reference": [
+    {
+      "citation": "K. Mislow et al., J. Am. Chem. Soc. 1963, 85, 1199-1200",
+      "doi": "10.1021/ja00891a038",
+      "method": "conformational KIEs on the racemization rate"
+    },
+    {
+      "citation": "K. Mislow, G. H. Wahl, A. J. Gordon, R. Graeve, J. Am. Chem. Soc. 1964, 86, 1733-1741",
+      "doi": "10.1021/ja01063a015",
+      "method": "conformational KIEs on the racemization rate"
+    },
+    {
+      "citation": "G. Grazioli, A. Ly, D. Sabetnejad, A. Mattapalli, C. T. Nguyen, D. J. O'Leary, PyQuiverHS: A Web Tool for Computing Isotope Effects, ChemRxiv 2026 (preprint, CC-BY 4.0)",
+      "doi": "10.26434/chemrxiv.15004570/v1",
+      "method": "source of the frequency calculations (SI data, Gaussian 16) and of the experimental value(s) quoted here, from Table 3 (315 K; no uncertainties given); its PyQuiverHS results for the same files are in pyquiverhs/"
+    }
+  ],
+  "notes": "Compound 1 of Grazioli et al. The measured values are those quoted in their Table 3; the primary papers are Mislow's. Deuterating the methyl groups (d6), the bridge CH2 groups (d4) or both (d10) speeds up racemization (inverse KIEs). The d2 rows put one deuterium on each bridge carbon, axial or equatorial; they were not measured. Their PyQuiverHS values (Bigeleisen-Mayer, no tunnelling) are given in the notes column.",
+  "temperature": 315.0,
+  "scale": 0.97,
+  "level_of_theory": "B3LYP/6-31G(d,p) (Gaussian 16, ultrafine grid)",
+  "reactants": [
+    "gs.log"
+  ],
+  "transition_structure": [
+    "ts.log"
+  ],
+  "tunneling": "bell",
+  "project": false,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "1-d6 (two CD3)",
+      "iso": "26,27,28,30,31,32",
+      "experimental": 0.88,
+      "uncertainty": null,
+      "note": "PyQuiverHS 0.889"
+    },
+    {
+      "position": "1-d4 (CD2-CD2 bridge)",
+      "iso": "20,21,23,24",
+      "experimental": 0.952,
+      "uncertainty": null,
+      "note": "PyQuiverHS 0.952"
+    },
+    {
+      "position": "1-d10 (both)",
+      "iso": "26,27,28,30,31,32,20,21,23,24",
+      "experimental": 0.847,
+      "uncertainty": null,
+      "note": "PyQuiverHS 0.847"
+    },
+    {
+      "position": "1-d2ax (axial bridge H)",
+      "iso": "20,23",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "PyQuiverHS 0.995; not measured"
+    },
+    {
+      "position": "1-d2eq (equatorial bridge H)",
+      "iso": "21,24",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "PyQuiverHS 0.957; not measured"
+    }
+  ]
+}

@@ -53,6 +53,9 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   rotating methyl group); the KIE is divided by the geometric mean of theirs.
   `reference` at the top may be a list of sources; `notes` is printed under
   the source line.
+- Optional: `imag_cutoff` (cm⁻¹, default 50) for a transition structure whose
+  reaction-coordinate frequency is small, as in some conformational
+  processes.
 - A case whose structures do not exist yet sets `reactants` and
   `transition_structure` to `null` and each `iso` to `null`; the report
   lists its measurements and marks it "Not computed yet".
@@ -67,8 +70,19 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | baeyer_villiger | needed (addition of m-CPBA to cyclohexanone) | entered: Singleton, Szymanski, JACS 1999, 121, 9455, Figure 1a; Crow, Hirschi, Clinton, Hirschi, ChemRxiv 2026 (preprint), SI Tables S3a/S3b |
 | baeyer_villiger_migration | needed (migration step of the Criegee intermediate) | entered: same papers, 1999 Figure 1c and 2026 SI Table S8b |
 | shi_epoxidation | in repo (Gaussian 16 B3LYP/6-31G(d) at the SI geometries of the alkene and transition structure 10) | entered: Singleton, Wang, JACS 2005, 127, 6679, Figure 1 (6 positions; mean absolute deviation 0.0012; the paper's six predictions reproduced) |
+| dihydrophenanthrene | in repo (PyQuiverHS SI; B3LYP/6-31G(d,p), scaled 0.97) | as quoted by Grazioli et al. 2026, Table 3 (Mislow et al., JACS 1963/1964): d6, d4, d10 at 315 K (mean absolute deviation 0.0040) |
+| biaryl_diketone | in repo (PyQuiverHS SI; B3LYP/6-31G(d,p), scaled 0.97; `imag_cutoff` 30) | as quoted in their Table 4 (Mislow et al., TL 1962; JACS 1964): d8 at 368 K (deviation 0.015) |
+| metaparacyclophane | in repo (PyQuiverHS SI; B3LYP/6-31G(d,p), scaled 0.97) | as quoted in their section 3.2 (Sherrod, Boekelheide, JACS 1972): 0.833 ± 0.04 at 308 K (deviation 0.0004) |
+| sn2_chloride_methyl_bromide | in repo (PyQuiverHS SI; HF/6-31+G(d)) | as quoted in their Table 7 (Viggiano, Truhlar et al., JACS 1991): 0.81 ± 0.03 at 300 K (deviation 0.08: harmonic TST misses this gas-phase KIE) |
+| tetramethylcyclohexane_eie | in repo (PyQuiverHS SI; B3LYP/6-311G(d)) | as quoted in their Table 8 (Anet et al., JACS 1980): EQE 1.042 ± 0.001 at 290.15 K (deviation 0.0003) |
 
-Further cases (an SN2 reaction, an epoxidation, an ene reaction, a hydride
-transfer, another EQE) need new frequency calculations at a documented
+The five cases from the PyQuiverHS SI also keep PyQuiverHS's input and its
+outputs for the same files (`pyquiverhs/`), from 10 to 1000 K;
+`tests/test_pyquiverhs.py` checks Kinisot against them. Their measured
+values are quoted from that paper, which cites the primary literature
+listed in each `case.json`.
+
+Further cases (an ene reaction, a hydride transfer with a large primary
+²H KIE, another EQE) need new frequency calculations at a documented
 level of theory; put the trimmed outputs (the sections listed in
 `docs/file_formats.md`) under `benchmarks/<case>/`.

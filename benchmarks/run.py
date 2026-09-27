@@ -63,6 +63,7 @@ def compute(case, iso, reference=None):
         tunneling=case.get("tunneling", "bell"),
         project=case.get("project"),
         reference=reference,
+        imag_cutoff=case.get("imag_cutoff", 50.0),
     )
 
 

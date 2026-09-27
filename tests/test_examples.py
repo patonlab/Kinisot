@@ -129,6 +129,15 @@ def test_benchmark_runner(tmp_path, monkeypatch):
         assert round(row["computed"], 3) == float(row["note"].split()[1]), row["position"]
     assert rows[0]["computed"] == pytest.approx(1.0221, abs=1e-4) and rows[0]["experimental"] == [1.022, 1.02]
     assert sum(abs(r["deviation"]) for r in rows) / 6 == pytest.approx(0.0012, abs=1e-4)
+    # cases from the PyQuiverHS SI: an EQE (product file) and a small reaction-coordinate frequency (imag_cutoff)
+    (case,) = module.load_cases(["tetramethylcyclohexane_eie"])
+    (row,) = module.run_case(case)
+    assert row["computed"] == pytest.approx(1.0417, abs=1e-4) and row["deviation"] == pytest.approx(-0.0003, abs=1e-4)
+    (case,) = module.load_cases(["biaryl_diketone"])
+    assert module.run_case(case)[0]["computed"] == pytest.approx(1.0752, abs=1e-4)
+    del case["imag_cutoff"]  # the 45i cm-1 mode is not a reaction coordinate at the default 50 cm-1 cutoff
+    with pytest.raises(Exception, match="imaginary frequency beyond the 50.0 cm-1 cutoff"):
+        module.run_case(case)
     # a case with measurements but no structures yet (Baeyer-Villiger) is listed, not computed
     (case,) = module.load_cases(["baeyer_villiger"])
     rows = module.run_case(case)

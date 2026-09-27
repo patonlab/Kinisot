@@ -1,0 +1,38 @@
+{
+  "name": "Gas-phase SN2 reaction of chloride with methyl bromide (alpha-secondary KIE)",
+  "reference": [
+    {
+      "citation": "A. A. Viggiano, J. Paschkewitz, R. A. Morris, J. F. Paulson, A. Gonzalez-Lafont, D. G. Truhlar, J. Am. Chem. Soc. 1991, 113, 9404-9405",
+      "doi": "10.1021/ja00024a076",
+      "method": "gas-phase kinetics, CH3Br versus CD3Br, 207, 300 and 538 K"
+    },
+    {
+      "citation": "G. Grazioli, A. Ly, D. Sabetnejad, A. Mattapalli, C. T. Nguyen, D. J. O'Leary, PyQuiverHS: A Web Tool for Computing Isotope Effects, ChemRxiv 2026 (preprint, CC-BY 4.0)",
+      "doi": "10.26434/chemrxiv.15004570/v1",
+      "method": "source of the frequency calculations (SI data, Gaussian 16) and of the experimental value(s) quoted here, from Table 7 and section 3.4 (300 K); its PyQuiverHS results for the same files are in pyquiverhs/"
+    }
+  ],
+  "notes": "Compound 4 of Grazioli et al.; the measured value at 300 K is the one quoted in their Table 7. Their text also quotes 0.81 +/- 0.03 at 207 K and 0.89 +/- 0.06 at 538 K. The chloride ion is not in the reactant file: it carries no label, so its reduced partition-function ratio is exactly 1 and Bigeleisen-Mayer is unaffected (a free-energy or enthalpy-entropy treatment would still need its translational term; see docs/theory.md, section 6). Harmonic transition-state theory at HF/6-31+G(d) overestimates this KIE by 0.08, more than the experimental error: a known limit of the model for a gas-phase ion-molecule reaction with loose low-frequency modes, not of the program (PyQuiverHS gives the same value).",
+  "temperature": 300.0,
+  "scale": 1.0,
+  "level_of_theory": "HF/6-31+G(d), unscaled (Gaussian 16)",
+  "reactants": [
+    "methyl_bromide.log"
+  ],
+  "transition_structure": [
+    "ts.log"
+  ],
+  "tunneling": "bell",
+  "project": false,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "4-d3 (CD3Br)",
+      "iso": "2,3,4",
+      "experimental": 0.81,
+      "uncertainty": 0.03,
+      "note": "PyQuiverHS 0.888"
+    }
+  ]
+}

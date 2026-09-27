@@ -1,0 +1,43 @@
+{
+  "name": "Conformational ring flip of [2.2]metaparacyclophane-d",
+  "reference": [
+    {
+      "citation": "S. A. Sherrod, V. Boekelheide, J. Am. Chem. Soc. 1972, 94, 5513-5515",
+      "doi": "10.1021/ja00770a066",
+      "method": "conformational KIE of the ring flip, 308 K"
+    },
+    {
+      "citation": "S. A. Sherrod, R. L. da Costa, R. A. Barnes, V. Boekelheide, J. Am. Chem. Soc. 1974, 96, 1565-1577",
+      "doi": "10.1021/ja00812a047",
+      "method": "steric isotope effect and other steric effects in [2.2]metaparacyclophanes"
+    },
+    {
+      "citation": "G. Grazioli, A. Ly, D. Sabetnejad, A. Mattapalli, C. T. Nguyen, D. J. O'Leary, PyQuiverHS: A Web Tool for Computing Isotope Effects, ChemRxiv 2026 (preprint, CC-BY 4.0)",
+      "doi": "10.26434/chemrxiv.15004570/v1",
+      "method": "source of the frequency calculations (SI data, Gaussian 16) and of the experimental value(s) quoted here, from Table 5 and section 3.2 (308 K); its PyQuiverHS results for the same files are in pyquiverhs/"
+    }
+  ],
+  "notes": "Compound 3 of Grazioli et al.; the measured value is the one quoted in their section 3.2. The single deuterium (atom 27) is the internal hydrogen of the meta-bridged ring, which is squeezed across the face of the para-bridged ring during the ring flip. Their Table 5 labels the column 3-d8, but the text and the PyQuiverHS input have one deuterium.",
+  "temperature": 308.0,
+  "scale": 0.97,
+  "level_of_theory": "B3LYP/6-31G(d,p) (Gaussian 16, ultrafine grid)",
+  "reactants": [
+    "gs.log"
+  ],
+  "transition_structure": [
+    "ts.log"
+  ],
+  "tunneling": "bell",
+  "project": false,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "3-d (internal H)",
+      "iso": "27",
+      "experimental": 0.833,
+      "uncertainty": 0.04,
+      "note": "PyQuiverHS 0.832"
+    }
+  ]
+}

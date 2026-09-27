@@ -34,9 +34,51 @@ atomic mass unit:
 A web front end to the PyQuiver family with Bigeleisen–Mayer and
 enthalpy–entropy partition functions, Wigner and Bell corrections and
 temperature scans (Grazioli et al., J. Phys. Org. Chem. 2026, 39, e70099,
-[doi:10.1002/poc.70099](https://doi.org/10.1002/poc.70099)). Its
-1,1,3,3-tetramethylcyclohexane EIE demonstration is the same system as
+[doi:10.1002/poc.70099](https://doi.org/10.1002/poc.70099); preprint
+[doi:10.26434/chemrxiv.15004570](https://doi.org/10.26434/chemrxiv.15004570)).
+Its 1,1,3,3-tetramethylcyclohexane EIE demonstration is the same system as
 Kinisot's [eqe_cyclohexane](../examples/eqe_cyclohexane/README.md) example.
+
+The Gaussian files and PyQuiverHS outputs of the preprint's SI are
+Kinisot benchmark cases, with the authors' agreement:
+- `dihydrophenanthrene`, `biaryl_diketone` and `metaparacyclophane`
+  (conformational KIEs);
+- `sn2_chloride_methyl_bromide`;
+- `tetramethylcyclohexane_eie`.
+
+`tests/test_pyquiverhs.py` runs Kinisot with the same labels, scaling
+factors and imaginary-frequency thresholds, over their 10–1000 K scans:
+- **Agreement.** Every Bigeleisen–Mayer term and total (uncorrected, Wigner
+  and Bell), for all 11 isotopologues, agrees within 0.01 K / T, i.e.
+  3 × 10⁻⁵ at 300 K. The difference grows as 1/T through the zero-point
+  term, as with PyQuiver above.
+- **Below the crossover temperature**, where Bell's formula does not apply,
+  Kinisot stops with an error. PyQuiverHS prints a value there, negative
+  for the 45i cm⁻¹ biaryl transition structure at 10 K.
+- **Enthalpy–entropy terms.** PyQuiverHS's H-S terms contain vibrational and
+  rotational entropy but no translational term. That cancels when the same
+  atoms are on both sides. It does not when an unlabelled reactant is left
+  out of the input, as the chloride is in the SN2 case: there the H-S KIE
+  is 1.3% below the Bigeleisen–Mayer one (0.877 against 0.888 at 300 K;
+  [theory.md, section 6](theory.md#6-bigeleisenmayer-versus-free-energy-differences)).
+
+## Other programs
+
+- **QUIVER**, PyQuiver's ancestor, first written by Keith Laidig around 1988
+  (according to Rzepa's post below).
+- **THERMISTP** (Saunders, Wolfsberg, Anet and Kronja, J. Am. Chem. Soc.
+  2007, 129, 10276, [doi:10.1021/ja072375r](https://doi.org/10.1021/ja072375r)).
+- **ISOEFF** (Anisimov and Paneth, J. Math. Chem. 1999, 26, 75,
+  [doi:10.1023/a:1019173509273](https://doi.org/10.1023/a:1019173509273)).
+
+These are the older Bigeleisen–Mayer programs. Rzepa's account of
+reproducing a 20-year-old QUIVER calculation (fixed array sizes, a
+preprocessor available only as an executable) is a reminder of why
+Kinisot keeps its test inputs and outputs in the repository
+([Henry Rzepa's blog, 2015](https://www.ch.ic.ac.uk/rzepa/blog/?p=14255)).
+Rzepa's own program, which Kinisot descends from, was archived in 2015 as
+the Zenodo record Kinisot is cited by
+([doi:10.5281/zenodo.19272](https://doi.org/10.5281/zenodo.19272)).
 
 ## Gaussian `freq=readisotopes`
 

@@ -168,7 +168,8 @@ def parse_gaussian(file):
         level_of_theory=_level_from_archive(archive),
         linear=linear,
         positions=_positions_from_archive(archive, natoms),
-        program_frequencies=tuple(printed[-(3 * natoms - 5) :]) if printed else None,
+        # the last block of printed frequencies: jobs such as opt=calcall print earlier blocks too
+        program_frequencies=tuple(printed[-(3 * natoms - (5 if linear else 6)) :]) if printed else None,
         energy=_energy_from_archive(archive),
     )
 
