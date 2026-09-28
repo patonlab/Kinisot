@@ -30,10 +30,14 @@ EQE @ 300.0 K                1.026844   1.025140   0.985373   1.037262   1.00000
 ```
 
 **Reading it.** There is no reaction coordinate, so the V-ratio column is
-empty and the tunnelling correction is 1. The EQE is the equilibrium
-constant for moving the CD₃ label from the first methyl group (hydrogens
-24–26) to the second (28–30); a value of 1.038 at 290 K means the second
-site is favoured by 3.8 % for CD₃ relative to CH₃. The effect comes almost
+empty and the tunnelling correction is 1. The EQE is (s/s')f of the first
+labelling (hydrogens 24–26, the axial methyl group in this file) divided by
+that of the second (28–30, equatorial). It is therefore the equilibrium
+constant [CD₃ axial]/[CD₃ equatorial]: a value of 1.038 at 290 K means CD₃
+prefers the more crowded axial position by 3.8 % relative to CH₃. Anet and
+co-workers measured 1.042 ± 0.001 at 290 K (J. Am. Chem. Soc. 1980, 102,
+3945, as quoted by Grazioli et al. 2026;
+benchmarks/tetramethylcyclohexane_eie computes it at B3LYP/6-311G(d)). The effect comes almost
 entirely from zero-point energy (ZPE 1.028) and the low-frequency
 excitation term (EXC 1.025) and shrinks with temperature, as conformational
 isotope effects do. The TRPF term is temperature independent.

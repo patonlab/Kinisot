@@ -181,9 +181,27 @@ full comparison; `scripts/compare_free_energy_route.py` reproduces it.
   KIEs are 1.018 and 1.014 without tunnelling, and 1.022 and 1.017 with
   Bell's correction. Kinisot applies Bell's correction by default and prints
   the uncorrected KIE alongside.
+- **No translational terms to get wrong.** Bigeleisen–Mayer uses no
+  translational partition functions, and an unlabelled reactant has a
+  reduced ratio of exactly 1, so it can be left out of the input (the
+  chloride of an SN2 reaction, say). A free-energy or
+  enthalpy–entropy treatment can drop the chloride's own terms, which
+  cancel, but must keep the translational terms of methyl bromide and the
+  transition structure, whose masses differ by the chloride's. Dropping
+  them costs 1.3% for Cl⁻ + CH₃Br: the enthalpy–entropy KIE
+  PyQuiverHS reports is 0.877 at 300 K, against 0.888 from Bigeleisen–Mayer
+  ([docs/theory.md](docs/theory.md), section 6;
+  [benchmarks/sn2_chloride_methyl_bromide](benchmarks/sn2_chloride_methyl_bromide/case.json)).
 - **It is less work.** One frequency calculation per species gives every
   isotopologue at every temperature in seconds. The free-energy route needs
   a thermochemistry run for each set of isotopes and each temperature.
+
+The two routes often agree to a few 10⁻⁴. Rzepa's Baeyer–Villiger KIEs came
+out 1.023 (free energies) against 1.0226 (Bigeleisen–Mayer) for ¹³C, and
+0.928 against 0.92831 for ²H
+([Henry Rzepa's blog, 2015](https://www.ch.ic.ac.uk/rzepa/blog/?p=14255)). The
+differences above are at the 10⁻³ level, which is what matters when a
+prediction is held against a natural-abundance measurement.
 
 When a predicted KIE disagrees with experiment, look first at the
 transition structure. Bigeleisen–Mayer KIE predictions for heavy atoms are
@@ -270,6 +288,16 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
     mean absolute deviation 0.0012). Kinisot also matches the authors' own
     QUIVER predictions for all 18 published transition structures: 102 of
     108 values exactly at three decimals, the rest within 0.0008.
+
+  Five more systems come from the SI of the PyQuiverHS paper (Grazioli et
+  al., 2026), with their measured values: conformational KIEs of three
+  biaryl and cyclophane ring flips, a gas-phase SN2 α-secondary KIE, and a
+  CD₃ axial/equatorial EIE.
+  - Six of the seven measured values are reproduced within 0.016.
+  - The SN2 KIE is 0.08 too high: harmonic transition-state theory at
+    HF/6-31+G(d) misses it, and PyQuiverHS gives the same value.
+  - `tests/test_pyquiverhs.py` checks Kinisot against PyQuiverHS's own
+    output for these files over 10–1000 K.
 - [CHANGELOG.md](CHANGELOG.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
   for what changed and what is coming.
 - A [video guide](http://www.youtube.com/watch?v=r4x2gmkc0U8) to an older

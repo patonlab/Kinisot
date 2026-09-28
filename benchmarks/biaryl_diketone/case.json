@@ -1,0 +1,58 @@
+{
+  "name": "Racemization of a doubly bridged biphenyl diketone (conformational KIE)",
+  "reference": [
+    {
+      "citation": "K. Mislow, E. Simon, H. B. Hopps, Tetrahedron Lett. 1962, 1011-1014",
+      "doi": "10.1016/S0040-4039(00)70947-6",
+      "method": "secondary KIE on the racemization rate"
+    },
+    {
+      "citation": "K. Mislow, E. Simon, M. A. W. Glass, G. H. Wahl, H. B. Hopps, J. Am. Chem. Soc. 1964, 86, 1710-1733",
+      "doi": "10.1021/ja01063a014",
+      "method": "optical stability of doubly bridged biphenyls"
+    },
+    {
+      "citation": "G. Grazioli, A. Ly, D. Sabetnejad, A. Mattapalli, C. T. Nguyen, D. J. O'Leary, PyQuiverHS: A Web Tool for Computing Isotope Effects, ChemRxiv 2026 (preprint, CC-BY 4.0)",
+      "doi": "10.26434/chemrxiv.15004570/v1",
+      "method": "source of the frequency calculations (SI data, Gaussian 16) and of the experimental value(s) quoted here, from Table 4 (368 K; no uncertainty given); its PyQuiverHS results for the same files are in pyquiverhs/"
+    }
+  ],
+  "notes": "Compound 2 of Grazioli et al.; the measured value is the one quoted in their Table 4. Deuterating all eight bridge CH2 hydrogens (d8) slows racemization (normal KIE). 2-da and 2-db carry one deuterium at the two inequivalent bridge positions (atoms 27 and 28); they were not measured. The transition structure's reaction-coordinate frequency is only 45i cm-1, below Kinisot's default 50 cm-1 cutoff, hence imag_cutoff 30 (the value in the PyQuiverHS input).",
+  "temperature": 368.0,
+  "scale": 0.97,
+  "imag_cutoff": 30.0,
+  "level_of_theory": "B3LYP/6-31G(d,p) (Gaussian 16, ultrafine grid)",
+  "reactants": [
+    "gs.log"
+  ],
+  "transition_structure": [
+    "ts.log"
+  ],
+  "tunneling": "bell",
+  "project": false,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "2-d8 (bridge CD2 groups)",
+      "iso": "27,28,29,30,31,32,33,34",
+      "experimental": 1.06,
+      "uncertainty": null,
+      "note": "PyQuiverHS 1.075"
+    },
+    {
+      "position": "2-da (atom 27)",
+      "iso": "27",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "PyQuiverHS 1.006; not measured"
+    },
+    {
+      "position": "2-db (atom 28)",
+      "iso": "28",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "PyQuiverHS 1.125; not measured"
+    }
+  ]
+}

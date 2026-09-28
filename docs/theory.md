@@ -97,8 +97,10 @@ reaction coordinate: `V-ratio` is empty, `1D-tunn` is 1, and
 
     EQE = (s/s')f_R / (s/s')f_P
 
-is the equilibrium constant of R(heavy) + P(light) ⇌ R(light) + P(heavy),
-printed in the `KIE` column of an `EQE @` line. Symmetry numbers are not
+is the equilibrium constant of R(light) + P(heavy) ⇌ R(heavy) + P(light),
+that is K_L/K_H for R ⇌ P. It is printed in the `KIE` column of an
+`EQE @` line. Above 1, the heavy isotope accumulates in R, the side with
+the stiffer vibrations. Symmetry numbers are not
 included: (s/s')f is by definition the *reduced* ratio. If a substitution
 changes the symmetry number of a species (e.g. CH₃ → CH₂D), multiply by
 the ratio s/s' yourself.
@@ -179,6 +181,32 @@ A program that includes them adds ln[(σ_H/σ_L)‡ / (σ_H/σ_L)_R] to the righ
 side; the term vanishes when no substitution changes a symmetry number, or
 when it changes those of the reactant and the transition structure by the
 same ratio, as in the Claisen example.
+
+**Translational entropy.** The mass term (M_H/M_L)^{3/2} in δ is the
+translational partition-function ratio. Bigeleisen–Mayer does not use it. An
+unlabelled species' reduced ratio is exactly 1, so it can simply be left out
+of the input: the chloride of an SN2 reaction, for instance. In the
+free-energy route an unlabelled species' own free energy cancels between
+isotopologues as well. The translational terms of the labelled species do
+not: they cancel only when the reactant and the transition structure have
+the same total mass.
+
+A free-energy or enthalpy–entropy treatment that drops the translational
+term is therefore wrong by (3/2) ln[(M_H/M_L)_R / (M_H/M_L)‡], with M the
+total masses of the labelled reactant and of the transition structure. The
+term is not zero whenever an unlabelled partner adds its mass to the
+transition structure, as the chloride does in Cl⁻ + CH₃Br: the chloride's
+own terms cancel, but its mass is part of the transition structure's.
+PyQuiverHS's enthalpy–entropy terms are an example: they contain
+vibrational and rotational entropy only. The error is 1.3% for
+Cl⁻ + CH₃Br/CD₃Br. Grazioli et al. report an enthalpy–entropy KIE of 0.877
+at 300 K where Bigeleisen–Mayer gives 0.888 (their Table 7;
+benchmarks/sn2_chloride_methyl_bromide). Free energies from the same
+frequencies, without the translational term, give exactly 0.877; with it
+they give 0.8882, and the term above is the factor 1.0128 between them.
+When the same atoms appear on both sides (unimolecular reactions,
+conformational equilibria) the masses match, the translational terms cancel
+and the omission is harmless.
 
 The Bigeleisen–Mayer form is the robust one because of what happens to a
 soft vibration. For a mode with u = hcν/kT ≪ 1 its TRPF, ZPE and EXC

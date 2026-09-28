@@ -63,6 +63,7 @@ def compute(case, iso, reference=None):
         tunneling=case.get("tunneling", "bell"),
         project=case.get("project"),
         reference=reference,
+        imag_cutoff=case.get("imag_cutoff", 50.0),
     )
 
 
@@ -171,6 +172,8 @@ def format_case(case, rows):
     if compared:
         mad = sum(abs(r["deviation"]) for r in compared) / len(compared)
         lines += ["", "Mean absolute deviation over %d measured positions: %.4f" % (len(compared), mad)]
+        if case.get("alternative_to"):
+            lines += ["", "An alternative to `%s`, left out of the overall mean." % case["alternative_to"]]
     elif all(r["computed"] is None for r in rows):
         lines += ["", "No structures yet: add the frequency calculations and their paths to `case.json`."]
     else:
@@ -200,7 +203,8 @@ def main(argv=None):
         rows = run_case(case)
         payload[case["_name"]] = {"case": {k: v for k, v in case.items() if not k.startswith("_")}, "rows": rows}
         report.append(format_case(case, rows))
-        all_dev += [abs(r["deviation"]) for r in rows if r["deviation"] is not None]
+        if not case.get("alternative_to"):  # a rejected mechanism, computed for comparison only
+            all_dev += [abs(r["deviation"]) for r in rows if r["deviation"] is not None]
     if all_dev:
         report.append(
             "Overall mean absolute deviation over %d measured positions: %.4f\n"

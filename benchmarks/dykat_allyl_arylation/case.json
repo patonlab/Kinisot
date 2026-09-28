@@ -1,0 +1,62 @@
+{
+  "name": "Rh-catalysed asymmetric arylation of racemic 3-chlorocyclohexene (DYKAT): 13C KIEs from two enantiomeric channels",
+  "reference": [
+    {
+      "citation": "L. van Dijk, R. Ardkhean, M. Sidera, S. Karabiyikoglu, O. Sari, T. D. W. Claridge, G. C. Lloyd-Jones, R. S. Paton, S. P. Fletcher, Nat. Catal. 2021, 4, 284-292",
+      "doi": "10.1038/s41929-021-00589-y",
+      "method": "13C KIEs at natural abundance by quantitative 13C NMR of product 4 (3-phenylcyclohexene) from three reactions at 40 C in THF stopped at 10, 11 and 17% conversion, against fully converted product; relative to C5; averages and standard errors from Supplementary Table 4 (Figure 3a prints them to three decimals). Computed KIEs (Kinisot, 313.15 K, Bell) for the anti-oxidative addition of each enantiomer from Supplementary Tables 24 and 25; structures from Supplementary Data 1"
+    },
+    {
+      "citation": "H. J. A. Dale, A. G. Leach, G. C. Lloyd-Jones, J. Am. Chem. Soc. 2021, 143, 21079-21099 (Case Study IV; SI eqs S103-S112)",
+      "doi": "10.1021/jacs.1c07351",
+      "method": "the same data as an example of two channels converging on one product"
+    }
+  ],
+  "notes": "Two parallel channels (IMPLEMENTATION_PLAN.md, Phase 10): (S)-3 and (R)-3 undergo irreversible anti-oxidative addition through diastereomeric transition structures and converge on one eta3-allyl Rh intermediate, so each product allyl carbon comes from a different substrate carbon in each channel. Product C3 is the carbon that bore Cl in (S)-3 and the alkene terminus in (R)-3; C1 is the reverse; C2 is the central allyl carbon in both; C4 is next to the chlorinated carbon of (S)-3 and to the alkene terminus of (R)-3, C6 the reverse. The paper's per-channel KIEs (Bell, relative to the reference carbon) are, for (S)-3: C-Cl 1.035, alkene CH 0.998, central 0.994, CH2 next to C-Cl 1.006, CH2 next to CH 1.003; for (R)-3: C-Cl 1.029, CH 1.000, central 0.999, 1.006 and 1.002. With s = k_S/k_R = 3.3 the channel formula 1/KIE = sum_c y_c/KIE_c (y_S = s/(1+s)) gives C1 1.0050, C2 0.9952, C3 1.0266, C4 1.0051 and C6 1.0037, reproducing Figure 3d (1.006, 0.995, 1.027, 1.005, 1.003) to within the rounding of the inputs. C7, the ipso carbon of the phenyl group (1.0273 +/- 0.0063), comes from the irreversible transmetallation and is not modelled here. The paper computes each channel from the Rh-bound substrate complex to the transition structure. For an intermolecular KIE on this product the reactant in the flask is free 3 (Singleton), so computing from 3 as well shows the size of the complexation equilibrium isotope effect. Structures: the five Gaussian inputs hold the paper's coordinates for free 3 (pseudo-axial), the (R)- and (S)-3 reactant complexes and the (R)- and (S)-3 anti-oxidative-addition transition structures, as frequency jobs at its level (wB97X-D/6-31G(d), LANL2DZ with an f function of exponent 1.35 on Rh; see README.md). The jobs are still to be run, and computing the combined KIE needs the channel treatment of Phase 10.",
+  "temperature": 313.15,
+  "scale": null,
+  "level_of_theory": null,
+  "tunneling": "bell",
+  "project": false,
+  "reactants": null,
+  "transition_structure": null,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "C1 (bears Ph)",
+      "iso": null,
+      "experimental": 1.0097,
+      "uncertainty": 0.0044,
+      "note": "Fig. 3d 1.006 (s = 3.3)"
+    },
+    {
+      "position": "C2",
+      "iso": null,
+      "experimental": 0.9952,
+      "uncertainty": 0.0016,
+      "note": "Fig. 3d 0.995"
+    },
+    {
+      "position": "C3",
+      "iso": null,
+      "experimental": 1.0244,
+      "uncertainty": 0.0027,
+      "note": "Fig. 3d 1.027"
+    },
+    {
+      "position": "C4",
+      "iso": null,
+      "experimental": 1.0084,
+      "uncertainty": 0.004,
+      "note": "Fig. 3d 1.005"
+    },
+    {
+      "position": "C6",
+      "iso": null,
+      "experimental": 0.9983,
+      "uncertainty": 0.0048,
+      "note": "Fig. 3d 1.003"
+    }
+  ]
+}
