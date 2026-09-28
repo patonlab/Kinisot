@@ -256,10 +256,10 @@ def write_ensemble_results(log, results):
     log.Write(DASH_LINE)
     for r in results:
         log.Write(("\n  " + r.kind + " (ensemble) @ " + str(r.temperature) + " K").ljust(50))
+        lowest = "{:10.6f}".format(r.kie_tunnel_lowest) if r.kie_tunnel_lowest is not None else "{:>10}".format("-")
         log.Write(
-            " {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}-{:<10.6f} {:6.2f}".format(
-                r.kie, r.tunnel_corr, r.kie_tunnel, r.kie_tunnel_lowest, r.kie_tunnel_range[0], r.kie_tunnel_range[1],
-                r.n_effective,
+            " {:10.6f} {:10.6f} {:10.6f} {} {:10.6f}-{:<10.6f} {:6.2f}".format(
+                r.kie, r.tunnel_corr, r.kie_tunnel, lowest, r.kie_tunnel_range[0], r.kie_tunnel_range[1], r.n_effective,
             )
         )  # fmt: skip
         if r.reference is not None:

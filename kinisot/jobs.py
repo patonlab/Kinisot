@@ -150,7 +150,12 @@ def load_job(path):
             job["prd"] = _side(base, data["product"], "product")
     if ("isotopologues" in data) == ("iso" in data):
         raise KinisotInputError('give "iso" (one isotopologue) or "isotopologues" (a list), one of them')
-    entries = data.get("isotopologues") or [{"iso": data["iso"], "reference": data.get("reference")}]
+    if "isotopologues" in data:
+        entries = data["isotopologues"]
+        if not isinstance(entries, list) or not entries:
+            raise KinisotInputError('"isotopologues" must be a non-empty list')
+    else:
+        entries = [{"iso": data["iso"], "reference": data.get("reference")}]
     if "isotopologues" in data and "reference" in data:
         raise KinisotInputError('with "isotopologues", give each one its own "reference"')
     job["isotopologues"] = []

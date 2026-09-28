@@ -135,8 +135,13 @@ def _formula(data):
     return tuple(sorted(data.atomic_numbers))
 
 
-def _members(result, role, index, inputs):
-    """(data, light SpeciesResult, degeneracy, dG within the species or None, kappa_L) per conformer."""
+def _members(result, role, index, species):
+    """(data, light SpeciesResult, degeneracy, dG within the species or None, kappa_L) per conformer.
+
+    ``species`` is the loaded Conformers: a one-file species reaches compute_kie as a plain file, so its
+    degeneracy is read from here.
+    """
+    inputs = species.files
     if isinstance(result, EnsembleIsotopeEffect):
         rows = [c for c in result.conformers if c.role == role and c.species == index]
         return [(d, c.light, c.degeneracy, c.free_energy, c.kappa_light) for d, c in zip(inputs, rows)]
@@ -145,7 +150,7 @@ def _members(result, role, index, inputs):
     kappa = 1.0
     if light.imaginary is not None and result.kind == "KIE":
         kappa = tunneling_kappa(result.tunneling, light.imaginary, result.temperature, result.barrier)
-    return [(inputs[0], light, 1.0, None, kappa)]
+    return [(inputs[0], light, species.degeneracy[0] if species.degeneracy else 1.0, None, kappa)]
 
 
 def _anchor(members):
@@ -488,7 +493,7 @@ def compute_series(
         raise KinisotInputError("a series is made of transition structures")
 
     # effective free energy of each step: its lowest conformer's G, less RT ln of its conformer sum
-    members = [_members(r, "transition structure", 0, s.files) for r, s in zip(results, steps)]
+    members = [_members(r, "transition structure", 0, s) for r, s in zip(results, steps)]
     if series.commitment is not None:
         source = "commitment"
         semiclassical = tunnel = _commitment_energies(series.commitment, temperature)
@@ -764,7 +769,7 @@ def channels(
                 continue
             for role, side, sign in (("reactant", reactants, -1.0), ("transition structure", other, 1.0)):
                 for k, species in enumerate(side):
-                    members = _members(result, role, k, species.files)
+                    members = _members(result, role, k, species)
                     anchor = 0.0
                     if barriers is None:
                         anchor = _computed_anchor(members, temperature, scheme, "the channels' shares or barriers")

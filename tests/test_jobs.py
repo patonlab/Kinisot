@@ -195,3 +195,12 @@ def test_job_matches_channels_api(tmp_path, monkeypatch):
     assert data["kie_tunnel"] == pytest.approx(expected.kie_tunnel, abs=1e-13)
     assert data["shares"] == pytest.approx(list(expected.shares), abs=1e-13)
     assert data["results"][1]["series"] is True
+
+
+def test_isotopologues_must_be_a_non_empty_list(tmp_path):
+    base = dict(SETTINGS, reactants=[rel(tmp_path, REACTANT)], transition_structure=[rel(tmp_path, TS["A"])])
+    for value in ([], {}, "2"):
+        with open(os.path.join(str(tmp_path), "job.json"), "w") as handle:
+            json.dump(dict(base, isotopologues=value), handle)
+        with pytest.raises(KinisotInputError, match="non-empty list"):
+            load_job(os.path.join(str(tmp_path), "job.json"))

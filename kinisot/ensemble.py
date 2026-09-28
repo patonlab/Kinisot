@@ -182,8 +182,8 @@ class EnsembleIsotopeEffect:
     conformers: Tuple[ConformerResult, ...]
     kie: float
     kie_tunnel: float
-    kie_lowest: float  # from the lowest conformer of every species
-    kie_tunnel_lowest: float
+    kie_lowest: Optional[float]  # from the lowest conformer of every species (None if they cannot be ranked)
+    kie_tunnel_lowest: Optional[float]
     rho_reactant: float  # prod over reactant species of the ensemble-averaged rho
     rho_other: float  # the same for the other side, rho' without tunnelling
     rho_other_tunnel: float  # and with it
@@ -648,8 +648,25 @@ def compute_ensemble(
     rho_reactant, rho_other = _side_values(sides, energies, temperature, scheme, tunnel=False)
     rho_other_tunnel = _side_values(sides, energies, temperature, scheme, tunnel=True)[1]
     kie, kie_tunnel = rho_reactant / rho_other, rho_reactant / rho_other_tunnel
-    kie_lowest = _ensemble_value(sides, energies, temperature, "lowest", tunnel=False)
-    kie_tunnel_lowest = _ensemble_value(sides, energies, temperature, "lowest", tunnel=True)
+    # the lowest conformers: 'equal' weights set every free energy to zero, so rank by the given ones or by
+    # computed qRRHO ones; without either (no electronic energies), there is no lowest conformer to report
+    ranking = energies
+    if scheme == "equal":
+        ranking = {}
+        for rows in evaluated["reactant"] + evaluated["other"]:
+            if len(rows) < 2:
+                ranking.update({id(r): 0.0 for r in rows})
+            elif all(r["user_energy"] is not None for r in rows):
+                ranking.update({id(r): r["user_energy"] for r in rows})
+            elif all(r["data"].energy is not None for r in rows):
+                ranking.update({id(r): free_energy(r["data"], r["light"], temperature, "qrrho") for r in rows})
+            else:
+                ranking = None
+                break
+    kie_lowest = kie_tunnel_lowest = None
+    if ranking is not None:
+        kie_lowest = _ensemble_value(sides, ranking, temperature, "lowest", tunnel=False)
+        kie_tunnel_lowest = _ensemble_value(sides, ranking, temperature, "lowest", tunnel=True)
 
     # sensitivity: move each free energy by +/- weight_uncertainty in turn
     values = [kie_tunnel]
@@ -728,8 +745,8 @@ def compute_ensemble(
         conformers=tuple(conformers),
         kie=float(kie),
         kie_tunnel=float(kie_tunnel if kind == "KIE" else kie),
-        kie_lowest=float(kie_lowest),
-        kie_tunnel_lowest=float(kie_tunnel_lowest if kind == "KIE" else kie_lowest),
+        kie_lowest=None if kie_lowest is None else float(kie_lowest),
+        kie_tunnel_lowest=None if kie_lowest is None else float(kie_tunnel_lowest if kind == "KIE" else kie_lowest),
         rho_reactant=float(rho_reactant),
         rho_other=float(rho_other),
         rho_other_tunnel=float(rho_other_tunnel if kind == "KIE" else rho_other),

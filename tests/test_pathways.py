@@ -36,7 +36,8 @@ SHI = os.path.join(ROOT, "benchmarks", "shi_epoxidation")
 T, SCALE = 273.15, 0.9614
 OPTIONS = dict(temperature=T, scale=SCALE, project=True)
 # Two routes through computed free energies agree only to round-off: the channel and series code subtracts
-# absolute free energies of about 1e4 kcal/mol, which loses about 1e-12 kcal/mol (1e-13 in a KIE on some platforms)
+# absolute free energies (8e5 kcal/mol for the Shi transition structures), which loses about 1e-10 kcal/mol, far
+# below the precision of the electronic energies themselves; in a KIE that is 1e-13 on some platforms
 ROUTES = 1e-11
 
 
@@ -326,3 +327,21 @@ def test_a_channel_can_be_a_series(shi):
     assert 0 < by_barrier.shares[0] < 1
     assert quiet(channels, [dict(rct=reactant, ts=Conformers([ts["A"]]), iso=["2", "8"])], **OPTIONS).kie_tunnel == \
         pytest.approx(pair(reactant, ts["A"]).kie_tunnel)  # fmt: skip
+
+
+def test_the_degeneracy_of_a_one_file_species_counts(shi):
+    """Conformers([ts], degeneracy=[2]) reaches compute_kie as a plain file; its degeneracy must still count."""
+    reactant, ts = shi
+    doubled = Conformers([ts["A"]], degeneracy=[2])
+    jobs = [dict(rct=reactant, ts=ts["A"], iso=["2", "8"]), dict(rct=reactant, ts=ts["G"], iso=["2", "8"])]
+    plain = quiet(channels, jobs, **OPTIONS)
+    twice = quiet(channels, [dict(jobs[0], ts=doubled), jobs[1]], **OPTIONS)
+    assert twice.shares[0] / twice.shares[1] == pytest.approx(2 * plain.shares[0] / plain.shares[1], rel=1e-8)
+    by_barrier = quiet(channels, [dict(jobs[0], ts=doubled), jobs[1]], barriers=[0.0, 1.0], **OPTIONS)
+    single = quiet(channels, jobs, barriers=[0.0, 1.0], **OPTIONS)
+    assert by_barrier.shares[0] / by_barrier.shares[1] == pytest.approx(2 * single.shares[0] / single.shares[1])
+    # a series: the doubled step is twice as fast, so its 1/k weight halves
+    series = [quiet(compute_kie, rct=reactant, ts=Series([step, ts["G"]], free_energies=[0.0, 1.0]),
+                    iso=["2", "8", "8"], **OPTIONS) for step in (ts["A"], doubled)]  # fmt: skip
+    ratio = [s.shares[0] / s.shares[1] for s in series]
+    assert ratio[1] == pytest.approx(ratio[0] / 2, rel=1e-12)

@@ -125,6 +125,16 @@ def test_weighting_schemes(shi):
     lowest = kie(reactant, [files], weights="lowest")
     assert lowest.kie_tunnel == pytest.approx(pairs["A"].kie_tunnel, abs=1e-12)
     equal = kie(reactant, [files], weights="equal", tunneling="none")
+    # the lowest conformer is still found with equal weights, whatever the order of the files
+    for order in (files, files[::-1]):
+        assert kie(reactant, [order], weights="equal").kie_tunnel_lowest == pytest.approx(
+            pairs["A"].kie_tunnel, abs=1e-12
+        )
+    no_energies = [dataclasses.replace(f, energy=None) for f in files]
+    unranked = kie(reactant, [no_energies], weights="equal")
+    assert unranked.kie_tunnel_lowest is None and unranked.kie_lowest is None
+    ranked = kie(reactant, Conformers(no_energies[::-1], free_energies=[3, 2, 1, 0]), weights="equal")
+    assert ranked.kie_tunnel_lowest == pytest.approx(pairs["A"].kie_tunnel, abs=1e-12)
     rho = [p.other.rpfr / p.imag_ratio for p in pairs.values()]
     assert equal.kie == pytest.approx(pairs["A"].reactant.rpfr / np.mean(rho), abs=1e-13)
     assert all(r.free_energy is None for r in equal.rows("transition structure"))
