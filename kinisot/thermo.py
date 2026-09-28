@@ -125,6 +125,35 @@ def skodje_truhlar_correction(imaginary_light, imaginary_heavy, temperature, bar
 TUNNELING_MODELS = ("none", "bell", "wigner", "skodje")
 
 
+def tunneling_kappa(model, imaginary_wn, temperature, barrier_kcal=None):
+    """Tunnelling factor of one isotopologue; tunneling_correction is the ratio of two of these.
+
+    Conformer ensembles need it on its own: a transition-structure conformer's share of the rate
+    carries the light isotopologue's factor.
+    """
+    if model == "none":
+        return 1.0
+    if model == "bell":
+        u = float(reduced_energies(imaginary_wn, temperature))
+        if u >= 2.0 * np.pi:
+            raise KinisotInputError(
+                "the Bell tunnelling correction is not defined at %.1f K for an imaginary frequency of "
+                "%.1fi cm-1 (crossover temperature %.1f K); use --tunneling wigner or --tunneling none"
+                % (temperature, imaginary_wn, crossover_temperature(imaginary_wn))
+            )
+        return float(0.5 * u / np.sin(0.5 * u))
+    if model == "wigner":
+        return float(1.0 + float(reduced_energies(imaginary_wn, temperature)) ** 2 / 24.0)
+    if model == "skodje":
+        if barrier_kcal is None:
+            raise KinisotInputError(
+                "the Skodje-Truhlar correction needs the barrier height: give --barrier (kcal/mol) or files whose "
+                "electronic energies Kinisot can read"
+            )
+        return skodje_truhlar_kappa(imaginary_wn, temperature, barrier_kcal)
+    raise KinisotInputError("unknown tunnelling model %r (choose from %s)" % (model, ", ".join(TUNNELING_MODELS)))
+
+
 def tunneling_correction(model, imaginary_light, imaginary_heavy, temperature, barrier_kcal=None):
     """Tunnelling correction factor for the KIE, by model name.
 

@@ -57,3 +57,32 @@ def test_ensemble_is_dominated_by_ts_10(shi):
         assert 0.84 < ensemble["share"]["A"] < 0.91 and 0.05 < ensemble["share"]["B"] < 0.14, name
         for site in module.SITES:
             assert ensemble["relative"][site] == pytest.approx(rows["A"]["relative"][site], abs=5e-4), (name, site)
+
+
+def test_compute_kie_reproduces_the_prototype(shi):
+    """The prototype's qRRHO ensemble, from compute_kie with all 18 structures as conformers."""
+    import warnings
+
+    from kinisot import compute_kie, equivalent_positions, load_hessian
+
+    module, rows, ensembles = shi
+    reactant = load_hessian(os.path.join(ENSEMBLE, "..", "methylstyrene.log"))
+    conformers = [[load_hessian(module.path(label)) for label in module.LABELS]]
+
+    def site(pairs):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = [
+                compute_kie(rct=reactant, ts=conformers, iso=list(pair), temperature=module.TEMPERATURE,
+                            scale=module.SCALE, project=True)
+                for pair in pairs
+            ]  # fmt: skip
+        return results, equivalent_positions(results)[1]
+
+    results, meta = site(module.META)
+    prototype = ensembles["qRRHO G, 273 K"]
+    shares = [c.population for c in results[0].rows("transition structure")]
+    # GoodVibes reads Gaussian's projected frequencies; Kinisot projects its own (within 0.006 kcal/mol)
+    assert shares == pytest.approx([prototype["share"][label] for label in module.LABELS], abs=3e-4)
+    for name, pairs in module.SITES.items():
+        assert site(pairs)[1] / meta == pytest.approx(prototype["relative"][name], abs=2e-6), name

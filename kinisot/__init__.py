@@ -9,6 +9,10 @@ Python::
     from kinisot import compute_kie
     result = compute_kie(rct="reactant.out", ts="ts.out", iso="5", temperature=393.0, scale=0.961)
     result.kie_tunnel, result.zpe, result.exc, result.trpf, result.to_dict()
+
+    # a conformer ensemble: several files for one species
+    result = compute_kie(rct="reactant.out", ts=[["ts_a.out", "ts_b.out"]], iso="5", temperature=393.0)
+    result.kie_tunnel, result.conformers, result.kie_lowest, result.n_effective
 """
 
 __version__ = "2.6.0.dev0"
@@ -17,6 +21,7 @@ from .api import IsotopeEffect, IsotopologueResult, SideResult, SpeciesResult, c
 from .backends import load_hessian
 from .backends.ase import build_calculator, hessian_for_geometry, hessian_from_calculator, save_hessian_json
 from .backends.gaussian import parse_gaussian
+from .ensemble import ConformerResult, Conformers, EnsembleIsotopeEffect, equivalent_positions
 from .exceptions import KinisotError, KinisotInputError, KinisotParseError, KinisotWarning
 from .hessian import HessianInput, mass_weight
 from .isotopes import Substitution, isotope_mass, light_mass, substitute
@@ -32,6 +37,10 @@ __all__ = [
     "SideResult",
     "IsotopologueResult",
     "SpeciesResult",
+    "Conformers",
+    "ConformerResult",
+    "EnsembleIsotopeEffect",
+    "equivalent_positions",
     "HessianInput",
     "load_hessian",
     "parse_gaussian",
