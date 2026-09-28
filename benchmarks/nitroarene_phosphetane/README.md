@@ -29,7 +29,9 @@ At 393 K with the paper's scale factor (0.9614), uncorrected:
 | Experiment | | | 1.033 ± 0.003 | 1.066 ± 0.003 |
 
 With Bell tunnelling, TS2 gives 1.0346 and 1.0709, and TS1B 1.0319 and
-1.0654.
+1.0653. The singly labelled values here are the exact (harmonic) averages;
+the benchmark runner averages the two positions geometrically and reports
+1.0305 and, with Bell, 1.0321 for TS1B (the same to 10⁻⁵ for TS2).
 
 - **The jobs reproduce the paper's predictions**, to within 0.0006 for
   TS2 and 0.0010 for TS1B.
