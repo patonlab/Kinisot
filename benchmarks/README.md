@@ -50,9 +50,15 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   for that entry (13C and 2H KIEs are often measured against different
   positions). `reference_average` gives several labels instead, for a
   reference group whose positions interconvert (the three hydrogens of a
-  rotating methyl group); the KIE is divided by the geometric mean of theirs.
+  rotating methyl group); the KIE is divided by their average. `iso_average`
+  does the same for the measured position. Both average the isotope ratios
+  over the placements on each side (`kinisot.equivalent_positions`), which is
+  exact: the placements are conformers of equal weight.
   `reference` at the top may be a list of sources; `notes` is printed under
   the source line.
+- A species may be a list of files instead of one file: its conformers,
+  weighted as `compute_kie` does (`weights`: `qrrho` by default, or `rrho`,
+  `lowest`, `equal`).
 - Optional: `imag_cutoff` (cm⁻¹, default 50) for a transition structure whose
   reaction-coordinate frequency is small, as in some conformational
   processes.
@@ -80,7 +86,7 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | tetramethylcyclohexane_eie | in repo (PyQuiverHS SI; B3LYP/6-311G(d)) | as quoted in their Table 8 (Anet et al., JACS 1980): EQE 1.042 ± 0.001 at 290.15 K (deviation 0.0003) |
 | nitroarene_phosphetane | in repo (ORCA 6.1.0 M06-2X/6-31G(d,p) at the SI geometries; external modes projected) | entered: Kang, Radosevich, Tetrahedron 2025, 186, 134892, Tables 1 and 2: 18O KIEs 1.033 ± 0.003 (one oxygen) and 1.066 ± 0.003 (both); transition structure TS2 (deviations +0.0016 and +0.0049 with Bell tunnelling) |
 | nitroarene_phosphetane_ts1b | in repo (the same jobs) | same measurements against the monotopic TS1B the paper rejects (`alternative_to`, left out of the overall mean): −0.0009 and −0.0007 |
-| wittig_anisaldehyde | needed (anisaldehyde, ylide, two transition structures in series; M06-2X/6-31+G**/PCM) and Phase 10's series treatment | entered: Chen, Nieves-Quinones, Waas, Singleton, JACS 2014, 136, 13122, Figure 1 (three positions); Table 1's predictions in the notes |
+| wittig_anisaldehyde | needed (Gaussian inputs at the SI geometries in the case directory: anisaldehyde, ylide, two transition structures in series; M06-2X/6-31+G**/PCM) and Phase 10's series treatment | entered: Chen, Nieves-Quinones, Waas, Singleton, JACS 2014, 136, 13122, Figure 1 (three positions); Table 1's predictions in the notes |
 | dykat_allyl_arylation | needed (Gaussian inputs at the paper's geometries in the case directory: free 3, both reactant complexes, both anti-oxidative-addition transition structures) and Phase 10's channel treatment | entered: van Dijk et al., Nat. Catal. 2021, 4, 284, SI Table 4 (five allyl positions); the paper's combined predictions in the notes |
 
 The five cases from the PyQuiverHS SI also keep PyQuiverHS's input and its

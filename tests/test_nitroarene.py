@@ -16,7 +16,7 @@ import warnings
 
 import pytest
 
-from kinisot import KinisotWarning, compute_kie, load_hessian
+from kinisot import KinisotWarning, compute_kie, equivalent_positions, load_hessian
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 CASE = os.path.join(ROOT, "benchmarks", "nitroarene_phosphetane")
@@ -29,16 +29,21 @@ def files():
     return {name: load_hessian(os.path.join(CASE, name + ".out")) for name in ("phno2", "ts2", "ts1b")}
 
 
-def kie(files, ts, oxygens, tunneling="none", project=True):
-    """KIE of the 18O label(s) relative to [15N]-nitrobenzene; ``oxygens`` indexes (A, B) of the TS."""
+def result(files, ts, oxygens, tunneling="none", project=True):
+    """compute_kie for the 18O label(s) with 15N, against 15N alone; ``oxygens`` indexes (A, B) of the TS."""
     n, *ts_oxygens = ATOMS[ts]
     rct = ",".join(["12:15N"] + ["%d:18O" % (13 + i) for i in oxygens])
     other = ",".join(["%d:15N" % n] + ["%d:18O" % ts_oxygens[i] for i in oxygens])
-    result = compute_kie(
+    return compute_kie(
         rct=[files["phno2"]], ts=[files[ts]], iso=[rct, other], reference=["12:15N", "%d:15N" % n],
         temperature=393.0, scale=0.9614, tunneling=tunneling, project=project,
     )  # fmt: skip
-    return result.kie_relative if tunneling == "none" else result.kie_tunnel_relative
+
+
+def kie(files, ts, oxygens, tunneling="none", project=True):
+    """KIE of the 18O label(s) relative to [15N]-nitrobenzene."""
+    r = result(files, ts, oxygens, tunneling, project)
+    return r.kie_relative if tunneling == "none" else r.kie_tunnel_relative
 
 
 def test_projected_frequencies_match_orca(files):
@@ -73,9 +78,13 @@ def test_ts1b_singly_labelled_kie_is_an_average_over_both_oxygens(files):
     # the paper's 1.0468 (SI Table S3) is the attacked oxygen alone
     assert attacked == pytest.approx(1.0468, abs=1e-3)
     assert abs(spectator - 1.0468) > 0.03
-    # a singly labelled molecule reacts through both isotopomers: harmonic mean of the two
+    # a singly labelled molecule reacts through both isotopomers: harmonic mean of the two, which is what
+    # averaging the isotope ratios over both placements gives
     average = 2 / (1 / attacked + 1 / spectator)
     assert average == pytest.approx(1.0304, abs=1e-4)
+    placements = [result(files, "ts1b", (i,)) for i in (0, 1)]
+    exact = equivalent_positions(placements)[0] / placements[0].reference.kie
+    assert average == pytest.approx(exact, abs=1e-8)
     assert abs(average - 1.033) < 0.003  # within the measured value's error
     # and the doubly labelled KIE is close to the product of the two positions, as for TS2
     both = kie(files, "ts1b", (0, 1))
@@ -93,7 +102,8 @@ def test_benchmark_cases():
     assert [round(r["semiclassical"], 4) for r in rows] == [1.0322, 1.0661]
     assert [round(r["computed"], 4) for r in rows] == [1.0346, 1.0709]
     rows = module.run_case(ts1b)
-    # the runner averages equivalent positions geometrically (1.0305); the exact average is 1.0304
-    assert [round(r["semiclassical"], 4) for r in rows] == [1.0305, 1.0621]
+    # the runner averages the isotope ratios over equivalent positions, which is exact
+    assert [round(r["semiclassical"], 4) for r in rows] == [1.0304, 1.0621]
+    assert [round(r["computed"], 4) for r in rows] == [1.0319, 1.0653]
     assert ts1b["alternative_to"] == "nitroarene_phosphetane"
     assert "left out of the overall mean" in module.format_case(ts1b, rows)

@@ -462,6 +462,8 @@ def compute_kie(
     reference=None,
     calculator=None,
     delta=0.01,
+    weights=None,
+    weight_uncertainty=0.5,
 ):
     """Compute a kinetic (``ts``) or equilibrium (``prd``) isotope effect.
 
@@ -469,6 +471,12 @@ def compute_kie(
     ----------
     rct, ts, prd : path, HessianInput, or a list of them
         Reactant(s) and either the transition structure(s) or the product(s).
+        A species given as a list of files, or as ``Conformers(...)``, is a
+        conformer ensemble (see kinisot.ensemble): ``rct="gs.out",
+        ts=[["ts1.out", "ts2.out"]]`` weights two TS conformers.
+        ``ts=Series([...])`` gives transition structures in series (see
+        kinisot.pathways); ``iso`` then has one label per reactant and one
+        per step.
     iso : str or list of str
         Atom numbers to substitute, one label per file in the order of the
         reactants followed by the transition structure/product ('0' for a
@@ -497,10 +505,14 @@ def compute_kie(
         'module:callable') or an ASE calculator object, used to compute the
         Hessian of inputs that are geometry files; ``delta`` is the
         finite-difference step in Angstrom.
+    weights : how conformers of an ensemble are weighted: 'qrrho' (default),
+        'rrho', 'user' (the free energies given with Conformers), 'lowest'
+        or 'equal'. ``weight_uncertainty`` (kcal/mol) sets the sensitivity
+        range reported for the ensemble.
 
     Returns
     -------
-    IsotopeEffect
+    IsotopeEffect; EnsembleIsotopeEffect when a species has several conformers; SeriesIsotopeEffect for a Series
 
     Raises
     ------
@@ -519,6 +531,25 @@ def compute_kie(
         raise KinisotInputError(
             "unknown tunnelling model %r (choose from %s)" % (tunneling, ", ".join(TUNNELING_MODELS))
         )
+    # imported here: kinisot.ensemble and kinisot.pathways import this module
+    from .ensemble import compute_ensemble, is_ensemble
+    from .pathways import Series, compute_series
+
+    series = [x for x in _as_list(ts) if isinstance(x, Series)]
+    if series:
+        if len(_as_list(ts)) != 1:
+            raise KinisotInputError("a Series is the whole transition-structure side: pass ts=Series([...]) alone")
+        return compute_series(
+            rct, series[0], iso=iso, temperature=temperature, scale=scale, imag_cutoff=imag_cutoff, tunneling=tunneling,
+            scale_type=scale_type, project=project, barrier=barrier, reference=reference, calculator=calculator,
+            delta=delta, weights=weights, weight_uncertainty=weight_uncertainty,
+        )  # fmt: skip
+    if weights is not None or is_ensemble(rct) or is_ensemble(ts if ts is not None else prd):
+        return compute_ensemble(
+            rct, ts, prd, iso=iso, temperature=temperature, scale=scale, imag_cutoff=imag_cutoff, tunneling=tunneling,
+            scale_type=scale_type, project=project, barrier=barrier, reference=reference, calculator=calculator,
+            delta=delta, weights=weights, weight_uncertainty=weight_uncertainty,
+        )  # fmt: skip
 
     kind = "KIE" if ts is not None else "EQE"
     side_name = "transition structure" if kind == "KIE" else "product"

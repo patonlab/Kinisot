@@ -11,6 +11,7 @@ frequency outputs the examples read live in `../tests/data/gaussian/`.
 | [diels_alder](diels_alder/README.md) | Diels–Alder reaction of isoprene with maleic anhydride | ¹³C and ²H KIEs at 298 K; one versus two reactant files | `dienophile.out`, `diene.out`, `DATS_rct.out`, `DATS.out` |
 | [orca_claisen](orca_claisen/README.md) | the Claisen KIE from ORCA `.out`/`.hess` files, scaling factor detected from the `!` line | ¹³C KIE at 393 K | `tests/data/orca/*` |
 | [mlip_claisen](mlip_claisen/README.md) | Hessians in ASE form, and how to compute them with a machine-learned potential (`--calc`) | ¹³C KIE at 393 K | `tests/data/ase/*` |
+| [conformers](conformers/README.md) | Claisen rearrangement of allyl vinyl ether, eight reactant conformers and the chair and boat transition structures (GFN2-xTB) | ¹³C, ¹⁷O and ²H KIEs at 393 K from the lowest pair and from the conformer ensemble; degeneracies; a job file | `conformers/*.hessian.json` |
 | [eqe_cyclohexane](eqe_cyclohexane/README.md) | CD₃ axial/equatorial preference in 1,1,3,3-tetramethylcyclohexane | equilibrium isotope effect at 290 and 300 K | `tetramethylcyclohexane.out` |
 
 The same calculations from Python: [api_example.py](api_example.py) and the
@@ -23,6 +24,7 @@ examples/run_examples.sh                       # with the kinisot console script
 KINISOT="python -m kinisot" examples/run_examples.sh
 ```
 
-All frequency calculations are B3LYP/6-31G(d) (Gaussian 09/16). Reading the
+All frequency calculations are B3LYP/6-31G(d) (Gaussian 09/16), except the
+GFN2-xTB Hessians of mlip_claisen and conformers. Reading the
 output table is explained in the [README](../README.md#reading-the-output)
 and the equations in [docs/theory.md](../docs/theory.md).

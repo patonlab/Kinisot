@@ -19,7 +19,7 @@ from kinisot import cli
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXAMPLES = os.path.join(ROOT, "examples")
-RESULT = re.compile(r"^  (KIE|EQE) @ .*$", re.M)
+RESULT = re.compile(r"^  (KIE|EQE)( \((ensemble|series|channels)\))? @ .*$", re.M)
 
 
 def example_commands():
@@ -32,7 +32,7 @@ def example_commands():
     for line in script.splitlines():
         line = line.strip()
         if line.startswith("cd "):
-            directory = next((d for d in ("orca", "xtb", "ase") if "/" + d in line), "gaussian")
+            directory = next((d for d in ("orca", "xtb", "ase", "conformers") if "/" + d in line), "gaussian")
         elif line.startswith("for atoms in "):
             loop_values = line[len("for atoms in ") :].split(";")[0].split()
         elif line == "done":
@@ -48,9 +48,10 @@ COMMANDS = example_commands()
 
 
 def test_all_example_commands_found():
-    assert len(COMMANDS) == 32
+    assert len(COMMANDS) == 35
     assert sum(1 for case, _, _ in COMMANDS if case == "claisen") == 12
     assert sum(1 for _, directory, _ in COMMANDS if directory == "xtb") == 4
+    assert sum(1 for _, directory, _ in COMMANDS if directory == "conformers") == 3
 
 
 @pytest.mark.parametrize("case", sorted({case for case, _, _ in COMMANDS}))
@@ -58,7 +59,7 @@ def test_examples_reproduce_expected_output(case, tmp_path, monkeypatch):
     output = str(tmp_path / "output.dat")
     for command_case, directory, args in COMMANDS:
         if command_case == case:
-            monkeypatch.chdir(datapath(directory))
+            monkeypatch.chdir(os.path.join(EXAMPLES, directory) if directory == "conformers" else datapath(directory))
             assert cli.main(shlex.split(args) + ["--quiet", "--output", output]) == 0
     with open(os.path.join(EXAMPLES, case, "expected_output.dat")) as handle:
         expected_text = handle.read()

@@ -6,6 +6,72 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- Conformer ensembles (IMPLEMENTATION_PLAN.md, Phase 10). A species given
+  as several files, `kinisot --rct gs_1.out gs_2.out --ts ts_*.out`, or in
+  Python as a list or `Conformers(files, free_energies=None,
+  degeneracy=None)`, is an ensemble of conformers with the same atom
+  numbering, in fast equilibrium.
+  - KIE = Σ x_i ρ_i / Σ y_j ρ‡_j, with the weights of the light isotopologue,
+    which is exact; for a transition structure, the weight is its share of
+    the rate, including its tunnelling factor. EQEs work the same way.
+    docs/theory.md has a new section 7 with the derivation.
+  - `--weights` (`weights=`): `qrrho` (default; quasi-harmonic free
+    energies from Kinisot's frequencies with Grimme's entropy interpolation,
+    through GoodVibes' functions), `rrho`, `user`, `lowest` or `equal`.
+    `--energies TABLE` gives your own free energies and degeneracies.
+  - The result, `EnsembleIsotopeEffect`, lists each conformer's free
+    energy, share and own KIE, and gives the KIE of the lowest conformers,
+    the effective number of transition-structure conformers and the range
+    when each free energy moves by ±0.5 kcal/mol (`--weight-uncertainty`).
+    The text output prints the conformer table and `KIE (ensemble) @ T`
+    lines; JSON and CSV carry the same.
+  - Conformers of a species must have the same atoms in the same order
+    (an error names the first difference). Different bonding, duplicate
+    structures and different levels of theory are warnings.
+  - One conformer per species gives the ordinary `IsotopeEffect`, unchanged.
+  - `kinisot.equivalent_positions()` gives the exact isotope effect of
+    positions made equivalent by fast motion from one result per placement
+    of the label.
+  - Over the 18 Shi epoxidation transition structures, `compute_kie`
+    reproduces the prototype ensemble (`benchmarks/shi_epoxidation/ensemble`)
+    to 2 × 10⁻⁶ at every site. Benchmark cases may list conformers per
+    species.
+- Transition structures in series and parallel channels (Phase 10;
+  docs/theory.md, sections 7a and 7b).
+  - `compute_kie(rct, ts=Series([ts_1, ts_2, ...]), iso=...)` combines
+    steps none of which alone commits the substrate:
+    KIE = Σ w_n KIE_n with w_n ∝ exp(+G_n/RT)/κ_L,n. The weights come from a
+    commitment factor (two steps), the steps' free energies, or computed
+    free energies. The result gives each step's KIE and share, C_f, a
+    sensitivity range, `kie_at(C_f)` and `commitment_for(measured)`.
+  - `channels([dict(rct=..., ts=..., iso=...), ...])` combines parallel
+    routes with their own reactants, transition structures or labels:
+    1/KIE = Σ y_c/KIE_c. The shares are given (a measured selectivity),
+    built from barriers, or computed; `amounts` covers reactants that do not
+    interconvert, and `selectivity_for(measured)` inverts two channels.
+  - A step or a channel may be a conformer ensemble, and a channel may be a
+    series.
+  - `series_kie()` and `channel_kie()` apply the formulas to KIEs from
+    anywhere. They reproduce the Wittig predictions of Chen et al. (JACS
+    2014; 1.028 from the free energies, 1.033 from the trajectories) and
+    Figure 3d of van Dijk et al. (Nat. Catal. 2021; s = 3.3).
+  - Checks: the series formula matches the slowest eigenvalue of a
+    three-step rate matrix to 7 × 10⁻⁸, and channels computed from one
+    reactant reproduce the conformer ensemble of their transition
+    structures to 10⁻¹³.
+- Worked example `examples/conformers`: eight GFN2-xTB conformers of allyl
+  vinyl ether and the chair and boat Claisen transition structures, made by
+  `scripts/make_conformer_example.py` (conformer search by dihedral
+  rotation, duplicates and mirror images recognized, degeneracies from
+  chirality, each saddle point checked to connect reactant and product).
+  ¹³C and ¹⁷O KIEs hardly depend on the conformer; the C4-d₂ KIE runs from
+  0.926 to 0.984, and the ensemble (0.968) differs from the lowest pair by
+  0.010. `run_examples.sh` and `tests/test_examples.py` include it.
+- `kinisot --job job.json`: a JSON job file with the structures, labels and
+  settings, for series, channels, conformer ensembles with free energies,
+  and several isotopologues in one run (docs/job_files.md). The results
+  file prints the steps or channels with their shares, and `--json` and
+  `--csv` carry an `isotopologue` key.
 - Five benchmark cases from the SI of the PyQuiverHS paper (Grazioli, Ly,
   Sabetnejad, Mattapalli, Nguyen and O'Leary, ChemRxiv 2026), included with
   the authors' agreement. Each has its Gaussian files, the PyQuiverHS input
@@ -177,6 +243,14 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 - The calculator registry records which keyword receives the `:model` part
   of a `--calc` specification (`method` for tblite, `model` elsewhere).
+- The benchmark runner averages equivalent positions (`iso_average`,
+  `reference_average`) exactly: the isotope ratios are averaged over the
+  placements of the label on each side, which for a difference on one side
+  is the harmonic mean of the separate KIEs. It took the geometric mean
+  before. Two reported values move: the Diels–Alder H3 KIE by 1 × 10⁻⁴
+  (0.9904 to 0.9905) and the singly labelled TS1B nitroarene KIE by
+  1 × 10⁻⁴ (1.0305 to 1.0304; 1.0321 to 1.0319 with Bell tunnelling). The
+  mean absolute deviation over the 34 measured positions stays 0.0058.
 
 ## [2.5.0] - 2026-09-25
 

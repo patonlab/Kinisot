@@ -12,11 +12,10 @@ without an "iso" label, are listed with their experimental values only.
 import argparse
 import glob
 import json
-import math
 import os
 import sys
 
-from kinisot import __version__, compute_kie
+from kinisot import __version__, compute_kie, equivalent_positions
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -36,11 +35,18 @@ def load_cases(names=None):
 
 
 def resolve(case, key):
-    """The files listed under ``key`` as paths relative to the case directory, or None."""
+    """The files listed under ``key`` as paths relative to the case directory, or None.
+
+    An entry that is itself a list holds the conformers of one species.
+    """
     files = case.get(key)
     if not files:
         return None
-    return [os.path.normpath(os.path.join(case["_dir"], f)) for f in files]
+
+    def path(f):
+        return os.path.normpath(os.path.join(case["_dir"], f))
+
+    return [[path(g) for g in f] if isinstance(f, list) else path(f) for f in files]
 
 
 def measured(entry):
@@ -64,12 +70,8 @@ def compute(case, iso, reference=None):
         project=case.get("project"),
         reference=reference,
         imag_cutoff=case.get("imag_cutoff", 50.0),
+        weights=case.get("weights"),
     )
-
-
-def geometric_mean(values):
-    """Geometric mean, for positions that are equivalent in the experiment."""
-    return math.exp(sum(math.log(v) for v in values) / len(values))
 
 
 def has_structures(case):
@@ -86,14 +88,16 @@ def run_case(case):
         computable = has_structures(case) and (entry.get("iso") is not None or bool(entry.get("iso_average")))
         if computable and (entry.get("iso_average") or entry.get("reference_average")):
             # positions that are equivalent in the experiment (a rotating methyl group, the two ortho or
-            # meta carbons of a phenyl ring) but not in the static structures: geometric mean over them
+            # meta carbons of a phenyl ring) but not in the static structures: each placement of the label
+            # is a conformer of equal weight, so the isotope ratios are averaged on each side
             results = [compute(case, label) for label in entry.get("iso_average") or [entry["iso"]]]
-            computed = geometric_mean([r.kie_tunnel for r in results])
-            semiclassical = geometric_mean([r.kie for r in results])
-            references = [compute(case, label) for label in entry.get("reference_average", [])]
-            if references:
-                computed /= geometric_mean([r.kie_tunnel for r in references])
-                semiclassical /= geometric_mean([r.kie for r in references])
+            semiclassical, computed = equivalent_positions(results)
+            reference = entry.get("reference", case.get("reference_isotopologue"))
+            labels = entry.get("reference_average") or ([reference] if reference is not None else [])
+            if labels:
+                reference_kie, reference_kie_tunnel = equivalent_positions([compute(case, label) for label in labels])
+                semiclassical /= reference_kie
+                computed /= reference_kie_tunnel
             tunneling = results[0].tunneling
         elif computable:
             result = compute(case, entry["iso"], entry.get("reference", case.get("reference_isotopologue")))

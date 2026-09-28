@@ -79,9 +79,12 @@ The equations behind every column are in [docs/theory.md](docs/theory.md).
 ## Usage
 
 ```
-kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso ATOMS ...]
-        [-t K] [-s FACTOR] [--imag-cutoff CM-1] [--tunneling MODEL] [--barrier KCAL] [--project]
-        [--reference ATOMS] [--calc SPEC] [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
+kinisot --rct FILE [FILE ...] [--rct FILE ...] (--ts FILE [FILE ...] | --prd FILE [FILE ...])
+        --iso ATOMS [--iso ATOMS ...] [-t K] [-s FACTOR] [--imag-cutoff CM-1] [--tunneling MODEL]
+        [--barrier KCAL] [--project] [--reference ATOMS] [--calc SPEC]
+        [--weights SCHEME] [--energies TABLE] [--weight-uncertainty KCAL]
+        [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
+kinisot --job job.json [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
 ```
 
 `python -m kinisot` is equivalent to `kinisot`.
@@ -93,6 +96,7 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | KIE, one reactant | `kinisot --rct gs.out --ts ts.out --iso 5` | one `--iso` when the atom numbering is the same in both files |
 | KIE, bimolecular | `kinisot --rct dienophile.out --rct diene.out --ts ts.out --iso 0 --iso 6 --iso 15` | one `--iso` per file, `--rct` files first, `0` for a file without a substituted atom |
 | EQE | `kinisot --rct conf_a.out --prd conf_b.out --iso 24,25,26 --iso 28,29,30` | the same, with the product instead of a TS |
+| Conformers | `kinisot --rct gs_1.out gs_2.out --ts ts_*.out --iso 5` | several files after one flag are conformers of one species, with the same atom numbering; one `--iso` per flag |
 
 **Options**
 
@@ -106,8 +110,12 @@ kinisot --rct FILE [--rct FILE ...] (--ts FILE | --prd FILE) --iso ATOMS [--iso 
 | `--project` | project translations and rotations out of the Hessian (Eckart) instead of discarding the six lowest modes. On by default for `--calc`/ASE inputs, off for Gaussian and ORCA (`--no-project` forces it off). |
 | `--calc SPEC`, `--delta` | compute the Hessians of geometry inputs with an ASE calculator (`xtb`, `mace_mp:medium`, `module:callable`, ...); finite-difference step in Å. |
 | `--reference ATOMS` | a second isotopologue; the KIE is also reported divided by its KIE (natural-abundance NMR style). |
+| `--weights` | how conformers are weighted: `qrrho` (default; quasi-harmonic free energies of the light isotopologue), `rrho`, `user`, `lowest` or `equal` ([theory, section 7](docs/theory.md#7-conformer-ensembles)). |
+| `--energies TABLE` | free energies of conformers, one line per file: name, G (any zero; `-` to let Kinisot compute it) and optionally a degeneracy. `--energy-unit` is `kcal/mol` (default), `kJ/mol` or `hartree`. |
+| `--weight-uncertainty` | the ensemble result gives the range of the KIE when each conformer free energy moves by this much (default 0.5 kcal/mol). |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
 | `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
+| `--job FILE` | a JSON job file with the structures, labels and settings: transition structures in series, parallel channels, several isotopologues in one run ([docs/job_files.md](docs/job_files.md)). The other flags then give only the outputs. |
 | `--version` | print the version. |
 
 Invalid input (an atom number out of range, a reactant with an imaginary
@@ -228,8 +236,12 @@ case: potentials whose saddle point is a different reaction.
   Wigner correction, the Skodje–Truhlar correction (which also uses the
   barrier height), or none; Bell is refused below the crossover
   temperature h c |ν‡| / 2π k.
-- Rigid rotor / harmonic oscillator, no conformational averaging, no
-  solvent corrections: compute those outside Kinisot if you need them.
+- Rigid rotor / harmonic oscillator and no solvent corrections: compute
+  those outside Kinisot if you need them.
+- Conformers given together are in fast equilibrium (Curtin–Hammett) and
+  weighted by free energies of the light isotopologue, which is exact.
+  Transition structures in series are combined at steady state, and
+  parallel channels at low conversion.
 
 ## Python API
 
@@ -263,6 +275,49 @@ subclasses); non-fatal ones are `KinisotWarning`s and are listed in
 [examples/examples.ipynb](examples/examples.ipynb). The 2.x function
 `compute_isotope_effect()` still works but is deprecated.
 
+**Conformer ensembles.** A species given as a list of files, or as
+`Conformers(files, free_energies=None, degeneracy=None)`, is an ensemble
+of conformers with the same atom numbering:
+
+```python
+from kinisot import Conformers, compute_kie
+
+r = compute_kie(rct="gs.out", ts=[["ts_chair.out", "ts_boat.out"]], iso="5", temperature=393.0)
+r.kie_tunnel                          # sum_i x_i rho_i / sum_j y_j rho'_j
+r.conformers                          # per conformer: free energy, population, its own KIE
+r.kie_tunnel_lowest, r.n_effective, r.kie_tunnel_range
+compute_kie(rct="gs.out", ts=Conformers(["a.out", "b.out"], free_energies=[0.0, 1.2]), iso="5", weights="user")
+```
+
+It returns an `EnsembleIsotopeEffect` with the same `kie`, `kie_tunnel`,
+`kie_relative`, `to_dict()` and `summary_row()`, but no ZPE/EXC/TRPF
+breakdown, which exists per conformer only. One conformer per species gives
+the ordinary `IsotopeEffect`. `kinisot.equivalent_positions(results)` gives
+the exact isotope effect for positions made equivalent by fast motion (the
+hydrogens of a rotating methyl group) from one result per placement of the
+label. [docs/theory.md, section 7](docs/theory.md#7-conformer-ensembles)
+has the equations.
+
+**Transition structures in series and parallel channels.**
+
+```python
+from kinisot import Series, channels, compute_kie, series_kie
+
+# (atom numbers illustrative) steps none of which alone commits the substrate: one label per reactant, then per step
+r = compute_kie(rct=["aldehyde.out", "ylide.out"], ts=Series(["ts_4.out", "ts_6.out"], commitment=128 / 76),
+                iso=["8", "0", "20", "20"], temperature=340.15)
+r.kie_tunnel, r.shares, r.commitment, r.commitment_for(1.033)
+# parallel routes with their own files and labels; shares from a measured selectivity
+r = channels([dict(rct="3.out", ts="ts_S.out", iso=["1", "40"]), dict(rct="3.out", ts="ts_R.out", iso=["3", "38"])],
+             shares=[3.3, 1], temperature=313.15)
+r.kie_tunnel, r.selectivity_for(1.0244)
+series_kie([1.043, 1.015], free_energies=[25.9, 26.0], temperature=340.15)   # 1.0280, from KIEs you have
+```
+
+On the command line these come from a JSON job file, `kinisot --job
+job.json` ([docs/job_files.md](docs/job_files.md)), which also runs several
+isotopologues at once.
+
 Machine-readable output from the command line: `--json run.json` (the
 full result of one run) and `--csv runs.csv` (one row per run, appended).
 
@@ -272,9 +327,12 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
   and ²H KIEs, projection, reference isotopologue, tunnelling models,
   temperature scans), a Diels–Alder reaction with one or two reactant files,
   the same KIE from ORCA and from ASE inputs (with the machine-learned
-  potential workflow), and a conformational EQE, each with the commands, the
-  expected numbers and the literature background.
+  potential workflow), a conformational EQE, and a conformer ensemble (eight
+  allyl vinyl ether conformers and the chair and boat Claisen transition
+  structures), each with the commands, the expected numbers and the
+  literature background.
 - [docs/theory.md](docs/theory.md), [docs/file_formats.md](docs/file_formats.md),
+  [docs/job_files.md](docs/job_files.md),
   [docs/faq.md](docs/faq.md), [docs/comparison.md](docs/comparison.md)
   (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).
 - [benchmarks/](benchmarks/README.md): computed versus experimental KIEs,
