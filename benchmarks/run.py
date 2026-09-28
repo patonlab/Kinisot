@@ -35,11 +35,18 @@ def load_cases(names=None):
 
 
 def resolve(case, key):
-    """The files listed under ``key`` as paths relative to the case directory, or None."""
+    """The files listed under ``key`` as paths relative to the case directory, or None.
+
+    An entry that is itself a list holds the conformers of one species.
+    """
     files = case.get(key)
     if not files:
         return None
-    return [os.path.normpath(os.path.join(case["_dir"], f)) for f in files]
+
+    def path(f):
+        return os.path.normpath(os.path.join(case["_dir"], f))
+
+    return [[path(g) for g in f] if isinstance(f, list) else path(f) for f in files]
 
 
 def measured(entry):
@@ -63,6 +70,7 @@ def compute(case, iso, reference=None):
         project=case.get("project"),
         reference=reference,
         imag_cutoff=case.get("imag_cutoff", 50.0),
+        weights=case.get("weights"),
     )
 
 

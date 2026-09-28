@@ -56,6 +56,9 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   exact: the placements are conformers of equal weight.
   `reference` at the top may be a list of sources; `notes` is printed under
   the source line.
+- A species may be a list of files instead of one file: its conformers,
+  weighted as `compute_kie` does (`weights`: `qrrho` by default, or `rrho`,
+  `lowest`, `equal`).
 - Optional: `imag_cutoff` (cm⁻¹, default 50) for a transition structure whose
   reaction-coordinate frequency is small, as in some conformational
   processes.

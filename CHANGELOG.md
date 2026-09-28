@@ -6,6 +6,36 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Added
 
+- Conformer ensembles (IMPLEMENTATION_PLAN.md, Phase 10). A species given
+  as several files, `kinisot --rct gs_1.out gs_2.out --ts ts_*.out`, or in
+  Python as a list or `Conformers(files, free_energies=None,
+  degeneracy=None)`, is an ensemble of conformers with the same atom
+  numbering, in fast equilibrium.
+  - KIE = Σ x_i ρ_i / Σ y_j ρ‡_j, with the weights of the light isotopologue,
+    which is exact; for a transition structure, the weight is its share of
+    the rate, including its tunnelling factor. EQEs work the same way.
+    docs/theory.md has a new section 7 with the derivation.
+  - `--weights` (`weights=`): `qrrho` (default; quasi-harmonic free
+    energies from Kinisot's frequencies with Grimme's entropy interpolation,
+    through GoodVibes' functions), `rrho`, `user`, `lowest` or `equal`.
+    `--energies TABLE` gives your own free energies and degeneracies.
+  - The result, `EnsembleIsotopeEffect`, lists each conformer's free
+    energy, share and own KIE, and gives the KIE of the lowest conformers,
+    the effective number of transition-structure conformers and the range
+    when each free energy moves by ±0.5 kcal/mol (`--weight-uncertainty`).
+    The text output prints the conformer table and `KIE (ensemble) @ T`
+    lines; JSON and CSV carry the same.
+  - Conformers of a species must have the same atoms in the same order
+    (an error names the first difference). Different bonding, duplicate
+    structures and different levels of theory are warnings.
+  - One conformer per species gives the ordinary `IsotopeEffect`, unchanged.
+  - `kinisot.equivalent_positions()` gives the exact isotope effect of
+    positions made equivalent by fast motion from one result per placement
+    of the label.
+  - Over the 18 Shi epoxidation transition structures, `compute_kie`
+    reproduces the prototype ensemble (`benchmarks/shi_epoxidation/ensemble`)
+    to 2 × 10⁻⁶ at every site. Benchmark cases may list conformers per
+    species.
 - Five benchmark cases from the SI of the PyQuiverHS paper (Grazioli, Ly,
   Sabetnejad, Mattapalli, Nguyen and O'Leary, ChemRxiv 2026), included with
   the authors' agreement. Each has its Gaussian files, the PyQuiverHS input

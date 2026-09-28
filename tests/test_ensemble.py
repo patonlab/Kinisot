@@ -234,3 +234,117 @@ def test_renumbered_conformer_warns(shi):
             warnings.filterwarnings("ignore", message=".*(differ from|mixes).*")
             compute_kie(rct=reactant, ts=[[ts["A"], renumbered]], iso=BETA, temperature=T, scale=SCALE,
                         weights="equal")  # fmt: skip
+
+
+def permuted(data, order):
+    """The same structure with its atoms renumbered: new atom k is old atom order[k]."""
+    order = np.asarray(order)
+    index = (3 * order[:, None] + np.arange(3)).ravel()
+    return dataclasses.replace(
+        data,
+        hessian=np.asarray(data.hessian)[np.ix_(index, index)],
+        masses=tuple(np.asarray(data.masses)[order]),
+        atomic_numbers=tuple(np.asarray(data.atomic_numbers)[order]),
+        positions=np.asarray(data.positions)[order],
+        source="%s (renumbered)" % data.source,
+    )
+
+
+def rotamers(data, atoms):
+    """The three rotamers of a methyl group: its hydrogens (1-based ``atoms``) cycled."""
+    result = []
+    for shift in range(3):
+        order = list(range(len(data.masses)))
+        for k, atom in enumerate(atoms):
+            order[atom - 1] = atoms[(k + shift) % 3] - 1
+        result.append(permuted(data, order) if shift else data)
+    return result
+
+
+def test_methyl_rotamers_are_the_equivalent_position_average():
+    """Rotamers made by cycling the methyl hydrogens, equally weighted, give the equivalent-position average."""
+    diene = load_hessian(os.path.join(ROOT, "tests", "data", "gaussian", "diene.out"))
+    ts = load_hessian(os.path.join(ROOT, "tests", "data", "gaussian", "DATS.out"))
+    kwargs = dict(temperature=298.15, scale=1.0, project=True)
+    placements = [kie(diene, ts, iso=[str(h), str(h + 9)], **kwargs) for h in (11, 12, 13)]
+    exact = equivalent_positions(placements)
+    for weights in ("qrrho", "equal"):
+        ensemble = kie([rotamers(diene, [11, 12, 13])], [rotamers(ts, [20, 21, 22])], iso=["11", "20"],
+                       weights=weights, **kwargs)  # fmt: skip
+        assert (ensemble.kie, ensemble.kie_tunnel) == pytest.approx(exact, abs=1e-12)
+        assert [c.population for c in ensemble.conformers] == pytest.approx([1 / 3] * 6, abs=1e-9)
+
+
+def test_a_high_conformer_changes_nothing(shi):
+    reactant, ts = shi
+    plain = kie(reactant, ts["A"])
+    high = kie(reactant, Conformers([ts["A"], ts["G"]], free_energies=[0.0, 10.0]))
+    assert high.kie_tunnel == pytest.approx(plain.kie_tunnel, abs=1e-6)
+    assert high.n_effective == pytest.approx(1.0, abs=1e-6)
+
+
+def test_temperature_scan_and_eqe(shi):
+    reactant, ts = shi
+    for temperature in (250.0, 300.0, 350.0):
+        ensemble = kie(reactant, [[ts["A"], ts["A"]]], temperature=temperature)
+        assert ensemble.kie_tunnel == pytest.approx(kie(reactant, ts["A"], temperature=temperature).kie_tunnel)
+    warm = kie(reactant, [[ts["A"], ts["B"]]], temperature=350.0)
+    cold = kie(reactant, [[ts["A"], ts["B"]]], temperature=250.0)
+    assert warm.rows("transition structure")[1].population > cold.rows("transition structure")[1].population
+    # an EQE between the degenerate ring-flip conformers of a CD3 group, with the product as an ensemble
+    tmch = load_hessian(os.path.join(ROOT, "benchmarks", "tetramethylcyclohexane_eie", "tetramethylcyclohexane.log"))
+    iso = ["28,29,30", "24,25,26"]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", KinisotWarning)
+        plain = compute_kie(rct=tmch, prd=tmch, iso=iso, temperature=290.15, scale=1.0)
+        ensemble = compute_kie(rct=tmch, prd=[[tmch, tmch]], iso=iso, temperature=290.15, scale=1.0)
+    assert ensemble.kind == "EQE" and ensemble.kie == pytest.approx(plain.kie, abs=1e-12)
+    assert ensemble.kie_tunnel == ensemble.kie and ensemble.tunneling == "none"
+    assert ensemble.rows("product")[0].population == pytest.approx(0.5)
+
+
+def test_command_line(tmp_path, monkeypatch):
+    from kinisot import cli
+
+    monkeypatch.chdir(tmp_path)
+    reactant = os.path.join(SHI, "methylstyrene.log")
+    files = [ts_path(k) for k in ("A", "B", "G")]
+    common = ["--iso", "2", "--iso", "8", "-t", "273.15", "-s", "0.9614", "--project", "-q"]
+    assert cli.main(["--rct", reactant, "--ts", *files, *common, "--json", "run.json", "--csv", "run.csv"]) == 0
+    with open("Kinisot_output.dat") as handle:
+        text = handle.read()
+    assert "(3 conformers) isotopologue: 8" in text and "weights: qrrho" in text
+    assert "KIE (ensemble) @ 273.15 K" in text and "ts_G" in text
+    with open("run.json") as handle:
+        data = json.load(handle)
+    expected = kie(os.path.join(SHI, "methylstyrene.log"), [files])
+    assert data["ensemble"] and data["kie_tunnel"] == pytest.approx(expected.kie_tunnel, abs=1e-12)
+    with open("run.csv") as handle:
+        assert "n_effective" in handle.readline()
+
+    # free energies (and a degeneracy) from a table, matched by file name
+    with open("energies.csv", "w") as handle:
+        handle.write("file,G,g\nts10.log,0.0,1\nts_B.log,0.3,2\nts_G.log,1.1\n")
+    assert cli.main(["--rct", reactant, "--ts", *files, *common, "--energies", "energies.csv", "--weights", "user",
+                     "--json", "user.json"]) == 0  # fmt: skip
+    with open("user.json") as handle:
+        data = json.load(handle)
+    expected = kie(reactant, Conformers(files, free_energies=[0, 0.3, 1.1], degeneracy=[1, 2, 1]), weights="user")
+    assert data["kie_tunnel"] == pytest.approx(expected.kie_tunnel, abs=1e-12)
+
+    # a plain run is unchanged, and errors are reported as usage errors
+    assert cli.main(["--rct", reactant, "--ts", files[0], *common, "--overwrite"]) == 0
+    with open("Kinisot_output.dat") as handle:
+        text = handle.read()
+    assert "\n  KIE @ 273.15 K" in text and "ensemble" not in text
+    for bad in (["--weights", "user"], ["--energies", "missing.csv"], ["--weight-uncertainty", "-1"]):
+        with pytest.raises(SystemExit):
+            cli.main(["--rct", reactant, "--ts", *files, *common, *bad])
+    with open("partial.csv", "w") as handle:
+        handle.write("ts10.log 0.0\nts_B.log 0.3\n")
+    with pytest.raises(SystemExit):
+        cli.main(["--rct", reactant, "--ts", *files, *common, "--energies", "partial.csv"])
+    with open("stray.csv", "w") as handle:
+        handle.write("ts10.log - 1\nother.log 0.3\n")
+    with pytest.raises(SystemExit):
+        cli.main(["--rct", reactant, "--ts", *files, *common, "--energies", "stray.csv"])

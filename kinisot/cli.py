@@ -10,9 +10,19 @@ from argparse import SUPPRESS, ArgumentParser
 
 from . import __version__
 from .api import compute_kie
-from .exceptions import KinisotError, KinisotWarning
+from .ensemble import WEIGHTS, Conformers, EnsembleIsotopeEffect
+from .exceptions import KinisotError, KinisotInputError, KinisotWarning
 
-__all__ = ["Logger", "build_parser", "write_results", "write_json", "append_csv", "main"]
+__all__ = [
+    "Logger",
+    "build_parser",
+    "write_results",
+    "write_ensemble_results",
+    "read_energies",
+    "write_json",
+    "append_csv",
+    "main",
+]
 
 # print formatting
 SPACE = "   "
@@ -183,6 +193,149 @@ def write_results(log, results):
             log.Write(line + "\n")
 
 
+def write_ensemble_results(log, results):
+    """Write the conformer table and the ensemble isotope effects (one line per temperature) to the log."""
+    results = list(results)
+    result = results[0]
+    is_kie = result.kind == "KIE"
+    log.Write(
+        "\n\n"
+        + (SPACE * 17)
+        + "  Temp = "
+        + (str(result.temperature) if len(results) == 1 else ", ".join(str(r.temperature) for r in results))
+        + "K / Vib. scale factor = "
+        + str(result.scale_factor)
+        + " / weights: "
+        + result.weights
+    )
+    if is_kie and result.tunneling != "bell":
+        log.Write(" / tunnelling: " + result.tunneling)
+        if result.barrier is not None:
+            log.Write(" (barrier %.2f kcal/mol)" % result.barrier)
+    if result.project:
+        log.Write(" / external modes projected")
+
+    # the conformer table: each conformer's weight and its KIE against the ensemble on the other side
+    log.Write(
+        "\n\n  Conformers at %s K%s:"
+        % (result.temperature, " (the JSON output has the other temperatures)" if len(results) > 1 else "")
+    )
+    log.Write(
+        "\n  " + " ".join(["{:<44}".format(""), "{:>8} {:>5} {:>7} {:>10} {:>10} {:>10}"])
+        .format("dG", "g", "pop %", "V-ratio", result.kind, "corr-" + result.kind if is_kie else "")
+        .rstrip()
+    )  # fmt: skip
+    role = None
+    for c in result.conformers:
+        if (c.role, c.species) != role:
+            role = (c.role, c.species)
+            log.Write("\no %s %d, iso @ %s" % (c.role, c.species + 1, c.label))
+        energy = "{:8.2f}".format(c.free_energy) if c.free_energy is not None else "{:>8}".format("-")
+        ratio = "{:10.4f}".format(c.imaginary_light / c.imaginary_heavy) if c.imaginary_light else "{:>10}".format("")
+        log.Write(
+            "\n    " + c.name[:42].ljust(42) + " " + energy
+            + " {:5.0f} {:7.2f} {} {:10.6f}".format(c.degeneracy, 100 * c.population, ratio, c.kie)
+            + (" {:10.6f}".format(c.kie_tunnel) if is_kie else "")
+        )  # fmt: skip
+    log.Write(
+        "\n\n  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue%s; "
+        "%s: the conformer against the other side's ensemble"
+        % (" (for a transition structure, of its rate, with tunnelling)" if is_kie else "", result.kind)
+    )
+
+    log.Write("\n\n" + ("  ").ljust(50))
+    log.Write(
+        " {:>10} {:>10} {:>10} {:>10} {:>21} {:>6}\n".format(
+            result.kind, "1D-tunn", "corr-" + result.kind, "lowest", "range (+/-%.1f)" % result.weight_uncertainty,
+            "N_eff",
+        )
+    )  # fmt: skip
+    log.Write(DASH_LINE)
+    for r in results:
+        log.Write(("\n  " + r.kind + " (ensemble) @ " + str(r.temperature) + " K").ljust(50))
+        log.Write(
+            " {:10.6f} {:10.6f} {:10.6f} {:10.6f} {:10.6f}-{:<10.6f} {:6.2f}".format(
+                r.kie, r.tunnel_corr, r.kie_tunnel, r.kie_tunnel_lowest, r.kie_tunnel_range[0], r.kie_tunnel_range[1],
+                r.n_effective,
+            )
+        )  # fmt: skip
+        if r.reference is not None:
+            log.Write(("\n  relative to iso @ " + " / ".join(r.reference.labels) + ":").ljust(50))
+            log.Write(" {:10.6f} {:>10} {:10.6f}".format(r.kie_relative, "", r.kie_tunnel_relative))
+    log.Write("\n" + DASH_LINE + "\n")
+    log.Write(
+        "\n  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-%.1f kcal/mol "
+        "in turn; N_eff: effective number of %s, 1 / sum(pop^2)\n"
+        % (result.weight_uncertainty, "transition-structure conformers" if is_kie else "product conformers")
+    )
+
+
+def read_energies(path):
+    """Free energies (and degeneracies) of conformers from a table: file, G or dG, and optionally g.
+
+    Comma, semicolon or whitespace separated; lines starting with # and a header line are skipped. G may be
+    '-' to leave a conformer's free energy to Kinisot (a degeneracy alone). Returns {file: (G or None, g)}.
+    """
+    table = {}
+    try:
+        with open(path, encoding="utf-8") as handle:
+            lines = handle.read().splitlines()
+    except OSError as err:
+        raise KinisotInputError("cannot read the energies table %s: %s" % (path, err.strerror or err)) from None
+    first = True
+    for number, line in enumerate(lines, 1):
+        fields = line.split("#", 1)[0].replace(",", " ").replace(";", " ").split()
+        if not fields:
+            continue
+        try:
+            energy = None if fields[1] == "-" else float(fields[1])
+            degeneracy = float(fields[2]) if len(fields) > 2 else 1.0
+        except (IndexError, ValueError):
+            if first:  # a header
+                first = False
+                continue
+            raise KinisotInputError(
+                "%s, line %d: expected a file name, a free energy (or -) and optionally a degeneracy" % (path, number)
+            ) from None
+        first = False
+        table[fields[0]] = (energy, degeneracy)
+    if not table:
+        raise KinisotInputError("the energies table %s has no rows" % path)
+    return table
+
+
+def _species(groups, table, unit):
+    """One entry per species for compute_kie: a file, or Conformers when there are several (or a table row)."""
+    species = []
+    used = set()
+    for files in groups:
+        rows = []
+        for f in files:
+            key = f if f in table else os.path.basename(f) if os.path.basename(f) in table else None
+            rows.append(table.get(key))
+            used.add(key)
+        if len(files) == 1 and rows[0] is None:
+            species.append(files[0])
+            continue
+        energies = [r[0] if r else None for r in rows]
+        given = [e is not None for e in energies]
+        if any(given) and not all(given):
+            missing = [f for f, g in zip(files, given) if not g]
+            raise KinisotInputError(
+                "the energies table gives free energies for some conformers of a species but not for %s: give all "
+                "of them or none" % ", ".join(missing)
+            )
+        species.append(
+            Conformers(
+                files,
+                free_energies=energies if all(given) else None,
+                degeneracy=[r[1] if r else 1.0 for r in rows],
+                energy_unit=unit,
+            )
+        )
+    return species, used
+
+
 def write_json(path, result):
     """Write the full result of one run (or a list, one per temperature) as JSON (overwrites ``path``)."""
     payload = [r.to_dict() for r in result] if isinstance(result, list) else result.to_dict()
@@ -213,15 +366,29 @@ def build_parser():
         "--rct",
         dest="rct",
         action="append",
+        nargs="+",
         required=True,
         metavar="FILE",
         help="reactant frequency output (Gaussian .log/.out, ORCA .out/.hess, VibrationsData .json, or a geometry "
-        "with --calc); repeat for bimolecular reactions",
+        "with --calc); repeat for bimolecular reactions. Several files after one --rct are conformers of that "
+        "species, weighted by --weights",
     )
     parser.add_argument(
-        "--ts", dest="ts", action="append", metavar="FILE", help="transition structure frequency output (KIE)"
+        "--ts",
+        dest="ts",
+        action="append",
+        nargs="+",
+        metavar="FILE",
+        help="transition structure frequency output (KIE); several files are conformers",
     )
-    parser.add_argument("--prd", dest="prd", action="append", metavar="FILE", help="product frequency output (EQE)")
+    parser.add_argument(
+        "--prd",
+        dest="prd",
+        action="append",
+        nargs="+",
+        metavar="FILE",
+        help="product frequency output (EQE); several files are conformers",
+    )
     parser.add_argument(
         "--iso",
         dest="label",
@@ -316,6 +483,37 @@ def build_parser():
         "by the reference KIE",
     )
     parser.add_argument(
+        "--weights",
+        dest="weights",
+        choices=WEIGHTS,
+        default=None,
+        help="how conformers are weighted: qrrho (default: quasi-harmonic free energies, Grimme's entropy "
+        "interpolation), rrho (harmonic), user (the free energies in --energies), lowest, or equal",
+    )
+    parser.add_argument(
+        "--energies",
+        dest="energies",
+        metavar="TABLE",
+        help="free energies of conformers: one line per file with its name, G (or dG, or - to compute it) and "
+        "optionally a degeneracy; used in place of the computed ones",
+    )
+    parser.add_argument(
+        "--energy-unit",
+        dest="energy_unit",
+        choices=["kcal/mol", "kJ/mol", "hartree"],
+        default="kcal/mol",
+        help="unit of the free energies in --energies (default kcal/mol)",
+    )
+    parser.add_argument(
+        "--weight-uncertainty",
+        dest="weight_uncertainty",
+        type=float,
+        default=0.5,
+        metavar="KCAL",
+        help="the ensemble result gives the range of the KIE when each conformer free energy moves by this much "
+        "(default 0.5 kcal/mol)",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         dest="output",
@@ -356,20 +554,34 @@ def main(argv=None):
     if options.freq_scale_factor is not None and options.freq_scale_factor <= 0:
         parser.error("the scaling factor must be positive")
 
+    if options.weight_uncertainty < 0:
+        parser.error("--weight-uncertainty cannot be negative")
+
     is_kie = options.ts is not None
-    files = options.rct + (options.ts if is_kie else options.prd)
+    groups = options.rct + (options.ts if is_kie else options.prd)  # one list of conformer files per species
     # if only one set of labels is provided, assume that the atom numbering is the same for rct and ts/prd
     labels = options.label * 2 if len(options.label) == 1 else list(options.label)
-    if len(labels) != len(files):
+    if len(labels) != len(groups):
         parser.error(
-            "%d files were given but %d --iso labels: give one --iso per file (0 for no substitution) or a "
-            "single --iso when the atom numbering is the same" % (len(files), len(options.label))
+            "%d species were given but %d --iso labels: give one --iso per --rct/--ts/--prd (0 for no substitution) "
+            "or a single --iso when the atom numbering is the same" % (len(groups), len(options.label))
         )
     reference = None
     if options.reference:
         reference = options.reference * 2 if len(options.reference) == 1 else list(options.reference)
-        if len(reference) != len(files):
-            parser.error("%d files were given but %d --reference labels" % (len(files), len(options.reference)))
+        if len(reference) != len(groups):
+            parser.error("%d species were given but %d --reference labels" % (len(groups), len(options.reference)))
+    if options.weights == "user" and not options.energies:
+        parser.error("--weights user needs --energies")
+    try:
+        table = read_energies(options.energies) if options.energies else {}
+        rct, used = _species(options.rct, table, options.energy_unit)
+        other, used_other = _species(options.ts if is_kie else options.prd, table, options.energy_unit)
+    except KinisotInputError as err:
+        parser.error(str(err))
+    unmatched = sorted(set(table) - used - used_other)
+    if unmatched:
+        parser.error("the energies table lists files that are not among the inputs: %s" % ", ".join(unmatched))
 
     try:
         log = Logger(options.output, quiet=options.quiet, overwrite=options.overwrite)
@@ -380,8 +592,9 @@ def main(argv=None):
         return 1
     with log:
         log.Write("\n  " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M") + "\n")
-        for file, label in zip(files, labels):
-            log.Write("  Species: {} isotopologue: {}\n".format(file, label))
+        for files, label in zip(groups, labels):
+            names = files[0] if len(files) == 1 else "%s (%d conformers)" % (" ".join(files), len(files))
+            log.Write("  Species: {} isotopologue: {}\n".format(names, label))
         try:
             results = []
             seen = set()
@@ -390,9 +603,9 @@ def main(argv=None):
                 for temperature in temperatures:
                     results.append(
                         compute_kie(
-                            rct=options.rct,
-                            ts=options.ts,
-                            prd=options.prd,
+                            rct=rct,
+                            ts=other if is_kie else None,
+                            prd=None if is_kie else other,
                             iso=labels,
                             temperature=temperature,
                             scale=options.freq_scale_factor,
@@ -404,6 +617,8 @@ def main(argv=None):
                             reference=reference,
                             calculator=options.calc,
                             delta=options.delta,
+                            weights=options.weights,
+                            weight_uncertainty=options.weight_uncertainty,
                         )
                     )
             for message in results[0].scaling.messages:
@@ -412,7 +627,10 @@ def main(argv=None):
                 if str(warning.message) not in seen:
                     seen.add(str(warning.message))
                     log.Write("\n  WARNING: " + str(warning.message))
-            write_results(log, results)
+            if isinstance(results[0], EnsembleIsotopeEffect):
+                write_ensemble_results(log, results)
+            else:
+                write_results(log, results)
             if options.json_path:
                 write_json(options.json_path, results[0] if len(results) == 1 else results)
             if options.csv_path:

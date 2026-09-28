@@ -270,7 +270,86 @@ Chem. Soc. 1999, 121, 10865,
 [doi:10.1021/ja992372h](https://doi.org/10.1021/ja992372h)). Kinisot
 applies Bell's correction by default.
 
-## 7. Constants (CODATA 2018)
+## 7. Conformer ensembles
+
+With transition-state theory and conformers in fast equilibrium
+(Curtin–Hammett), isotopologue X reacts with
+
+    k^X = (k T / h) Σ_j κ_j^X Q‡_j^X exp(−E‡_j / kT) / Σ_i Q_i^X exp(−E_i / kT)
+
+where i runs over the reactant conformers and j over the
+transition-structure conformers. Every conformer of a species has the same
+atoms, so the Teller–Redlich mass factor is the same for all of them and
+cancels, and
+
+    KIE = Σ_i x_i ρ_i / Σ_j y_j ρ‡_j
+
+- ρ_i is (s/s')f of reactant conformer i (Section 2).
+- ρ‡_j = (s/s')f‡_j · (ν‡_H / ν‡_L)_j · (κ_H / κ_L)_j, so that ρ_i / ρ‡_j is
+  the ordinary KIE of that pair of conformers.
+- x_i is the population of reactant conformer i, ∝ g_i exp(−G_i / RT).
+- y_j is transition structure j's share of the rate, ∝ g_j κ_L,j exp(−G‡_j / RT).
+- g is a degeneracy, for example 2 for a conformer whose mirror image is
+  not in the list.
+
+The weights are those of the light isotopologue, and that is exact, not an
+approximation:
+
+    Σ_i Q_i^H e^{−E_i/kT} / Σ_i Q_i^L e^{−E_i/kT} = Σ_i x_i (Q_i^H / Q_i^L)
+
+Three consequences follow:
+
+1. **Only free energies within each ensemble matter.** The gap between the
+   reactant and transition-structure ensembles cancels.
+2. **The ensemble KIE is a ratio of means.** It is neither the Boltzmann
+   average of the pairwise KIEs nor the KIE of the lowest pair. A minor
+   transition structure counts in proportion to its share of the rate.
+3. **Several species multiply.** With two reactants, the reactant side is
+   the product of the two ensemble means. For an EQE, the product
+   conformers take the place of the transition structures, with κ = 1 and
+   no ν‡ ratio.
+
+**Weights.** The isotope ratios stay harmonic (Section 6), but the weights
+are free energies of the light isotopologue, for which a quasi-harmonic
+treatment of soft modes is appropriate. `--weights` chooses:
+
+| Weights | G |
+| --- | --- |
+| `qrrho` (default) | E + ZPE + thermal vibrational energy − T(S_vib + S_rot), with Grimme's interpolation of S_vib towards a free rotor below 100 cm⁻¹ (via GoodVibes) |
+| `rrho` | the same with harmonic S_vib |
+| `user` | free energies you give (`--energies`, or `Conformers(..., free_energies=...)`) |
+| `lowest` | the lowest conformer of every species alone |
+| `equal` | the degeneracies alone |
+
+Translation, electronic entropy and the rotational energy are the same for
+every conformer of a species and are left out. So is the rotational
+symmetry number: when conformers of one species differ in it, give each
+conformer 1/σ (relative to the others) as its degeneracy. The frequencies
+are Kinisot's scaled ones, projected or not as for the isotope effect;
+with `--project`, the relative free energies agree with GoodVibes' from
+Gaussian's printed frequencies to within 0.01 kcal/mol.
+
+**Diagnostics.** The result also gives the KIE of the lowest conformers
+alone, the effective number of transition-structure conformers 1 / Σ y_j²,
+and the range of the KIE when each free energy moves by ±0.5 kcal/mol in
+turn (`--weight-uncertainty`).
+
+**Equivalent positions.** Positions made equivalent by fast motion (the
+three hydrogens of a rotating methyl group, the two oxygens of a nitro
+group, the ortho carbons of a spinning phenyl ring) are an ensemble of the
+placements of the label, with equal weights. The isotope effect is the mean
+of ρ over the placements divided by the mean of ρ‡. When the positions
+differ on one side only, as in a transition structure that attacks one of
+two equivalent oxygens, this is the harmonic mean of the separate KIEs, not
+their arithmetic or geometric mean. `kinisot.equivalent_positions` computes
+it from one result per placement, and the benchmark runner uses it.
+
+**Limits.** The conformers must interconvert faster than they react.
+Transition structures in series (an intermediate that can return) and
+parallel channels to different products need different formulas, planned
+in IMPLEMENTATION_PLAN.md, Phase 10.
+
+## 8. Constants (CODATA 2018)
 
 | Constant | Value |
 | --- | --- |

@@ -71,9 +71,15 @@ large, MACE-MP-0) has the concerted Claisen transition structure, and their
 saddle points describe C–O cleavage or ring closure instead (details in the
 example).
 
-**Can I use several conformers?** Not in one run. Compute the KIE for
-each reactant/TS conformer pair and Boltzmann-average the rate constants,
-or use the lowest-energy pair.
+**Can I use several conformers?** Yes (from 2.6): give them all after one
+flag, `kinisot --rct gs_*.out --ts ts_*.out --iso 5`. They must have the same
+atoms in the same order. Kinisot weights them by quasi-harmonic free
+energies of the light isotopologue (`--weights`, or your own with
+`--energies`) and computes KIE = Σ x_i ρ_i / Σ y_j ρ‡_j, which is not the
+Boltzmann average of the pairwise KIEs ([theory, section
+7](theory.md#7-conformer-ensembles)). The output lists each conformer's
+share and its own KIE, the KIE of the lowest conformers alone, and how much
+the result moves when each free energy moves by 0.5 kcal/mol.
 
 **Does the temperature have to match the Gaussian job?** No. Kinisot
 evaluates the partition functions at `-t`; the Hessian does not depend on
