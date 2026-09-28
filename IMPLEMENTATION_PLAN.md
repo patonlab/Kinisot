@@ -62,13 +62,11 @@ CI before the parser is replaced):
 **Exit criteria:** both tests green in CI (item 4 done; item 5 waits for
 the GoodVibes dependency in Phase 5).
 
-## Phase 1 — Confirmed bug fixes ✅ (v2.0.3, unreleased)
+## Phase 1 — Confirmed bug fixes ✅ (v2.0.3, a development milestone released in 2.5.0)
 
 All six items done (constants block, `NameError`, exact scaling-factor
-match, table row, linearity from rotational constants, CHANGELOG). Remaining:
-publish v2.0.3 to PyPI and bump the conda recipe template. Do this before
-Phase 2 lands so users get the bug fixes without waiting for the CLI
-changes.
+match, table row, linearity from rotational constants, CHANGELOG). v2.0.3
+was never published on its own; the fixes reached users in 2.5.0.
 
 ## Phase 2 — Robustness ✅ (v2.1.0, implemented 2026-09-25)
 

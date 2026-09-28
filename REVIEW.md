@@ -426,6 +426,16 @@ download; an optional MACE test is skipped unless `mace-torch` is installed.
 Ship `examples/mlip_claisen/` reproducing the DFT Claisen KIEs with
 MACE-MP-0 or UMA and stating the discrepancy honestly.
 
+*Outcome (2026-09):* the example could not reproduce the KIEs with MACE.
+MACE-MP-0 and three MACE-OFF23 models were run, and none has the concerted
+Claisen transition structure: their saddle points describe C–O cleavage or
+ring closure. `examples/mlip_claisen/` reports that, with the rejected
+structures as a regression test (`tests/data/mace_mp0_rejected/`), and
+makes the KIE comparison with GFN2-xTB instead, which finds the concerted
+transition structure and misses experiment by up to 0.018. UMA was not
+tested; a comparison with it, or with a potential trained on reactive
+data, would still be worth adding.
+
 ## 7. Changes made to the implementation plan
 
 - Phases 0–1 marked done; new Phase 0 items for the cross-checks in

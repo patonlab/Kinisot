@@ -39,9 +39,12 @@ solvent correction of its own.
 **My transition structure has two imaginary frequencies.** Kinisot warns
 and takes the larger one as the reaction coordinate. The other is discarded
 along with the overall translations and rotations, so one of those (a mode
-near zero) is counted as a vibration in its place. Re-optimize the
-transition structure. If the second mode is a genuine low-frequency torsion smaller
-than the cutoff (50i cm⁻¹ by default), nothing is wrong.
+near zero) is counted as a vibration in its place. With `--project` (the
+default for xTB and machine-learned potentials) nothing is discarded that
+way, so the second mode stays among the vibrations and Kinisot stops with
+an error. Either way, re-optimize the transition structure. If the second
+mode is a genuine low-frequency torsion smaller than the cutoff (50i cm⁻¹
+by default), nothing is wrong.
 
 **My reactant has a small imaginary frequency.** Kinisot stops: reactants
 and products must be minima. If the mode is a numerical artefact (a few
