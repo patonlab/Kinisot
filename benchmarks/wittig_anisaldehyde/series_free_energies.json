@@ -1,0 +1,68 @@
+{
+  "description": "The same series weighted by the harmonic free energies of 4-TS and 6-TS, 25.9 and 26.0 kcal/mol (Figure 2), as for an intermediate in equilibrium. Labels: anisaldehyde, ylide, 4-TS, 6-TS. The carbonyl carbon is relative to a meta carbon of the ring (anisaldehyde 6, TS 25) and the ylide carbons to the ketone methyl carbon, the experiment's standards.",
+  "temperature": 340.15,
+  "scale": 0.9614,
+  "tunneling": "bell",
+  "project": true,
+  "reactants": [
+    "anisaldehyde_1.log",
+    "ylide_2.log"
+  ],
+  "series": {
+    "steps": [
+      "ts_4.log",
+      "ts_6.log"
+    ],
+    "free_energies": [
+      25.9,
+      26.0
+    ]
+  },
+  "isotopologues": [
+    {
+      "name": "carbonyl carbon",
+      "iso": [
+        "9",
+        "0",
+        "2",
+        "2"
+      ],
+      "reference": [
+        "6",
+        "0",
+        "25",
+        "25"
+      ]
+    },
+    {
+      "name": "ylide CH carbon",
+      "iso": [
+        "0",
+        "1",
+        "4",
+        "4"
+      ],
+      "reference": [
+        "0",
+        "38",
+        "52",
+        "52"
+      ]
+    },
+    {
+      "name": "ylide carbonyl carbon",
+      "iso": [
+        "0",
+        "37",
+        "51",
+        "51"
+      ],
+      "reference": [
+        "0",
+        "38",
+        "52",
+        "52"
+      ]
+    }
+  ]
+}

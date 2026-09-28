@@ -485,8 +485,11 @@ channels enter the report. DyKAT is done that way (2026-09-28): the Gaussian
 16 jobs at the paper's geometries reproduce SI Tables 24 and 25 and Figure 3d
 within 6 × 10⁻⁴, unscaled as the paper's Kinisot was, and all five combined
 KIEs lie within 1.1 standard errors of experiment (`tests/test_dykat.py`).
-Still to do: the Wittig series once the 6-TS job is in, and the DyKAT KIEs
-from free 3 once its spherical-d job is in.
+The Wittig series followed the same day: 4‡ and 6‡ reproduce SI Table S4
+within 5 × 10⁻⁴, and weighted by the paper's trajectories the three ¹³C
+KIEs match experiment (mean absolute deviation 0.0004), while the
+free-energy weighting misses by 0.005 (`tests/test_wittig.py`). Still to
+do: the DyKAT KIEs from free 3 once its spherical-d job is in.
 
 **Goal (requested 2026-09-27):** KIEs and EQEs from several conformers of
 each reactant, transition structure and product, given with the same atom

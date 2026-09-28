@@ -76,6 +76,17 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   case.json, the format of `kinisot --job`), so transition structures in
   series and parallel channels enter the report. Each `kies` entry names its
   isotopologue in the job file.
+- The Wittig case (`benchmarks/wittig_anisaldehyde`) is computed from
+  Gaussian 16 frequency jobs at the SI geometries, as two transition
+  structures in series (`series.json`). Both transition structures
+  reproduce SI Table S4 within 5 × 10⁻⁴ at every position, and the series
+  reproduces the paper's weighted predictions (Table 1). Weighted by the
+  paper's trajectories (C_f = 128/76), the three ¹³C KIEs match experiment
+  (mean absolute deviation 0.0004). Weighted by the free energies of the two
+  transition structures, as the paper shows they should not be, the case
+  `wittig_anisaldehyde_statistical` misses by 0.005 at both carbons that
+  change bonding; it is left out of the overall mean. The overall mean
+  absolute deviation moves to 0.0051 (42 positions).
 - The DYKAT case (`benchmarks/dykat_allyl_arylation`) is computed from
   Gaussian 16 frequency jobs at the paper's geometries, as two channels in
   `channels.json`. The transition structures and free 3 reproduce SI Table
@@ -128,7 +139,7 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   Nieves-Quinones, Waas and Singleton (J. Am. Chem. Soc. 2014, 136, 13122)
   for a Wittig reaction with two transition structures in series. The
   Phase 10 series formula reproduces the paper's two weighted predictions
-  from its single-structure KIEs. The structures are still needed.
+  from its single-structure KIEs.
 - Benchmark case `dykat_allyl_arylation` holds the ¹³C KIEs of van Dijk et
   al. (Nat. Catal. 2021, 4, 284) for the Rh-catalysed arylation of racemic
   3-chlorocyclohexene. Both enantiomers react, through different
