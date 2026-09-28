@@ -4,6 +4,7 @@
 
 import json
 import os
+import shutil
 import warnings
 
 import pytest
@@ -40,7 +41,30 @@ def run(tmp_path, monkeypatch, job, *extra):
 
 
 def rel(tmp_path, path):
-    return os.path.relpath(path, str(tmp_path))
+    """``path`` relative to the job's directory; absolute when there is no relative path (Windows, another drive)."""
+    try:
+        return os.path.relpath(path, str(tmp_path))
+    except ValueError:
+        return path
+
+
+def test_file_names_are_relative_to_the_job_file(tmp_path, monkeypatch):
+    """Files next to the job (in a subdirectory), run from another directory: the same on every platform."""
+    data = tmp_path / "job" / "data"
+    data.mkdir(parents=True)
+    for name in ("gs_1.hessian.json", "ts_chair.hessian.json"):
+        shutil.copy(os.path.join(ROOT, "examples", "conformers", name), str(data / name))
+    job = {"temperature": 393, "scale": 1.0, "reactants": ["data/gs_1.hessian.json"],
+           "transition_structure": ["data/ts_chair.hessian.json"], "iso": "4"}  # fmt: skip
+    with open(str(tmp_path / "job" / "job.json"), "w") as handle:
+        json.dump(job, handle)
+    monkeypatch.chdir(tmp_path)
+    assert quiet(cli.main, ["--job", os.path.join("job", "job.json"), "-q", "--json", "out.json"]) == 0
+    with open("out.json") as handle:
+        result = json.load(handle)
+    expected = quiet(compute_kie, rct=str(data / "gs_1.hessian.json"), ts=str(data / "ts_chair.hessian.json"), iso="4",
+                     temperature=393, scale=1.0)  # fmt: skip
+    assert result["kie_tunnel"] == pytest.approx(expected.kie_tunnel, abs=1e-13)
 
 
 def test_series_job(tmp_path, monkeypatch):
