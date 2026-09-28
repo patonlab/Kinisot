@@ -198,4 +198,18 @@ Compound 6 of Grazioli et al. (folder 'compound 5' of their SI data); the measur
 
 Mean absolute deviation over 1 measured positions: 0.0003
 
+## Wittig reaction of anisaldehyde with a stabilized ylide: 13C KIEs from two transition structures in series
+
+Z. Chen, Y. Nieves-Quinones, J. R. Waas, D. A. Singleton, J. Am. Chem. Soc. 2014, 136, 13122-13125 (doi:[10.1021/ja506497b](https://doi.org/10.1021/ja506497b)); 13C KIEs at natural abundance by NMR at 67 C: anisaldehyde recovered from two reactions taken to 69 +/- 2% and 73 +/- 2% conversion (standard: the carbons meta to the aldehyde); the ylide carbons from product at 20% conversion of the ylide against complete conversion (standard: the ketone methyl carbon); values from Figure 1, predictions from Table 1 and free energies from Figure 2. H. J. A. Dale, A. G. Leach, G. C. Lloyd-Jones, J. Am. Chem. Soc. 2021, 143, 21079-21099 (Case Study III) (doi:[10.1021/jacs.1c07351](https://doi.org/10.1021/jacs.1c07351)); the same data as an example of commitment between transition structures in series. Not computed yet.
+
+Two transition structures in series (IMPLEMENTATION_PLAN.md, Phase 10): C-C bond formation (4-TS) gives a betaine, and P-O bond formation (6-TS) gives the oxaphosphetane. At M06-2X/6-31+G(2df,p)/PCM//M06-2X/6-31+G**/PCM (THF) their harmonic free energies are 25.9 and 26.0 kcal/mol, with the betaine at 27.3 (Figure 2). Neither step alone commits the substrate. The paper's Table 1 gives, for the carbonyl carbon and the ylide CH carbon, 1.043 and 1.022 from 4-TS alone and 1.015 and 0.994 from 6-TS alone. Weighted by the free energies it gives 1.028 and 1.008, and weighted by the trajectories that recross (76) or go on to product (128) it gives 1.033 and 1.012. The series formula KIE = (KIE_6 + C_f KIE_4)/(1 + C_f) reproduces both rows from the single-structure values. With C_f = exp[(G_4 - G_6)/RT] = 0.862 at 340.15 K it gives 1.0280 and 1.0070; the printed 1.008 differs by the rounding of the inputs. With C_f = 128/76 it gives 1.0326 and 1.0116. Experiment agrees with the trajectory weighting, not the free-energy one: most trajectories pass the betaine without equilibrating, so this case also shows the limit of statistical weights. The anisaldehyde ring carbons (1.000-1.003 in Figure 1) are not entered. The paper gives no prediction for the ylide carbonyl carbon. Structures are still needed: anisaldehyde, the ylide Ph3P=CHCOMe, 4-TS and 6-TS at M06-2X/6-31+G**/PCM (THF), which the paper's SI should give. Computing this case also needs the series treatment of Phase 10, because the runner takes one transition structure.
+
+| Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
+| --- | --- | --- | --- | --- | --- |
+| carbonyl carbon (anisaldehyde) | – | – | 1.033 ± 0.002, 1.032 ± 0.002 |  | Table 1: 4-TS 1.043, 6-TS 1.015; weighted 1.028 (free energies), 1.033 (trajectories) |
+| ylide CH carbon | – | – | 1.011 ± 0.002, 1.011 ± 0.004 |  | Table 1: 4-TS 1.022, 6-TS 0.994; weighted 1.008 (free energies), 1.012 (trajectories) |
+| ylide carbonyl carbon | – | – | 0.997 ± 0.002 |  | no prediction in the paper |
+
+No structures yet: add the frequency calculations and their paths to `case.json`.
+
 Overall mean absolute deviation over 32 measured positions: 0.0060

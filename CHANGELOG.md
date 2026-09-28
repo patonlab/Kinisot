@@ -30,6 +30,11 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   for one oxygen and 1.066 ± 0.003 for both. They also hold ORCA inputs at
   the SI geometries of nitrobenzene and the two candidate transition
   structures. The frequency jobs are still to be run.
+- Benchmark case `wittig_anisaldehyde` holds the ¹³C KIEs of Chen,
+  Nieves-Quinones, Waas and Singleton (J. Am. Chem. Soc. 2014, 136, 13122)
+  for a Wittig reaction with two transition structures in series. The
+  Phase 10 series formula reproduces the paper's two weighted predictions
+  from its single-structure KIEs. The structures are still needed.
 - IMPLEMENTATION_PLAN.md, Phase 10: transition structures in series
   (commitment factors) and parallel channels with their own labels or
   reactants, following Dale, Leach and Lloyd-Jones (J. Am. Chem. Soc. 2021,

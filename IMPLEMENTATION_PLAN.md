@@ -558,6 +558,8 @@ material. Hence
   - KIE_obs as a function of ΔΔG‡ (or C_f);
   - the C_f that reproduces a measured value.
 
+  C_f can also be given directly, for example from trajectories.
+
   The Wittig analysis in Dale et al. (Case Study III) is of this kind:
   the experiment fits C_f ≈ 1, while each transition structure alone
   misses it.
@@ -749,10 +751,24 @@ dependency.
       group's structures: 3-chlorocyclohexene, TS-2R and TS-2S, plus the
       measured values from the paper.
     - **Series: the Wittig reaction** (Chen, Nieves-Quinones, Waas and
-      Singleton, J. Am. Chem. Soc. 2014, 136, 13122). This needs
-      structures for TS-1 and TS-2, if its SI gives coordinates. The
-      Baeyer–Villiger cases (addition, then migration) are a second
-      candidate, once their structures are computed.
+      Singleton, J. Am. Chem. Soc. 2014, 136, 13122;
+      `benchmarks/wittig_anisaldehyde`). Table 1 already tests the formula
+      without structures. From the single-structure KIEs (4‡: 1.043 and
+      1.022; 6‡: 1.015 and 0.994), the series formula gives:
+      - with the Figure 2 free energies (25.9 and 26.0 kcal/mol at
+        340.15 K, so C_f = 0.862): 1.0280 and 1.0070, against the paper's
+        1.028 and 1.008;
+      - with their trajectory ratio (C_f = 128/76): 1.0326 and 1.0116,
+        against 1.033 and 1.012.
+
+      The measured 1.032–1.033 and 1.011 match the trajectory weighting.
+      The statistical weights miss because most trajectories pass the
+      betaine without equilibrating, so C_f must also be accepted as an
+      input. Computing the single-structure KIEs needs the structures
+      from the paper's SI.
+    - **Series: Baeyer–Villiger.** The two cases (addition, then
+      migration) are a second candidate, once their structures are
+      computed.
 
 **Decisions needed**
 
