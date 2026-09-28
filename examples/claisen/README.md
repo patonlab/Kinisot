@@ -50,9 +50,15 @@ that rehybridizes from sp² towards sp³ as a new bond forms. The
 tunnelling correction (`1D-tunn`) changes heavy-atom KIEs by 0.2–0.3 %,
 the size of the experimental uncertainty in the NMR measurements.
 
-**More options, same C4 KIE.** `--project` removes translations and
-rotations by Eckart projection instead of discarding the six lowest modes
-(the KIE changes by 5 × 10⁻⁸ on this well-converged geometry);
+**Against experiment.** Meyer, DelMonte and Singleton measured these KIEs
+at 120 °C relative to C5. Computed the same way (`--reference 5`, below),
+these structures reproduce the five measured ¹³C and ¹⁷O KIEs with a mean
+absolute deviation of 0.0009 ([benchmarks/claisen](../../benchmarks/REPORT.md)).
+
+**More options, same C4 KIE.** `--project` removes the overall
+translations and rotations exactly, as Gaussian does, instead of discarding
+the six lowest modes (the KIE changes by 5 × 10⁻⁸ on this well-converged
+geometry);
 `--reference 5` also reports the KIE relative to the C5 position, which is
 how natural-abundance NMR experiments are referenced; `--tunneling skodje`
 uses the Skodje–Truhlar correction with the barrier read from the energies

@@ -37,7 +37,7 @@ neither `tblite` nor `sella` to run.
 - **Transition structures.** The chair is the GFN2-xTB saddle point of
   [mlip_claisen](../mlip_claisen/README.md). The boat started from it with
   the allyl fragment reflected through the plane of C1, O3, C4 and C6, and
-  was refined with Sella. Displaced along its imaginary mode either way
+  was refined with Sella, a saddle-point optimizer. Displaced along its imaginary mode either way
   and minimized, each saddle point gives allyl vinyl ether on one side and
   4-pentenal on the other. At this level the boat is asynchronous: C4–O3 is
   1.51 Å (1.59 in the chair) and C1–C6 formation leads.
@@ -61,7 +61,10 @@ neither `tblite` nor `sella` to run.
 
 Energies in kcal/mol: ΔE is the electronic energy above gs_1 (for the
 transition structures, the barrier from gs_1); ΔG is the free energy
-Kinisot computes for the weights, relative within each species.
+Kinisot computes for the weights, relative within each species. qRRHO is
+the quasi-harmonic free energy, Kinisot's default for weights, which treats
+the lowest vibrations partly as free rotations (Grimme's method, as in
+GoodVibes). RRHO is the plain harmonic free energy.
 
 **Degeneracies.** A conformer without a mirror plane has a mirror image of
 the same energy, which the list does not repeat. It therefore counts twice

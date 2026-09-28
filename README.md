@@ -31,9 +31,10 @@ at Colorado State University and is a rewrite of the Fortran Kinisot by
 - **Each labelled reactant.** For a bimolecular reaction, give each reactant
   (or a reactant complex). A reactant that carries no label can be left out,
   because it cancels.
-- **The atom number of each labelled position, in each file.** This is the
-  atom's place in the input geometry, counting from 1, as GaussView numbers
-  atoms. ORCA prints atoms from 0 in its output, so add 1 to ORCA's numbers.
+- **The atom number of each labelled position, in each file.** Kinisot
+  numbers atoms from 1, in the order of the input geometry, for every
+  program; this is the numbering GaussView shows. Take the numbers from your
+  input, not from ORCA's printed tables, which count from 0.
 - **The temperature of the experiment.**
 
 For a competition KIE, the transition structure is the one of the first
@@ -262,8 +263,8 @@ arylation, are in [docs/theory.md, section 7](docs/theory.md#7-conformer-ensembl
 | ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
 | ASE: machine-learned potentials, GFN2-xTB, any ASE calculator | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (`xtb`, `mace_mp`, `mace_off`, `orb`, `sevennet`, `aimnet2`, `module:callable`); the Hessian is computed and cached next to the geometry, external modes are projected out |
 
-Atom numbers always count from 1, whatever the program: ORCA's own output
-numbers atoms from 0. Details and pitfalls:
+Atom numbers count from 1 in the order of the input geometry, whatever
+the program. Details and pitfalls:
 [docs/file_formats.md](docs/file_formats.md).
 
 ## Why the Bigeleisen–Mayer equation rather than free energies
