@@ -1,0 +1,11 @@
+# file, free energy (- : computed by Kinisot), degeneracy (2: its mirror image is not listed)
+gs_1.hessian.json - 2
+gs_2.hessian.json - 2
+gs_3.hessian.json - 2
+gs_4.hessian.json - 2
+gs_5.hessian.json - 1
+gs_6.hessian.json - 2
+gs_7.hessian.json - 2
+gs_8.hessian.json - 2
+ts_chair.hessian.json - 2
+ts_boat.hessian.json - 2

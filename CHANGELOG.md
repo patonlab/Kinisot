@@ -59,6 +59,14 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
     three-step rate matrix to 7 × 10⁻⁸, and channels computed from one
     reactant reproduce the conformer ensemble of their transition
     structures to 10⁻¹³.
+- Worked example `examples/conformers`: eight GFN2-xTB conformers of allyl
+  vinyl ether and the chair and boat Claisen transition structures, made by
+  `scripts/make_conformer_example.py` (conformer search by dihedral
+  rotation, duplicates and mirror images recognized, degeneracies from
+  chirality, each saddle point checked to connect reactant and product).
+  ¹³C and ¹⁷O KIEs hardly depend on the conformer; the C4-d₂ KIE runs from
+  0.926 to 0.984, and the ensemble (0.968) differs from the lowest pair by
+  0.010. `run_examples.sh` and `tests/test_examples.py` include it.
 - `kinisot --job job.json`: a JSON job file with the structures, labels and
   settings, for series, channels, conformer ensembles with free energies,
   and several isotopologues in one run (docs/job_files.md). The results

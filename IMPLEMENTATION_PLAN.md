@@ -477,10 +477,12 @@ with `series_kie`/`channel_kie`, `kinisot --job` (docs/job_files.md) and
 theory.md sections 7a and 7b. Tests: `tests/test_pathways.py` (the Wittig
 and DyKAT published combinations, a three-step rate matrix to 7 × 10⁻⁸,
 channels from one reactant equal to the ensemble to 10⁻¹³) and
-`tests/test_jobs.py`. Still to do: the worked example
-(`examples/conformers/`), and the Wittig and DyKAT validations from our
-own jobs once the logs are in (benchmark cases with `series` and
-`channels`).
+`tests/test_jobs.py`. The worked example (`examples/conformers/`, made by
+`scripts/make_conformer_example.py`) followed: eight GFN2-xTB reactant
+conformers and the chair and boat transition structures, where the C4-d₂
+KIE moves by 0.010 from the lowest pair to the ensemble. Still to do: the
+Wittig and DyKAT validations from our own jobs once the logs are in
+(benchmark cases with `series` and `channels`).
 
 **Goal (requested 2026-09-27):** KIEs and EQEs from several conformers of
 each reactant, transition structure and product, given with the same atom

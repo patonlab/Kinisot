@@ -327,8 +327,10 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
   and ²H KIEs, projection, reference isotopologue, tunnelling models,
   temperature scans), a Diels–Alder reaction with one or two reactant files,
   the same KIE from ORCA and from ASE inputs (with the machine-learned
-  potential workflow), and a conformational EQE, each with the commands, the
-  expected numbers and the literature background.
+  potential workflow), a conformational EQE, and a conformer ensemble (eight
+  allyl vinyl ether conformers and the chair and boat Claisen transition
+  structures), each with the commands, the expected numbers and the
+  literature background.
 - [docs/theory.md](docs/theory.md), [docs/file_formats.md](docs/file_formats.md),
   [docs/job_files.md](docs/job_files.md),
   [docs/faq.md](docs/faq.md), [docs/comparison.md](docs/comparison.md)

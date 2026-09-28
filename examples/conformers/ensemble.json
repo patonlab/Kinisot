@@ -1,0 +1,25 @@
+{
+  "description": "Claisen rearrangement of allyl vinyl ether at 393 K: every measured position from eight reactant conformers and the chair and boat transition structures (GFN2-xTB), relative to C5 as in the experiment",
+  "temperature": 393,
+  "scale": 1.0,
+  "reactants": [
+    {
+      "files": ["gs_1.hessian.json", "gs_2.hessian.json", "gs_3.hessian.json", "gs_4.hessian.json",
+                "gs_5.hessian.json", "gs_6.hessian.json", "gs_7.hessian.json", "gs_8.hessian.json"],
+      "degeneracy": [2, 2, 2, 2, 1, 2, 2, 2]
+    }
+  ],
+  "transition_structure": [
+    {"files": ["ts_chair.hessian.json", "ts_boat.hessian.json"], "degeneracy": [2, 2]}
+  ],
+  "isotopologues": [
+    {"name": "C1 13C", "iso": "1", "reference": "5"},
+    {"name": "C2 13C", "iso": "2", "reference": "5"},
+    {"name": "O3 17O", "iso": "3:17O", "reference": "5"},
+    {"name": "C4 13C", "iso": "4", "reference": "5"},
+    {"name": "C6 13C", "iso": "6", "reference": "5"},
+    {"name": "C1-d2", "iso": "7,8", "reference": "5"},
+    {"name": "C4-d2", "iso": "10,11", "reference": "5"},
+    {"name": "C6-d2", "iso": "13,14", "reference": "5"}
+  ]
+}

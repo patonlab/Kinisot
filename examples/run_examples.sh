@@ -66,9 +66,19 @@ for atoms in 1 4 6 7,8; do
 done
 cd "$DATA"
 
+# Conformer ensembles (examples/conformers, made by scripts/make_conformer_example.py): GFN2-xTB Hessians of eight
+# allyl vinyl ether conformers and the chair and boat Claisen transition structures, at 393 K relative to C5.
+# The C4-d2 KIE from the lowest pair, then from every conformer with the degeneracies in degeneracies.txt, then
+# every position from the job file.
+cd "$HERE/conformers"
+run conformers --rct gs_1.hessian.json --ts ts_chair.hessian.json --iso 10,11 -t 393 -s 1 --reference 5
+run conformers --rct gs_1.hessian.json gs_2.hessian.json gs_3.hessian.json gs_4.hessian.json gs_5.hessian.json gs_6.hessian.json gs_7.hessian.json gs_8.hessian.json --ts ts_chair.hessian.json ts_boat.hessian.json --iso 10,11 -t 393 -s 1 --reference 5 --energies degeneracies.txt
+run conformers --job ensemble.json
+cd "$DATA"
+
 # Equilibrium isotope effect: CD3 axial versus equatorial in 1,1,3,3-tetramethylcyclohexane,
 # from one frequency calculation with the deuteriums placed on either methyl group. Unscaled.
 run eqe_cyclohexane --rct tetramethylcyclohexane.out --prd tetramethylcyclohexane.out --iso 24,25,26 --iso 28,29,30 -s 1 -t 290
 run eqe_cyclohexane --rct tetramethylcyclohexane.out --prd tetramethylcyclohexane.out --iso 24,25,26 --iso 28,29,30 -s 1 -t 300
 
-grep -h -E "^  (KIE|EQE) @|Species:" "$HERE"/*/expected_output.dat
+grep -h -E "^  (KIE|EQE)( \((ensemble|series|channels)\))? @|Species:|Isotopologue:" "$HERE"/*/expected_output.dat

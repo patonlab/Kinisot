@@ -1,0 +1,298 @@
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 02:51
+  Species: gs_1.hessian.json isotopologue: 10,11
+  Species: ts_chair.hessian.json isotopologue: 10,11
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o gs_1.hessian                                      --------------------------------------------------------------------------
+o ts_chair.hessian                                    494.0
+o gs_1.hessian: iso @ 10,11                                  1.851e+02  1.255e+00  1.371e-01
+o ts_chair.hessian: iso @ 10,11                       493.4  1.878e+02  1.239e+00  1.398e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.001185   0.985951   1.013433   0.980823   0.981195   1.000342   0.981530
+  relative to iso @ 5 / 5:                                                    KIE = 1.003889   0.977394              0.977653
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  gs_1.hessian (light): 36 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
+  gs_1.hessian (iso @ 10,11): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  ts_chair.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  ts_chair.hessian (iso @ 10,11): imaginary 493.4i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 02:51
+  Species: gs_1.hessian.json gs_2.hessian.json gs_3.hessian.json gs_4.hessian.json gs_5.hessian.json gs_6.hessian.json gs_7.hessian.json gs_8.hessian.json (8 conformers) isotopologue: 10,11
+  Species: ts_chair.hessian.json ts_boat.hessian.json (2 conformers) isotopologue: 10,11
+
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 10,11
+    gs_1.hessian                                   0.00     2   28.76              0.981190   0.981525
+    gs_2.hessian                                   0.23     2   21.30              0.969300   0.969631
+    gs_3.hessian                                   0.66     2   12.36              0.985614   0.985951
+    gs_4.hessian                                   0.56     2   14.10              0.950964   0.951289
+    gs_5.hessian                                   0.76     1    5.44              0.929329   0.929647
+    gs_6.hessian                                   1.15     2    6.56              0.960968   0.961296
+    gs_7.hessian                                   1.04     2    7.64              0.988193   0.988530
+    gs_8.hessian                                   1.57     2    3.84              0.982521   0.982857
+o transition structure 1, iso @ 10,11
+    ts_chair.hessian                               0.00     2   99.96     1.0012   0.971384   0.971716
+    ts_boat.hessian                                6.16     2    0.04     1.0006   0.958826   0.958934
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          0.971380   1.000342   0.971711   0.981530   0.969419-0.973724     1.00
+  relative to iso @ 5 / 5:                          0.967498              0.967755
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 02:51
+  Job: ensemble.json (transition structure)
+
+
+  Isotopologue: C1 13C
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 1
+    gs_1.hessian                                   0.00     2   28.76              1.021683   1.026068
+    gs_2.hessian                                   0.23     2   21.30              1.021659   1.026045
+    gs_3.hessian                                   0.66     2   12.36              1.021471   1.025856
+    gs_4.hessian                                   0.56     2   14.10              1.021508   1.025893
+    gs_5.hessian                                   0.76     1    5.44              1.021491   1.025876
+    gs_6.hessian                                   1.15     2    6.56              1.021987   1.026374
+    gs_7.hessian                                   1.04     2    7.64              1.022012   1.026400
+    gs_8.hessian                                   1.57     2    3.84              1.021993   1.026380
+o transition structure 1, iso @ 1
+    ts_chair.hessian                               0.00     2   99.96     1.0152   1.021673   1.026059
+    ts_boat.hessian                                6.16     2    0.04     1.0164   1.024085   1.026946
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          1.021674   1.004293   1.026059   1.026068   1.026039-1.026081     1.00
+  relative to iso @ 5 / 5:                          1.017591              1.021881
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: C2 13C
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 2
+    gs_1.hessian                                   0.00     2   28.76              1.005602   1.005722
+    gs_2.hessian                                   0.23     2   21.30              1.005598   1.005718
+    gs_3.hessian                                   0.66     2   12.36              1.005490   1.005610
+    gs_4.hessian                                   0.56     2   14.10              1.005851   1.005970
+    gs_5.hessian                                   0.76     1    5.44              1.005866   1.005986
+    gs_6.hessian                                   1.15     2    6.56              1.004967   1.005087
+    gs_7.hessian                                   1.04     2    7.64              1.004967   1.005087
+    gs_8.hessian                                   1.57     2    3.84              1.004870   1.004989
+o transition structure 1, iso @ 2
+    ts_chair.hessian                               0.00     2   99.96     1.0004   1.005518   1.005638
+    ts_boat.hessian                                6.16     2    0.04     1.0002   1.006010   1.006040
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          1.005519   1.000119   1.005638   1.005722   1.005603-1.005676     1.00
+  relative to iso @ 5 / 5:                          1.001500              1.001543
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: O3 17O
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 3:17O
+    gs_1.hessian                                   0.00     2   28.76              1.013240   1.013917
+    gs_2.hessian                                   0.23     2   21.30              1.013523   1.014201
+    gs_3.hessian                                   0.66     2   12.36              1.013032   1.013709
+    gs_4.hessian                                   0.56     2   14.10              1.013094   1.013771
+    gs_5.hessian                                   0.76     1    5.44              1.013625   1.014303
+    gs_6.hessian                                   1.15     2    6.56              1.012791   1.013468
+    gs_7.hessian                                   1.04     2    7.64              1.012199   1.012875
+    gs_8.hessian                                   1.57     2    3.84              1.012260   1.012936
+o transition structure 1, iso @ 3:17O
+    ts_chair.hessian                               0.00     2   99.96     1.0023   1.013130   1.013807
+    ts_boat.hessian                                6.16     2    0.04     1.0008   1.008939   1.009079
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          1.013128   1.000668   1.013805   1.013919   1.013746-1.013869     1.00
+  relative to iso @ 5 / 5:                          1.009080              1.009677
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: C4 13C
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 4
+    gs_1.hessian                                   0.00     2   28.76              1.019179   1.020556
+    gs_2.hessian                                   0.23     2   21.30              1.019316   1.020694
+    gs_3.hessian                                   0.66     2   12.36              1.019067   1.020444
+    gs_4.hessian                                   0.56     2   14.10              1.019260   1.020637
+    gs_5.hessian                                   0.76     1    5.44              1.019478   1.020856
+    gs_6.hessian                                   1.15     2    6.56              1.019376   1.020753
+    gs_7.hessian                                   1.04     2    7.64              1.019252   1.020630
+    gs_8.hessian                                   1.57     2    3.84              1.019164   1.020541
+o transition structure 1, iso @ 4
+    ts_chair.hessian                               0.00     2   99.96     1.0047   1.019242   1.020620
+    ts_boat.hessian                                6.16     2    0.04     1.0012   1.013219   1.013428
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          1.019240   1.001351   1.020617   1.020559   1.020600-1.020630     1.00
+  relative to iso @ 5 / 5:                          1.015167              1.016461
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: C6 13C
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 6
+    gs_1.hessian                                   0.00     2   28.76              1.023499   1.027910
+    gs_2.hessian                                   0.23     2   21.30              1.023664   1.028076
+    gs_3.hessian                                   0.66     2   12.36              1.023541   1.027953
+    gs_4.hessian                                   0.56     2   14.10              1.023659   1.028071
+    gs_5.hessian                                   0.76     1    5.44              1.023778   1.028190
+    gs_6.hessian                                   1.15     2    6.56              1.023624   1.028036
+    gs_7.hessian                                   1.04     2    7.64              1.023533   1.027945
+    gs_8.hessian                                   1.57     2    3.84              1.023598   1.028010
+o transition structure 1, iso @ 6
+    ts_chair.hessian                               0.00     2   99.96     1.0153   1.023590   1.028002
+    ts_boat.hessian                                6.16     2    0.04     1.0180   1.028780   1.031928
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          1.023592   1.004310   1.028003   1.027909   1.027984-1.028018     1.00
+  relative to iso @ 5 / 5:                          1.019501              1.023817
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: C1-d2
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 7,8
+    gs_1.hessian                                   0.00     2   28.76              0.902117   0.903959
+    gs_2.hessian                                   0.23     2   21.30              0.899171   0.901007
+    gs_3.hessian                                   0.66     2   12.36              0.901264   0.903104
+    gs_4.hessian                                   0.56     2   14.10              0.898283   0.900118
+    gs_5.hessian                                   0.76     1    5.44              0.899171   0.901007
+    gs_6.hessian                                   1.15     2    6.56              0.885604   0.887412
+    gs_7.hessian                                   1.04     2    7.64              0.885622   0.887431
+    gs_8.hessian                                   1.57     2    3.84              0.885984   0.887793
+o transition structure 1, iso @ 7,8
+    ts_chair.hessian                               0.00     2   99.96     1.0071   0.897731   0.899563
+    ts_boat.hessian                                6.16     2    0.04     1.0131   0.870702   0.872652
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          0.897720   1.002042   0.899553   0.903969   0.898776-0.900457     1.00
+  relative to iso @ 5 / 5:                          0.894133              0.895890
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: C4-d2
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 10,11
+    gs_1.hessian                                   0.00     2   28.76              0.981190   0.981525
+    gs_2.hessian                                   0.23     2   21.30              0.969300   0.969631
+    gs_3.hessian                                   0.66     2   12.36              0.985614   0.985951
+    gs_4.hessian                                   0.56     2   14.10              0.950964   0.951289
+    gs_5.hessian                                   0.76     1    5.44              0.929329   0.929647
+    gs_6.hessian                                   1.15     2    6.56              0.960968   0.961296
+    gs_7.hessian                                   1.04     2    7.64              0.988193   0.988530
+    gs_8.hessian                                   1.57     2    3.84              0.982521   0.982857
+o transition structure 1, iso @ 10,11
+    ts_chair.hessian                               0.00     2   99.96     1.0012   0.971384   0.971716
+    ts_boat.hessian                                6.16     2    0.04     1.0006   0.958826   0.958934
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          0.971380   1.000342   0.971711   0.981530   0.969419-0.973724     1.00
+  relative to iso @ 5 / 5:                          0.967498              0.967755
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
+
+
+  Isotopologue: C6-d2
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+
+  Conformers at 393.0 K:
+                                                     dG     g   pop %    V-ratio        KIE   corr-KIE
+o reactant 1, iso @ 13,14
+    gs_1.hessian                                   0.00     2   28.76              0.875850   0.876645
+    gs_2.hessian                                   0.23     2   21.30              0.882149   0.882949
+    gs_3.hessian                                   0.66     2   12.36              0.876799   0.877594
+    gs_4.hessian                                   0.56     2   14.10              0.878776   0.879573
+    gs_5.hessian                                   0.76     1    5.44              0.884066   0.884868
+    gs_6.hessian                                   1.15     2    6.56              0.884113   0.884916
+    gs_7.hessian                                   1.04     2    7.64              0.876148   0.876943
+    gs_8.hessian                                   1.57     2    3.84              0.877002   0.877798
+o transition structure 1, iso @ 13,14
+    ts_chair.hessian                               0.00     2   99.96     1.0032   0.878778   0.879575
+    ts_boat.hessian                                6.16     2    0.04     1.0156   0.877301   0.879644
+
+  dG: kcal/mol above the lowest conformer of the species; pop: share of the light isotopologue (for a transition structure, of its rate, with tunnelling); KIE: the conformer against the other side's ensemble
+
+                                                          KIE    1D-tunn   corr-KIE     lowest        range (+/-0.5)  N_eff
+                                                    --------------------------------------------------------------------------
+  KIE (ensemble) @ 393.0 K                          0.878778   1.000907   0.879575   0.876645   0.878974-0.880116     1.00
+  relative to iso @ 5 / 5:                          0.875266              0.875993
+                                                    --------------------------------------------------------------------------
+
+  lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
