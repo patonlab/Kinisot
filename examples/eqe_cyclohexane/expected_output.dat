@@ -1,10 +1,11 @@
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:26
   Species: tetramethylcyclohexane.out isotopologue: 24,25,26
   Species: tetramethylcyclohexane.out isotopologue: 28,29,30
 
 
                                                      Temp = 290.0K / Vib. scale factor = 1.0
+  Labelled atoms: tetramethylcyclohexane H24 -> 2H, H25 -> 2H, H26 -> 2H; tetramethylcyclohexane H28 -> 2H, H29 -> 2H, H30 -> 2H
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o tetramethylcyclohexane                            --------------------------------------------------------------------------
@@ -21,12 +22,13 @@ o tetramethylcyclohexane: iso @ 28,29,30                     4.204e+04  1.424e+0
   tetramethylcyclohexane (light): 84 kept; discarded: -4.9 -0.1 0.2 0.2 6.2 11.6
   tetramethylcyclohexane (iso @ 28,29,30): 84 kept; discarded: -4.8 -0.1 0.2 0.2 6.0 11.3
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:26
   Species: tetramethylcyclohexane.out isotopologue: 24,25,26
   Species: tetramethylcyclohexane.out isotopologue: 28,29,30
 
 
                                                      Temp = 300.0K / Vib. scale factor = 1.0
+  Labelled atoms: tetramethylcyclohexane H24 -> 2H, H25 -> 2H, H26 -> 2H; tetramethylcyclohexane H28 -> 2H, H29 -> 2H, H30 -> 2H
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o tetramethylcyclohexane                            --------------------------------------------------------------------------

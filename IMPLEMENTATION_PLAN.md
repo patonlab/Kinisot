@@ -66,7 +66,7 @@ the GoodVibes dependency in Phase 5).
 
 All six items done (constants block, `NameError`, exact scaling-factor
 match, table row, linearity from rotational constants, CHANGELOG). Remaining:
-publish v2.0.3 to PyPI and bump the conda-forge recipe. Do this before
+publish v2.0.3 to PyPI and bump the conda recipe template. Do this before
 Phase 2 lands so users get the bug fixes without waiting for the CLI
 changes.
 
@@ -280,8 +280,9 @@ the maintainer 2026-09-25), so a pushed `v*` tag is a complete release.
    on a `v*` tag the workflow checks the tag against `__version__`, runs
    the tests, builds sdist/wheel and uploads with PyPI trusted publishing
    (environment `pypi`). One-time PyPI/GitHub setup is in CONTRIBUTING.md.
-   The conda-forge bot picks up the PyPI release; keep `recipe/meta.yaml`
-   in sync.
+   Kinisot is not on conda-forge: `recipe/meta.yaml` is a template for a
+   staged-recipes submission (CONTRIBUTING.md). Once a feedstock exists,
+   the conda-forge bot picks up each PyPI release.
 3. Dependabot for Actions versions.
 4. Zenodo integration so each tag gets a DOI; `CITATION.cff` updated by the
    release workflow.

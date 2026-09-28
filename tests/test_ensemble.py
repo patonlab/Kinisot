@@ -325,6 +325,7 @@ def test_command_line(tmp_path, monkeypatch):
         text = handle.read()
     assert "(3 conformers) isotopologue: 8" in text and "weights: qrrho" in text
     assert "KIE (ensemble) @ 273.15 K" in text and "ts_G" in text
+    assert "Labelled atoms: methylstyrene C2 -> 13C; ts10 (+2 conformers) C8 -> 13C" in text
     with open("run.json") as handle:
         data = json.load(handle)
     expected = kie(os.path.join(SHI, "methylstyrene.log"), [files])

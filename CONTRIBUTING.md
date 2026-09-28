@@ -71,15 +71,21 @@ involved. For each release:
 ```
 # bump __version__ in kinisot/__init__.py, move the CHANGELOG "Unreleased"
 # section to the new version, update CITATION.cff, commit, then
-git tag v2.1.0
-git push origin v2.1.0
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
 
 The workflow checks that the tag matches `kinisot.__version__`, runs the
 tests, builds the sdist and wheel, uploads them, and then creates a GitHub
-Release whose notes are the matching CHANGELOG section. Once the release is
-on PyPI the conda-forge bot opens the feedstock update automatically
-(`recipe/meta.yaml` in this repository is the template to keep in sync).
+Release whose notes are the matching CHANGELOG section.
+
+**conda-forge**: Kinisot is not on conda-forge yet, so pip is the only
+install route. `recipe/meta.yaml` is the recipe to submit to
+[conda-forge/staged-recipes](https://github.com/conda-forge/staged-recipes)
+(its dependencies, numpy and goodvibes, are both on conda-forge). Update its
+version and sha256 from the PyPI release before submitting. Once a
+`kinisot-feedstock` exists, the conda-forge bot opens an update for each
+PyPI release, and the README can offer `conda install`.
 
 **Zenodo DOI per release**: the repository is connected to Zenodo, so
 every GitHub Release is archived with the metadata in `.zenodo.json` and

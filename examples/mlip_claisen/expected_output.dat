@@ -1,10 +1,11 @@
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs.hessian C4 -> 13C; claisen_ts.hessian C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs.hessian                                --------------------------------------------------------------------------
@@ -21,12 +22,13 @@ o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+0
   claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961 / external modes projected
+  Labelled atoms: claisen_gs.hessian C4 -> 13C; claisen_ts.hessian C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs.hessian                                --------------------------------------------------------------------------
@@ -43,13 +45,14 @@ o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+0
   claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.hessian.json isotopologue: 1
   Species: claisen_ts.hessian.json isotopologue: 1
 
   Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian C1 -> 13C; claisen_ts.hessian C1 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs.hessian                                --------------------------------------------------------------------------
@@ -66,13 +69,14 @@ o claisen_ts.hessian: iso @ 1                         486.6  1.143e+00  1.015e+0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 1): imaginary 486.6i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
   Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian C4 -> 13C; claisen_ts.hessian C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs.hessian                                --------------------------------------------------------------------------
@@ -89,13 +93,14 @@ o claisen_ts.hessian: iso @ 4                         491.7  1.148e+00  1.021e+0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 4): imaginary 491.7i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.hessian.json isotopologue: 6
   Species: claisen_ts.hessian.json isotopologue: 6
 
   Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian C6 -> 13C; claisen_ts.hessian C6 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs.hessian                                --------------------------------------------------------------------------
@@ -112,13 +117,14 @@ o claisen_ts.hessian: iso @ 6                         486.6  1.142e+00  1.015e+0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 6): imaginary 486.6i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.hessian.json isotopologue: 7,8
   Species: claisen_ts.hessian.json isotopologue: 7,8
 
   Unable to find vibrational scaling factor for GFN2-xTB; using value of 1.0 (override with -s)
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian H7 -> 2H, H8 -> 2H; claisen_ts.hessian H7 -> 2H, H8 -> 2H
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs.hessian                                --------------------------------------------------------------------------

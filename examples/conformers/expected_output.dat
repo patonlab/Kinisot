@@ -1,10 +1,12 @@
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 02:51
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: gs_1.hessian.json isotopologue: 10,11
   Species: ts_chair.hessian.json isotopologue: 10,11
 
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: gs_1.hessian H10 -> 2H, H11 -> 2H; ts_chair.hessian H10 -> 2H, H11 -> 2H
+  Reference atoms: gs_1.hessian C5 -> 13C; ts_chair.hessian C5 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o gs_1.hessian                                      --------------------------------------------------------------------------
@@ -22,12 +24,14 @@ o ts_chair.hessian: iso @ 10,11                       493.4  1.878e+02  1.239e+0
   ts_chair.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   ts_chair.hessian (iso @ 10,11): imaginary 493.4i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 02:51
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: gs_1.hessian.json gs_2.hessian.json gs_3.hessian.json gs_4.hessian.json gs_5.hessian.json gs_6.hessian.json gs_7.hessian.json gs_8.hessian.json (8 conformers) isotopologue: 10,11
   Species: ts_chair.hessian.json ts_boat.hessian.json (2 conformers) isotopologue: 10,11
 
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) H10 -> 2H, H11 -> 2H; ts_chair.hessian (+1 conformer) H10 -> 2H, H11 -> 2H
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -54,13 +58,15 @@ o transition structure 1, iso @ 10,11
 
   lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 02:51
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Job: ensemble.json (transition structure)
 
 
   Isotopologue: C1 13C
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) C1 -> 13C; ts_chair.hessian (+1 conformer) C1 -> 13C
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -91,6 +97,8 @@ o transition structure 1, iso @ 1
   Isotopologue: C2 13C
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) C2 -> 13C; ts_chair.hessian (+1 conformer) C2 -> 13C
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -121,6 +129,8 @@ o transition structure 1, iso @ 2
   Isotopologue: O3 17O
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) O3 -> 17O; ts_chair.hessian (+1 conformer) O3 -> 17O
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -151,6 +161,8 @@ o transition structure 1, iso @ 3:17O
   Isotopologue: C4 13C
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) C4 -> 13C; ts_chair.hessian (+1 conformer) C4 -> 13C
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -181,6 +193,8 @@ o transition structure 1, iso @ 4
   Isotopologue: C6 13C
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) C6 -> 13C; ts_chair.hessian (+1 conformer) C6 -> 13C
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -211,6 +225,8 @@ o transition structure 1, iso @ 6
   Isotopologue: C1-d2
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) H7 -> 2H, H8 -> 2H; ts_chair.hessian (+1 conformer) H7 -> 2H, H8 -> 2H
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -241,6 +257,8 @@ o transition structure 1, iso @ 7,8
   Isotopologue: C4-d2
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) H10 -> 2H, H11 -> 2H; ts_chair.hessian (+1 conformer) H10 -> 2H, H11 -> 2H
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE
@@ -271,6 +289,8 @@ o transition structure 1, iso @ 10,11
   Isotopologue: C6-d2
 
                                                      Temp = 393.0K / Vib. scale factor = 1.0 / weights: qrrho / external modes projected
+  Labelled atoms: gs_1.hessian (+7 conformers) H13 -> 2H, H14 -> 2H; ts_chair.hessian (+1 conformer) H13 -> 2H, H14 -> 2H
+  Reference atoms: gs_1.hessian (+7 conformers) C5 -> 13C; ts_chair.hessian (+1 conformer) C5 -> 13C
 
   Conformers at 393.0 K:
                                                      dG     g   pop %    V-ratio        KIE   corr-KIE

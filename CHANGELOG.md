@@ -72,6 +72,12 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   and several isotopologues in one run (docs/job_files.md). The results
   file prints the steps or channels with their shares, and `--json` and
   `--csv` carry an `isotopologue` key.
+- The results file names every labelled atom in each file, with its
+  element and isotope: `Labelled atoms: claisen_gs C1 -> 13C; claisen_ts
+  C1 -> 13C`, and a `Reference atoms` line with `--reference`. Ensembles,
+  each step of a series and each channel get the same lines. An atom number
+  that is off by one but lands on another atom of the same element passes
+  every other check; this line makes it visible.
 - Five benchmark cases from the SI of the PyQuiverHS paper (Grazioli, Ly,
   Sabetnejad, Mattapalli, Nguyen and O'Leary, ChemRxiv 2026), included with
   the authors' agreement. Each has its Gaussian files, the PyQuiverHS input
@@ -214,6 +220,10 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ### Fixed
 
+- The README offered `conda install -c conda-forge kinisot`, but Kinisot is
+  not on conda-forge. Install with pip. `recipe/meta.yaml` is refreshed to
+  2.5.0 as the recipe to submit to conda-forge's staged-recipes, and
+  CONTRIBUTING.md no longer says a conda-forge bot follows each release.
 - A Gaussian log with more than one block of printed frequencies, such as
   an `opt=(calcall,ts) freq` job, gave a false "frequencies differ from the
   program's" warning. The self-check took the last 3N−5 printed values,

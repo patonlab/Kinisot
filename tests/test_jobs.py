@@ -88,6 +88,8 @@ def test_series_job(tmp_path, monkeypatch):
     with open("Kinisot_output.dat") as handle:
         text = handle.read()
     assert "Isotopologue: C-alpha" in text and "KIE (series) @ 273.15 K" in text and "Steps in series" in text
+    assert "Reference atoms (step 1): methylstyrene C11 -> 13C; ts10 C4 -> 13C" in text
+    assert "Labelled atoms (step 2): methylstyrene C1 -> 13C; ts_B (+1 conformer) C7 -> 13C" in text
     with open("rows.csv") as handle:
         assert handle.readline().startswith("isotopologue,kind")
 
@@ -110,6 +112,7 @@ def test_channels_job(tmp_path, monkeypatch):
     with open("Kinisot_output.dat") as handle:
         text = handle.read()
     assert "KIE (channels) @ 393.0 K" in text and "o spectator: ts1b" in text
+    assert "Labelled atoms (spectator): phno2 N12 -> 15N, O14 -> 18O; ts1b N1 -> 15N, O3 -> 18O" in text
 
 
 def test_conformer_and_eqe_jobs(tmp_path, monkeypatch):

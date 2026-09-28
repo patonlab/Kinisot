@@ -47,7 +47,7 @@ an intermediate can return to the reactant, see
 Kinisot needs Python 3.9 or later. The example files come with the source:
 
 ```
-pip install kinisot            # or: conda install -c conda-forge kinisot
+pip install kinisot
 git clone https://github.com/patonlab/Kinisot && cd Kinisot/tests/data/gaussian
 kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 1 -t 393 -s 0.961
 ```
@@ -56,11 +56,12 @@ This computes the ¹³C KIE at carbon 1 of allyl vinyl ether for its Claisen
 rearrangement at 393 K, with B3LYP/6-31G(d) frequencies scaled by 0.961:
 
 ```
-  KINISOT.py v 2.5.0: 2026-09-25 12:45
+  KINISOT.py v 2.6.0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 1
   Species: claisen_ts.out isotopologue: 1
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C1 -> 13C; claisen_ts C1 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -80,7 +81,8 @@ o claisen_ts: iso @ 1                                 460.3  1.144e+00  1.021e+0
 
 The number to report is **corr-KIE = 1.015** (the semiclassical KIE of
 1.013 times the tunnelling correction). The same block is appended to
-`Kinisot_output.dat`.
+`Kinisot_output.dat`. Its first line gives the Kinisot version, which
+`kinisot --version` also prints.
 
 ## Reading the output
 
@@ -93,6 +95,12 @@ the side with the stiffer vibrations.
 **The number to report** is the last column, `corr-KIE`: the KIE with the
 tunnelling correction. The other columns show where it comes from.
 
+- **Labelled atoms** names each substituted atom in each file, with its
+  element and the isotope it became (`claisen_ts C1 -> 13C`). Check it
+  against your structures: an atom number that is off by one but lands on
+  another carbon passes every other check. With `--reference`, a
+  `Reference atoms` line does the same for the reference position. (This
+  line is new in 2.6.)
 - **Species rows** show, for the reactant and the transition structure,
   the imaginary frequency of each isotopologue (cm⁻¹) and three factors as
   light/heavy ratios:
