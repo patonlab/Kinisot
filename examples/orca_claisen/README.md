@@ -1,7 +1,9 @@
 # ORCA input: the Claisen KIE from `.out` + `.hess` files
 
 ORCA keeps the Hessian in `name.hess` next to `name.out`. Give Kinisot
-either file; everything else is as for Gaussian. The fixture files in
+either file; everything else is as for Gaussian. That includes atom numbers:
+they count from 1 in the order of the input geometry, although ORCA's own
+printed tables count from 0. The fixture files in
 `tests/data/orca/` are the Claisen Gaussian Hessians rewritten in ORCA's
 layout (see the README there), so the numbers are the same as in the
 [claisen](../claisen/README.md) example and check the ORCA reader end to

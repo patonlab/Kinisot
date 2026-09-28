@@ -1,5 +1,16 @@
 # ASE input: Hessians from any calculator, including machine-learned potentials
 
+**In short.** GFN2-xTB and machine-learned potentials give Hessians in
+minutes, but their transition structures can differ from DFT's.
+- For the Claisen rearrangement, GFN2-xTB finds the concerted transition
+  structure but a tighter one. Its ¹³C and ¹⁷O KIEs miss experiment by up to
+  0.018 (mean absolute deviation 0.0089, against 0.0009 for B3LYP).
+- None of four general-purpose MACE potentials finds the concerted
+  transition structure at all.
+
+Check the transition structure (its imaginary mode, and what it connects)
+before trusting its isotope effects.
+
 Kinisot reads Hessians saved in ASE's `VibrationsData` JSON form and can
 compute them itself with any ASE calculator (`--calc`). The fixture files
 in `tests/data/ase/` are the Claisen B3LYP/6-31G(d) Hessians written in

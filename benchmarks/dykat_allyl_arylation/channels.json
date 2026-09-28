@@ -1,0 +1,19 @@
+{
+  "description": "Rh-catalysed arylation of racemic 3-chlorocyclohexene (van Dijk et al., Nat. Catal. 2021): 13C KIEs on the product from the two enantiomeric channels, each from its Rh-bound reactant complex to its anti-oxidative-addition transition structure, relative to C5, with s = k(S)/k(R) = 3.3 (the second channel's share over the first's, as Kinisot prints it). Unscaled frequencies, as in the paper. Atom numbers are the same product carbon in both channels.",
+  "temperature": 313.15,
+  "scale": 1.0,
+  "tunneling": "bell",
+  "project": false,
+  "channels": [
+    {"name": "(R)-3", "reactants": ["r3_reactant_complex.log"], "transition_structure": ["r3_anti_oa_ts.log"]},
+    {"name": "(S)-3", "reactants": ["s3_reactant_complex.log"], "transition_structure": ["s3_anti_oa_ts.log"]}
+  ],
+  "shares": [1, 3.3],
+  "isotopologues": [
+    {"name": "C1", "iso": ["118", "118"], "reference": ["120", "120"]},
+    {"name": "C2", "iso": ["117", "117"], "reference": ["120", "120"]},
+    {"name": "C3", "iso": ["122", "122"], "reference": ["120", "120"]},
+    {"name": "C4", "iso": ["121", "121"], "reference": ["120", "120"]},
+    {"name": "C6", "iso": ["119", "119"], "reference": ["120", "120"]}
+  ]
+}

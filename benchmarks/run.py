@@ -5,8 +5,11 @@
 Each case directory holds a case.json (format in benchmarks/README.md).
 Rows whose experimental value is null are computed and listed, but do not
 enter the deviation statistics. Cases without structures yet (null
-"reactants", or null "transition_structure" and "product"), and entries
-without an "iso" label, are listed with their experimental values only.
+"reactants", or null "transition_structure" and "product", and no "job"),
+and entries without an "iso" label (or "isotopologue" name, with a job),
+are listed with their experimental values only. A case with transition
+structures in series or parallel channels names a job file ("job", the
+format of `kinisot --job`) and picks each entry's isotopologue by name.
 """
 
 import argparse
@@ -16,6 +19,7 @@ import os
 import sys
 
 from kinisot import __version__, compute_kie, equivalent_positions
+from kinisot.jobs import load_job, run_job
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -75,18 +79,44 @@ def compute(case, iso, reference=None):
 
 
 def has_structures(case):
-    """Reactants and a transition structure (or product) are both given: the case can be computed."""
-    return bool(case.get("reactants") and (case.get("transition_structure") or case.get("product")))
+    """Reactants and a transition structure (or product), or a job file, are given: the case can be computed."""
+    return bool(case.get("job")) or bool(
+        case.get("reactants") and (case.get("transition_structure") or case.get("product"))
+    )
+
+
+def run_job_file(case):
+    """The isotopologues of the case's job file at the case's temperature, by name.
+
+    The job file holds the structures and the settings; those the case also states must agree with it.
+    """
+    job = load_job(os.path.join(case["_dir"], case["job"]))
+    for key in ("scale", "tunneling", "project"):
+        if case.get(key) is not None and job["settings"].get(key) != case[key]:
+            raise ValueError("%s: %s is %r in case.json but %r in %s" % (
+                case["_name"], key, case[key], job["settings"].get(key), case["job"]))  # fmt: skip
+    return dict(run_job(job, case["temperature"]))
 
 
 def run_case(case):
     """One row per ``kies`` entry: semiclassical and tunnelling-corrected KIE, measurement and deviation."""
     rows = []
+    job_results = run_job_file(case) if case.get("job") else None
     for entry in case["kies"]:
         semiclassical = computed = tunneling = None
         # an entry without an isotopologue label yet is listed with its measurement only
         computable = has_structures(case) and (entry.get("iso") is not None or bool(entry.get("iso_average")))
-        if computable and (entry.get("iso_average") or entry.get("reference_average")):
+        if job_results is not None:
+            name = entry.get("isotopologue")
+            if name is not None:
+                if name not in job_results:
+                    raise ValueError("%s: no isotopologue %r in %s" % (case["_name"], name, case["job"]))
+                result = job_results[name]
+                relative = result.reference is not None
+                semiclassical = result.kie_relative if relative else result.kie
+                computed = result.kie_tunnel_relative if relative else result.kie_tunnel
+                tunneling = result.tunneling
+        elif computable and (entry.get("iso_average") or entry.get("reference_average")):
             # positions that are equivalent in the experiment (a rotating methyl group, the two ortho or
             # meta carbons of a phenyl ring) but not in the static structures: each placement of the label
             # is a conformer of equal weight, so the isotope ratios are averaged on each side
@@ -108,7 +138,7 @@ def run_case(case):
         rows.append(
             {
                 "position": entry["position"],
-                "iso": entry.get("iso"),
+                "iso": entry.get("iso", entry.get("isotopologue")),
                 "semiclassical": semiclassical,
                 "computed": computed,
                 "tunneling": tunneling,
@@ -145,15 +175,19 @@ def format_case(case, rows):
         for r in references
     )
     if has_structures(case):
+        # a job file's own settings are the ones its rows were computed with
+        settings = load_job(os.path.join(case["_dir"], case["job"]))["settings"] if case.get("job") else case
         source += " Computed at %s, %s K, scale %s, tunnelling %s%s." % (
             case.get("level_of_theory", "?"),
             case["temperature"],
-            case.get("scale") if case.get("scale") is not None else "none",
-            case.get("tunneling", "bell"),
+            settings.get("scale") if settings.get("scale") is not None else "none",
+            settings.get("tunneling", "bell"),
             ", relative to isotopologue %s" % case["reference_isotopologue"]
             if case.get("reference_isotopologue")
             else "",
         )
+        if case.get("job"):
+            source = source[:-1] + ", from the job file `%s`." % case["job"]
     else:
         source += " Not computed yet."
     lines = ["## %s" % case["name"], "", source, ""]
@@ -179,7 +213,8 @@ def format_case(case, rows):
         if case.get("alternative_to"):
             lines += ["", "An alternative to `%s`, left out of the overall mean." % case["alternative_to"]]
     elif all(r["computed"] is None for r in rows):
-        lines += ["", "No structures yet: add the frequency calculations and their paths to `case.json`."]
+        generic = "No structures yet: add the frequency calculations and their paths to `case.json`."
+        lines += ["", case.get("status") or generic]
     else:
         lines += ["", "No experimental values entered yet: enter them in `case.json` from the paper."]
     return "\n".join(lines) + "\n"

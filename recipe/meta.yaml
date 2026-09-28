@@ -1,6 +1,10 @@
-# Update version and sha256 from the PyPI release when submitting to conda-forge.
+# Kinisot is not on conda-forge yet. This is the recipe to submit to
+# conda-forge/staged-recipes (see CONTRIBUTING.md); update version and sha256
+# from the PyPI release first. Once a kinisot-feedstock exists, its bot
+# follows each PyPI release and this file is no longer needed.
 {% set name = "kinisot" %}
-{% set version = "2.0.2" %}
+{% set version = "2.5.0" %}
+{% set python_min = "3.9" %}
 
 package:
   name: "{{ name|lower }}"
@@ -8,7 +12,7 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: 0a37f1efe3810d3bff13e288b378f3c9cf9e65eca85d31c7aa679570cca78399
+  sha256: 02c0080a95b31b96c0fc91d183624044e7a092b640f054d6043a9cc67479a802
 
 build:
   number: 0
@@ -20,14 +24,16 @@ build:
 requirements:
   host:
     - pip
-    - python >=3.9
+    - python {{ python_min }}
     - setuptools >=64
   run:
     - numpy >=1.22
     - goodvibes >=4.4
-    - python >=3.9
+    - python >={{ python_min }}
 
 test:
+  requires:
+    - python {{ python_min }}
   imports:
     - kinisot
   commands:
@@ -38,7 +44,7 @@ about:
   license: MIT
   license_family: MIT
   license_file: LICENSE.txt
-  summary: "Compute Kinetic and Equibrium Isotope Effects from compchem outputs"
+  summary: "Compute kinetic and equilibrium isotope effects from computational chemistry outputs"
   doc_url: https://github.com/patonlab/kinisot
   dev_url: https://github.com/patonlab/kinisot
 

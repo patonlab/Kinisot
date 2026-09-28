@@ -31,9 +31,10 @@ at Colorado State University and is a rewrite of the Fortran Kinisot by
 - **Each labelled reactant.** For a bimolecular reaction, give each reactant
   (or a reactant complex). A reactant that carries no label can be left out,
   because it cancels.
-- **The atom number of each labelled position, in each file.** This is the
-  atom's place in the input geometry, counting from 1, as GaussView numbers
-  atoms. ORCA prints atoms from 0 in its output, so add 1 to ORCA's numbers.
+- **The atom number of each labelled position, in each file.** Kinisot
+  numbers atoms from 1, in the order of the input geometry, for every
+  program; this is the numbering GaussView shows. Take the numbers from your
+  input, not from ORCA's printed tables, which count from 0.
 - **The temperature of the experiment.**
 
 For a competition KIE, the transition structure is the one of the first
@@ -46,7 +47,7 @@ an intermediate can return to the reactant, see
 Kinisot needs Python 3.9 or later. The example files come with the source:
 
 ```
-pip install kinisot            # or: conda install -c conda-forge kinisot
+pip install kinisot
 git clone https://github.com/patonlab/Kinisot && cd Kinisot/tests/data/gaussian
 kinisot --rct claisen_gs.out --ts claisen_ts.out --iso 1 -t 393 -s 0.961
 ```
@@ -55,11 +56,12 @@ This computes the ¹³C KIE at carbon 1 of allyl vinyl ether for its Claisen
 rearrangement at 393 K, with B3LYP/6-31G(d) frequencies scaled by 0.961:
 
 ```
-  KINISOT.py v 2.5.0: 2026-09-25 12:45
+  KINISOT.py v 2.6.0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 1
   Species: claisen_ts.out isotopologue: 1
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C1 -> 13C; claisen_ts C1 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -79,7 +81,8 @@ o claisen_ts: iso @ 1                                 460.3  1.144e+00  1.021e+0
 
 The number to report is **corr-KIE = 1.015** (the semiclassical KIE of
 1.013 times the tunnelling correction). The same block is appended to
-`Kinisot_output.dat`.
+`Kinisot_output.dat`. Its first line gives the Kinisot version, which
+`kinisot --version` also prints.
 
 ## Reading the output
 
@@ -92,6 +95,12 @@ the side with the stiffer vibrations.
 **The number to report** is the last column, `corr-KIE`: the KIE with the
 tunnelling correction. The other columns show where it comes from.
 
+- **Labelled atoms** names each substituted atom in each file, with its
+  element and the isotope it became (`claisen_ts C1 -> 13C`). Check it
+  against your structures: an atom number that is off by one but lands on
+  another carbon passes every other check. With `--reference`, a
+  `Reference atoms` line does the same for the reference position. (This
+  line is new in 2.6.)
 - **Species rows** show, for the reactant and the transition structure,
   the imaginary frequency of each isotopologue (cm⁻¹) and three factors as
   light/heavy ratios:
@@ -262,8 +271,8 @@ arylation, are in [docs/theory.md, section 7](docs/theory.md#7-conformer-ensembl
 | ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
 | ASE: machine-learned potentials, GFN2-xTB, any ASE calculator | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (`xtb`, `mace_mp`, `mace_off`, `orb`, `sevennet`, `aimnet2`, `module:callable`); the Hessian is computed and cached next to the geometry, external modes are projected out |
 
-Atom numbers always count from 1, whatever the program: ORCA's own output
-numbers atoms from 0. Details and pitfalls:
+Atom numbers count from 1 in the order of the input geometry, whatever
+the program. Details and pitfalls:
 [docs/file_formats.md](docs/file_formats.md).
 
 ## Why the Bigeleisen–Mayer equation rather than free energies

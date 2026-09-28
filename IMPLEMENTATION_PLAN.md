@@ -62,13 +62,11 @@ CI before the parser is replaced):
 **Exit criteria:** both tests green in CI (item 4 done; item 5 waits for
 the GoodVibes dependency in Phase 5).
 
-## Phase 1 — Confirmed bug fixes ✅ (v2.0.3, unreleased)
+## Phase 1 — Confirmed bug fixes ✅ (v2.0.3, a development milestone released in 2.5.0)
 
 All six items done (constants block, `NameError`, exact scaling-factor
-match, table row, linearity from rotational constants, CHANGELOG). Remaining:
-publish v2.0.3 to PyPI and bump the conda-forge recipe. Do this before
-Phase 2 lands so users get the bug fixes without waiting for the CLI
-changes.
+match, table row, linearity from rotational constants, CHANGELOG). v2.0.3
+was never published on its own; the fixes reached users in 2.5.0.
 
 ## Phase 2 — Robustness ✅ (v2.1.0, implemented 2026-09-25)
 
@@ -280,8 +278,9 @@ the maintainer 2026-09-25), so a pushed `v*` tag is a complete release.
    on a `v*` tag the workflow checks the tag against `__version__`, runs
    the tests, builds sdist/wheel and uploads with PyPI trusted publishing
    (environment `pypi`). One-time PyPI/GitHub setup is in CONTRIBUTING.md.
-   The conda-forge bot picks up the PyPI release; keep `recipe/meta.yaml`
-   in sync.
+   Kinisot is not on conda-forge: `recipe/meta.yaml` is a template for a
+   staged-recipes submission (CONTRIBUTING.md). Once a feedstock exists,
+   the conda-forge bot picks up each PyPI release.
 3. Dependabot for Actions versions.
 4. Zenodo integration so each tag gets a DOI; `CITATION.cff` updated by the
    release workflow.
@@ -480,9 +479,14 @@ channels from one reactant equal to the ensemble to 10⁻¹³) and
 `tests/test_jobs.py`. The worked example (`examples/conformers/`, made by
 `scripts/make_conformer_example.py`) followed: eight GFN2-xTB reactant
 conformers and the chair and boat transition structures, where the C4-d₂
-KIE moves by 0.010 from the lowest pair to the ensemble. Still to do: the
-Wittig and DyKAT validations from our own jobs once the logs are in
-(benchmark cases with `series` and `channels`).
+KIE moves by 0.010 from the lowest pair to the ensemble. The benchmark
+runner computes a case from a job file (`job` in case.json), so series and
+channels enter the report. DyKAT is done that way (2026-09-28): the Gaussian
+16 jobs at the paper's geometries reproduce SI Tables 24 and 25 and Figure 3d
+within 6 × 10⁻⁴, unscaled as the paper's Kinisot was, and all five combined
+KIEs lie within 1.1 standard errors of experiment (`tests/test_dykat.py`).
+Still to do: the Wittig series once the 6-TS job is in, and the DyKAT KIEs
+from free 3 once its spherical-d job is in.
 
 **Goal (requested 2026-09-27):** KIEs and EQEs from several conformers of
 each reactant, transition structure and product, given with the same atom
@@ -777,8 +781,9 @@ dependency.
       `benchmarks/dykat_allyl_arylation`). This is a real 23:77 split
       (s = 3.3), which Shi cannot provide. The measured KIEs (SI Table 4),
       the per-enantiomer KIEs (SI Tables 24 and 25, computed with Kinisot)
-      and Gaussian inputs at the paper's geometries are in hand; the
-      frequency jobs are still to be run.
+      and Gaussian 16 jobs at the paper's geometries are in the case, and
+      `channels.json` reproduces the tables and Figure 3d within 6 × 10⁻⁴
+      (mean absolute deviation from experiment 0.0030).
       - The channel formula with s = 3.3 reproduces the paper's combined
         KIEs (Figure 3d) to within the rounding of its inputs, for example
         1.0266 at C3 against 1.027.

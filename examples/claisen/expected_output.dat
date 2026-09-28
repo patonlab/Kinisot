@@ -1,10 +1,11 @@
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 1
   Species: claisen_ts.out isotopologue: 1
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C1 -> 13C; claisen_ts C1 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -21,12 +22,13 @@ o claisen_ts: iso @ 1                                 460.3  1.144e+00  1.021e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 1): imaginary 460.3i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 2
   Species: claisen_ts.out isotopologue: 2
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C2 -> 13C; claisen_ts C2 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -43,12 +45,13 @@ o claisen_ts: iso @ 2                                 463.8  1.187e+00  1.016e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 2): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 3:18O
   Species: claisen_ts.out isotopologue: 3:18O
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs O3 -> 18O; claisen_ts O3 -> 18O
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -65,12 +68,13 @@ o claisen_ts: iso @ 3:18O                             457.7  1.126e+00  1.036e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 3:18O): imaginary 457.7i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.8
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 3:17O
   Species: claisen_ts.out isotopologue: 3:17O
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs O3 -> 17O; claisen_ts O3 -> 17O
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -87,12 +91,13 @@ o claisen_ts: iso @ 3:17O                             460.7  1.064e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 3:17O): imaginary 460.7i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C4 -> 13C; claisen_ts C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -109,12 +114,13 @@ o claisen_ts: iso @ 4                                 458.1  1.141e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 5
   Species: claisen_ts.out isotopologue: 5
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C5 -> 13C; claisen_ts C5 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -131,12 +137,13 @@ o claisen_ts: iso @ 5                                 463.8  1.178e+00  1.017e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 5): imaginary 463.8i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.2 17.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 6
   Species: claisen_ts.out isotopologue: 6
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C6 -> 13C; claisen_ts C6 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -153,12 +160,13 @@ o claisen_ts: iso @ 6                                 460.2  1.144e+00  1.021e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 6): imaginary 460.2i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 7,8
   Species: claisen_ts.out isotopologue: 7,8
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs H7 -> 2H, H8 -> 2H; claisen_ts H7 -> 2H, H8 -> 2H
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -175,12 +183,13 @@ o claisen_ts: iso @ 7,8                               460.6  1.445e+02  1.326e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 7,8): imaginary 460.6i; 35 kept; discarded: -9.5 -0.2 0.1 0.1 13.0 16.5
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961 / external modes projected
+  Labelled atoms: claisen_gs C4 -> 13C; claisen_ts C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -197,12 +206,14 @@ o claisen_ts: iso @ 4                                 458.1  1.141e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts (iso @ 4): imaginary 458.1i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C4 -> 13C; claisen_ts C4 -> 13C
+  Reference atoms: claisen_gs C5 -> 13C; claisen_ts C5 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -220,12 +231,13 @@ o claisen_ts: iso @ 4                                 458.1  1.141e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
 
                                                      Temp = 393.0K / Vib. scale factor = 0.961 / tunnelling: skodje (barrier 28.93 kcal/mol)
+  Labelled atoms: claisen_gs C4 -> 13C; claisen_ts C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------
@@ -242,12 +254,13 @@ o claisen_ts: iso @ 4                                 458.1  1.141e+00  1.019e+0
   claisen_ts (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.5.0: 2026-09-26 15:18
+  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
   Species: claisen_gs.out isotopologue: 4
   Species: claisen_ts.out isotopologue: 4
 
 
                                                      Temp = 300.0, 350.0, 400.0K / Vib. scale factor = 0.961
+  Labelled atoms: claisen_gs C4 -> 13C; claisen_ts C4 -> 13C
                                                      V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
 
 o claisen_gs                                        --------------------------------------------------------------------------

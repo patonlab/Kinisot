@@ -94,6 +94,43 @@ def parse_temperatures(text):
     return values
 
 
+def _label_groups(result):
+    """(file name, substitutions) for each species of a plain or ensemble result, reactants first."""
+    if isinstance(result, EnsembleIsotopeEffect):
+        groups = {}
+        for c in result.conformers:
+            groups.setdefault((c.role != "reactant", c.species), []).append(c)
+        out = []
+        for _, rows in sorted(groups.items()):
+            more = len(rows) - 1
+            name = rows[0].name + (" (+%d conformer%s)" % (more, "s" if more > 1 else "") if more else "")
+            out.append((name, rows[0].heavy.substitutions))
+        return out
+    return [(s.name, s.substitutions) for side in (result.reactant, result.other) for s in side.heavy.species]
+
+
+def describe_labels(result):
+    """The labelled atoms of a result, with their elements: 'claisen_gs C1 -> 13C; claisen_ts C1 -> 13C'.
+
+    A wrong atom number that lands on the same element on both sides passes every check, so the output
+    says which atoms were labelled.
+    """
+    parts = [
+        "%s %s" % (name, ", ".join("%s%d -> %s" % (s.symbol, s.atom, s.isotope) for s in subs))
+        for name, subs in _label_groups(result)
+        if subs
+    ]
+    return "; ".join(parts) if parts else "none"
+
+
+def _write_labels(log, result, part=""):
+    """'Labelled atoms' (and 'Reference atoms') lines for a plain or ensemble result."""
+    suffix = " (%s)" % part if part else ""
+    log.Write("\n  Labelled atoms%s: %s" % (suffix, describe_labels(result)))
+    if result.reference is not None:
+        log.Write("\n  Reference atoms%s: %s" % (suffix, describe_labels(result.reference)))
+
+
 def write_results(log, results):
     """Write the results table for one calculation (one or more temperatures) to the log."""
     results = list(results)
@@ -116,6 +153,7 @@ def write_results(log, results):
             log.Write(" (barrier %.2f kcal/mol)" % result.barrier)
     if result.project:
         log.Write(" / external modes projected")
+    _write_labels(log, result)
     log.Write(("\n  ").ljust(50))
     log.Write(
         " {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} \n".format(
@@ -217,6 +255,8 @@ def write_ensemble_results(log, results):
             log.Write(" (barrier %.2f kcal/mol)" % result.barrier)
     if result.project:
         log.Write(" / external modes projected")
+
+    _write_labels(log, result)
 
     # the conformer table: each conformer's weight and its KIE against the ensemble on the other side
     log.Write(
@@ -339,12 +379,23 @@ def _combined_lines(log, results, label, extra_name, extra):
     log.Write("\n" + DASH_LINE + "\n")
 
 
+def _write_labels_any(log, result, part):
+    """Labelled atoms of a step or channel, which may itself be a series."""
+    if isinstance(result, SeriesIsotopeEffect):
+        for n, step in enumerate(result.steps):
+            _write_labels(log, step, "%s, step %d" % (part, n + 1))
+    else:
+        _write_labels(log, result, part)
+
+
 def write_series_results(log, results):
     """Write the steps of a series and its combined KIE (one line per temperature) to the log."""
     results = list(results)
     result = results[0]
     how = {"commitment": "steps weighted by a commitment factor", "user": "steps weighted by given free energies"}
     _combined_header(log, result, how.get(result.weight_source, "steps weighted by computed free energies"))
+    for n, step in enumerate(result.steps):
+        _write_labels(log, step, "step %d" % (n + 1))
     log.Write("\n\n  Steps in series at %s K:" % result.temperature)
     log.Write("\n  " + "{:<44} {:>8} {:>8} {:>10} {:>10}".format("", "G", "share %", "KIE", "corr-KIE"))
     for n, step in enumerate(result.steps):
@@ -370,6 +421,8 @@ def write_channel_results(log, results):
     result = results[0]
     how = {"given": "shares given", "barriers": "shares from given barriers"}
     _combined_header(log, result, how.get(result.share_source, "shares from computed free energies"))
+    for name, channel in zip(result.names, result.channels):
+        _write_labels_any(log, channel, name)
     log.Write("\n\n  Parallel channels at %s K:" % result.temperature)
     log.Write("\n  " + "{:<44} {:>8} {:>10} {:>10}".format("", "share %", "KIE", "corr-KIE"))
     for name, channel, share in zip(result.names, result.channels, result.shares):

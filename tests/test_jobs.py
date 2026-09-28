@@ -88,6 +88,8 @@ def test_series_job(tmp_path, monkeypatch):
     with open("Kinisot_output.dat") as handle:
         text = handle.read()
     assert "Isotopologue: C-alpha" in text and "KIE (series) @ 273.15 K" in text and "Steps in series" in text
+    assert "Reference atoms (step 1): methylstyrene C11 -> 13C; ts10 C4 -> 13C" in text
+    assert "Labelled atoms (step 2): methylstyrene C1 -> 13C; ts_B (+1 conformer) C7 -> 13C" in text
     with open("rows.csv") as handle:
         assert handle.readline().startswith("isotopologue,kind")
 
@@ -110,6 +112,7 @@ def test_channels_job(tmp_path, monkeypatch):
     with open("Kinisot_output.dat") as handle:
         text = handle.read()
     assert "KIE (channels) @ 393.0 K" in text and "o spectator: ts1b" in text
+    assert "Labelled atoms (spectator): phno2 N12 -> 15N, O14 -> 18O; ts1b N1 -> 15N, O3 -> 18O" in text
 
 
 def test_conformer_and_eqe_jobs(tmp_path, monkeypatch):
@@ -136,12 +139,16 @@ def test_conformer_and_eqe_jobs(tmp_path, monkeypatch):
 def test_job_errors(tmp_path, monkeypatch):
     base = dict(SETTINGS, reactants=[rel(tmp_path, REACTANT)], transition_structure=[rel(tmp_path, TS["A"])],
                 iso=["2", "8"])  # fmt: skip
+    no_iso = {k: v for k, v in base.items() if k != "iso"}
     for broken, message in (
         (dict(base, temprature=300), "unknown key"),
         (dict(base, product=[rel(tmp_path, TS["A"])]), "exactly one of"),
-        ({k: v for k, v in base.items() if k != "iso"}, "\"iso\""),
+        (no_iso, "\"iso\""),
         (dict(base, shares=[1, 2]), "belongs to a job with \"channels\""),
         (dict(base, isotopologues=[{"iso": ["2", "8"]}]), "one of them"),
+        (dict(no_iso, isotopologues=[{"name": "C2", "iso": ["2", "8"]}, {"name": "C2", "iso": ["1", "7"]}]),
+         "already used"),
+        (dict(no_iso, isotopologues=[{"iso": ["2", "8"]}, {"iso": ["2", "8"]}]), "already used"),
         (dict(base, temperature=-5), "positive"),
         (dict(base, transition_structure=[{"file": "x"}]), "unknown key"),
         ({"channels": [{"reactants": ["a"], "transition_structure": ["b"]}], "iso": [["1", "2"], ["1", "2"]]},

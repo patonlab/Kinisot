@@ -30,8 +30,9 @@ EQE @ 300.0 K                1.026844   1.025140   0.985373   1.037262   1.00000
 ```
 
 **Reading it.** There is no reaction coordinate, so the V-ratio column is
-empty and the tunnelling correction is 1. The EQE is (s/s')f of the first
-labelling (hydrogens 24–26, the axial methyl group in this file) divided by
+empty and the tunnelling correction is 1. The EQE is the reduced isotopic
+partition function ratio (s/s')f, the product of the ZPE, EXC and TRPF
+factors, of the first labelling (hydrogens 24–26, the axial methyl group in this file) divided by
 that of the second (28–30, equatorial). It is therefore the equilibrium
 constant [CD₃ axial]/[CD₃ equatorial]: a value of 1.038 at 290 K means CD₃
 prefers the more crowded axial position by 3.8 % relative to CH₃. Anet and

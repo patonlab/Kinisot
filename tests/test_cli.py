@@ -44,7 +44,21 @@ def test_kie_run(run, capsys):
     # per-species rows carry each species' own Bigeleisen-Mayer factors
     assert "claisen_gs: iso @ 5" in out and "claisen_ts: iso @ 5" in out
     assert "imaginary 463.9i; 35 kept" in out
+    assert "Labelled atoms: claisen_gs C5 -> 13C; claisen_ts C5 -> 13C" in out and "Reference atoms" not in out
     assert "Results appended to Kinisot_output.dat" in capsys.readouterr().out
+
+
+def test_labelled_atoms_are_named(run):
+    # a wrong atom number that lands on the same element on both sides passes every check, so the output names them
+    rc, tmp_path = run(["--rct", GS, "--ts", TS, "--iso", "3:17O", "-t", "393", "-s", "0.961", "--reference", "5"])
+    assert rc == 0
+    out = read(tmp_path)
+    assert "Labelled atoms: claisen_gs O3 -> 17O; claisen_ts O3 -> 17O" in out
+    assert "Reference atoms: claisen_gs C5 -> 13C; claisen_ts C5 -> 13C" in out
+    rc, tmp_path = run(["--rct", TMCH, "--prd", TMCH, "--iso", "24,25:T", "--iso", "28,29:T", "-s", "1", "--overwrite"])
+    assert rc == 0
+    out = read(tmp_path)
+    assert "tetramethylcyclohexane H24 -> 2H, H25 -> 3H; tetramethylcyclohexane H28 -> 2H, H29 -> 3H" in out
 
 
 def test_eqe_run_and_auto_scaling(run):
@@ -77,6 +91,7 @@ def test_multiple_reactant_files(run):
     assert rc == 0
     out = read(tmp_path)
     assert "dienophile + diene: iso @ 0 / 6" in out
+    assert "Labelled atoms: diene C6 -> 13C; DATS C15 -> 13C" in out  # the unlabelled dienophile is left out
     assert "1.018631" in out and "1.022412" in out
 
 
