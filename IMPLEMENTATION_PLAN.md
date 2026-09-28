@@ -741,11 +741,14 @@ dependency.
       A reaction whose transition structures share the rate more evenly is
       still wanted for that.
     - **Channels: the nitroarene deoxygenation** (Kang and Radosevich,
-      Tetrahedron 2025). ¹⁸O KIEs of 1.033 for one oxygen and 1.066 for
-      both. The ORCA inputs at the SI geometries are in
-      `benchmarks/nitroarene_phosphetane/`, and the frequency jobs are
-      still to be run. The monotopic TS1B tests the equivalent-oxygen
-      average.
+      Tetrahedron 2025; `benchmarks/nitroarene_phosphetane`). ¹⁸O KIEs of
+      1.033 for one oxygen and 1.066 for both, now computed from ORCA jobs.
+      - In the monotopic TS1B the attacked and spectator oxygens give
+        1.0474 and 1.0140. The exact average for the singly labelled
+        substrate is their harmonic mean, 1.0304; the runner's geometric
+        mean gives 1.0305.
+      - The paper's 1.0468 is the attacked oxygen alone, which shows what
+        leaving out the average costs.
     - **Channels: the DyKAT arylation** (van Dijk et al. 2021;
       `benchmarks/dykat_allyl_arylation`). This is a real 23:77 split
       (s = 3.3), which Shi cannot provide. The measured KIEs (SI Table 4),

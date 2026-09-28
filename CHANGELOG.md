@@ -17,19 +17,28 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
   Six of the seven measured values are reproduced within 0.016. The SN2 KIE
   is 0.08 too high, a limit of harmonic transition-state theory at
-  HF/6-31+G(d) that PyQuiverHS shares. The benchmarks now cover 32 measured
-  positions, with a mean absolute deviation of 0.0060.
+  HF/6-31+G(d) that PyQuiverHS shares. With the nitroarene case below, the
+  benchmarks now cover 34 measured positions, with a mean absolute deviation
+  of 0.0058.
 - `tests/test_pyquiverhs.py` checks Kinisot against those outputs for all
   11 isotopologues at every temperature, uncorrected and with Wigner and
   Bell tunnelling. Every term agrees within 0.01 K / T (3 × 10⁻⁵ at 300 K).
 - The benchmark runner accepts `imag_cutoff` for transition structures with
   a small reaction-coordinate frequency (45i cm⁻¹ in the biaryl case).
 - Benchmark cases `nitroarene_phosphetane` and `nitroarene_phosphetane_ts1b`
-  hold the ¹⁸O KIEs of Kang and Radosevich (Tetrahedron 2025, 186, 134892)
-  for the phosphetane-catalysed deoxygenation of nitrobenzene: 1.033 ± 0.003
-  for one oxygen and 1.066 ± 0.003 for both. They also hold ORCA inputs at
-  the SI geometries of nitrobenzene and the two candidate transition
-  structures. The frequency jobs are still to be run.
+  compare the ¹⁸O KIEs of Kang and Radosevich (Tetrahedron 2025, 186,
+  134892), 1.033 ± 0.003 for one oxygen and 1.066 ± 0.003 for both, with
+  ORCA 6.1.0 frequency jobs at the SI geometries of nitrobenzene and the two
+  candidate transition structures.
+  - Kinisot reproduces the paper's PyQuiver predictions to within 0.001.
+  - For the rejected monotopic TS1B, the paper's singly labelled value
+    (1.0468) is the attacked oxygen alone. Averaged over the two equivalent
+    oxygens it is 1.0304, within the measured value. The ¹⁸O KIEs therefore
+    do not distinguish TS1B from TS2; its energy does.
+  - `tests/test_nitroarene.py` checks these numbers.
+- The benchmark runner accepts `alternative_to` for a case computing a
+  mechanism the paper rejects. It is reported but left out of the overall
+  mean absolute deviation.
 - Benchmark case `wittig_anisaldehyde` holds the ¹³C KIEs of Chen,
   Nieves-Quinones, Waas and Singleton (J. Am. Chem. Soc. 2014, 136, 13122)
   for a Wittig reaction with two transition structures in series. The
