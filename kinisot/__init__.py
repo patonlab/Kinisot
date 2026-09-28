@@ -13,6 +13,11 @@ Python::
     # a conformer ensemble: several files for one species
     result = compute_kie(rct="reactant.out", ts=[["ts_a.out", "ts_b.out"]], iso="5", temperature=393.0)
     result.kie_tunnel, result.conformers, result.kie_lowest, result.n_effective
+
+    # transition structures in series, and parallel channels
+    result = compute_kie(rct="gs.out", ts=Series(["ts_1.out", "ts_2.out"]), iso=["5", "5", "7"], temperature=393.0)
+    result = channels([dict(rct="a.out", ts="ts_a.out", iso="5"), dict(rct="b.out", ts="ts_b.out", iso="3")],
+                      shares=[1, 3.3])
 """
 
 __version__ = "2.6.0.dev0"
@@ -26,6 +31,7 @@ from .exceptions import KinisotError, KinisotInputError, KinisotParseError, Kini
 from .hessian import HessianInput, mass_weight
 from .isotopes import Substitution, isotope_mass, light_mass, substitute
 from .Kinisot import compute_isotope_effect  # deprecated, removed in 3.0
+from .pathways import ChannelIsotopeEffect, Series, SeriesIsotopeEffect, channel_kie, channels, series_kie
 from .projection import project_external_modes
 from .scaling import ScalingChoice, choose_scaling_factor, find_scaling_factor
 from .thermo import harmonic_frequencies
@@ -41,6 +47,12 @@ __all__ = [
     "ConformerResult",
     "EnsembleIsotopeEffect",
     "equivalent_positions",
+    "Series",
+    "SeriesIsotopeEffect",
+    "channels",
+    "ChannelIsotopeEffect",
+    "series_kie",
+    "channel_kie",
     "HessianInput",
     "load_hessian",
     "parse_gaussian",
