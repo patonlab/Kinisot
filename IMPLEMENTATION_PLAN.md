@@ -746,10 +746,17 @@ dependency.
       `benchmarks/nitroarene_phosphetane/`, and the frequency jobs are
       still to be run. The monotopic TS1B tests the equivalent-oxygen
       average.
-    - **Channels: the DyKAT arylation** (van Dijk et al. 2021). This is a
-      real 23:77 split (s = 3.3), which Shi cannot provide. It needs the
-      group's structures: 3-chlorocyclohexene, TS-2R and TS-2S, plus the
-      measured values from the paper.
+    - **Channels: the DyKAT arylation** (van Dijk et al. 2021;
+      `benchmarks/dykat_allyl_arylation`). This is a real 23:77 split
+      (s = 3.3), which Shi cannot provide. The measured KIEs (SI Table 4),
+      the per-enantiomer KIEs (SI Tables 24 and 25, computed with Kinisot)
+      and the coordinates are in hand; the frequency jobs are not.
+      - The channel formula with s = 3.3 reproduces the paper's combined
+        KIEs (Figure 3d) to within the rounding of its inputs, for example
+        1.0266 at C3 against 1.027.
+      - The paper computes each channel from the Rh-bound substrate
+        complex. Computing from free 3 as well shows the size of the
+        complexation equilibrium isotope effect.
     - **Series: the Wittig reaction** (Chen, Nieves-Quinones, Waas and
       Singleton, J. Am. Chem. Soc. 2014, 136, 13122;
       `benchmarks/wittig_anisaldehyde`). Table 1 already tests the formula

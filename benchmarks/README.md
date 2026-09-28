@@ -78,6 +78,7 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | nitroarene_phosphetane | needed (ORCA inputs at the SI geometries in the case directory; M06-2X/6-31G(d,p)) | entered: Kang, Radosevich, Tetrahedron 2025, 186, 134892, Tables 1 and 2: 18O KIEs 1.033 ± 0.003 (one oxygen) and 1.066 ± 0.003 (both), transition structure TS2 |
 | nitroarene_phosphetane_ts1b | needed (the same jobs) | same measurements, compared with the monotopic transition structure TS1B |
 | wittig_anisaldehyde | needed (anisaldehyde, ylide, two transition structures in series; M06-2X/6-31+G**/PCM) and Phase 10's series treatment | entered: Chen, Nieves-Quinones, Waas, Singleton, JACS 2014, 136, 13122, Figure 1 (three positions); Table 1's predictions in the notes |
+| dykat_allyl_arylation | coordinates in the case directory (free 3, both reactant complexes, both anti-oxidative-addition transition structures); frequency jobs and Phase 10's channel treatment needed | entered: van Dijk et al., Nat. Catal. 2021, 4, 284, SI Table 4 (five allyl positions); the paper's combined predictions in the notes |
 
 The five cases from the PyQuiverHS SI also keep PyQuiverHS's input and its
 outputs for the same files (`pyquiverhs/`), from 10 to 1000 K;

@@ -35,6 +35,13 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   for a Wittig reaction with two transition structures in series. The
   Phase 10 series formula reproduces the paper's two weighted predictions
   from its single-structure KIEs. The structures are still needed.
+- Benchmark case `dykat_allyl_arylation` holds the ¹³C KIEs of van Dijk et
+  al. (Nat. Catal. 2021, 4, 284) for the Rh-catalysed arylation of racemic
+  3-chlorocyclohexene. Both enantiomers react, through different
+  transition structures, and converge on one product. The case includes the
+  paper's coordinates for the five structures involved. The Phase 10
+  channel formula reproduces the paper's combined KIEs from its
+  per-enantiomer values.
 - IMPLEMENTATION_PLAN.md, Phase 10: transition structures in series
   (commitment factors) and parallel channels with their own labels or
   reactants, following Dale, Leach and Lloyd-Jones (J. Am. Chem. Soc. 2021,
