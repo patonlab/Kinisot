@@ -12,21 +12,21 @@
       "method": "the same data as an example of commitment between transition structures in series"
     }
   ],
-  "notes": "Two transition structures in series (IMPLEMENTATION_PLAN.md, Phase 10): C-C bond formation (4-TS) gives a betaine, and P-O bond formation (6-TS) gives the oxaphosphetane. At M06-2X/6-31+G(2df,p)/PCM//M06-2X/6-31+G**/PCM (THF) their harmonic free energies are 25.9 and 26.0 kcal/mol, with the betaine at 27.3 (Figure 2). Neither step alone commits the substrate. The paper's Table 1 gives, for the carbonyl carbon and the ylide CH carbon, 1.043 and 1.022 from 4-TS alone and 1.015 and 0.994 from 6-TS alone. Weighted by the free energies it gives 1.028 and 1.008, and weighted by the trajectories that recross (76) or go on to product (128) it gives 1.033 and 1.012. The series formula KIE = (KIE_6 + C_f KIE_4)/(1 + C_f) reproduces both rows from the single-structure values. With C_f = exp[(G_4 - G_6)/RT] = 0.862 at 340.15 K it gives 1.0280 and 1.0070; the printed 1.008 differs by the rounding of the inputs. With C_f = 128/76 it gives 1.0326 and 1.0116. Experiment agrees with the trajectory weighting, not the free-energy one: most trajectories pass the betaine without equilibrating, so this case also shows the limit of statistical weights. The anisaldehyde ring carbons (1.000-1.003 in Figure 1) are not entered. The paper gives no prediction for the ylide carbonyl carbon. Structures: Gaussian inputs at the SI geometries of anisaldehyde 1, the ylide 2, 4-TS and 6-TS (M06-2X/6-31+G**/PCM(THF), default radii) are in this directory (see README.md). The Gaussian 16 jobs for 1, 2 and 4-TS reproduce the SI energies and zero-point energies, and Kinisot reproduces the SI Table S4 predictions for 4-TS at every position (tests/test_wittig.py). The first 6-TS input held the coordinates of the oxaphosphetane OP1direct, the next structure in the SI, by an extraction error; it was corrected on 2026-09-28 and its job is still to be run. SI Table S4 gives, at this level, 0.998 and 0.999 for the ketone carbonyl carbon of the ylide (measured 0.997) and 1.016 and 1.045 for the aldehyde oxygen (16O/18O, not measured). Once the 6-TS job is in, a job file with the two steps in series computes the case (\"job\" in case.json).",
+  "notes": "Two transition structures in series (IMPLEMENTATION_PLAN.md, Phase 10): C-C bond formation (4-TS) gives a betaine, and P-O bond formation (6-TS) gives the oxaphosphetane. At M06-2X/6-31+G(2df,p)/PCM//M06-2X/6-31+G**/PCM (THF) their harmonic free energies are 25.9 and 26.0 kcal/mol, with the betaine at 27.3 (Figure 2). Neither step alone commits the substrate. The paper's Table 1 gives, for the carbonyl carbon and the ylide CH carbon, 1.043 and 1.022 from 4-TS alone and 1.015 and 0.994 from 6-TS alone. Weighted by the free energies it gives 1.028 and 1.008, and weighted by the trajectories that recross (76) or go on to product (128) it gives 1.033 and 1.012. The series formula KIE = (KIE_6 + C_f KIE_4)/(1 + C_f) reproduces both rows from the single-structure values. With C_f = exp[(G_4 - G_6)/RT] = 0.862 at 340.15 K it gives 1.0280 and 1.0070; the printed 1.008 differs by the rounding of the inputs. With C_f = 128/76 it gives 1.0326 and 1.0116. Experiment agrees with the trajectory weighting, not the free-energy one: most trajectories pass the betaine without equilibrating, so this case also shows the limit of statistical weights. The anisaldehyde ring carbons (1.000-1.003 in Figure 1) are not entered. The paper gives no prediction for the ylide carbonyl carbon. Structures: Gaussian inputs at the SI geometries of anisaldehyde 1, the ylide 2, 4-TS and 6-TS (M06-2X/6-31+G**/PCM(THF), default radii) and their Gaussian 16 frequency jobs are in this directory (see README.md). They reproduce the SI energies to 5e-5 hartree and the zero-point energies, and Kinisot reproduces the SI Table S4 predictions for 4-TS and for 6-TS at every position within 5e-4 (tests/test_wittig.py). (The first 6-TS input held the coordinates of the oxaphosphetane OP1direct, the next structure in the SI, by an extraction error; it was corrected before its job was run.) The computed rows come from series.json: the two steps weighted by the trajectories (C_f = 128/76), the paper's model, relative to the experiment's standards (a meta carbon for the carbonyl carbon; the other meta carbon gives 5e-4 less; the ketone methyl carbon for the ylide carbons). Their absolute values, 1.0325 and 1.0118, reproduce Table 1's 1.033 and 1.012. The free-energy weighting is the case wittig_anisaldehyde_statistical. SI Table S4 gives, at this level, 0.998 and 0.999 for the ketone carbonyl carbon of the ylide (measured 0.997) and 1.016 and 1.045 for the aldehyde oxygen (16O/18O, not measured).",
   "temperature": 340.15,
   "scale": 0.9614,
   "level_of_theory": "M06-2X/6-31+G(d,p), PCM (THF), Gaussian 16 C.01 frequency jobs at the SI geometries",
   "tunneling": "bell",
   "project": true,
+  "job": "series.json",
   "reactants": null,
   "transition_structure": null,
   "product": null,
   "reference_isotopologue": null,
-  "status": "Not computed yet: the jobs for 1, 2 and 4-TS are in the case directory (tests/test_wittig.py checks them against SI Table S4); the 6-TS job is still to be run, and then a job file with the two steps in series computes the case.",
   "kies": [
     {
       "position": "carbonyl carbon (anisaldehyde)",
-      "iso": null,
+      "isotopologue": "carbonyl carbon",
       "experimental": [
         1.033,
         1.032
@@ -39,7 +39,7 @@
     },
     {
       "position": "ylide CH carbon",
-      "iso": null,
+      "isotopologue": "ylide CH carbon",
       "experimental": [
         1.011,
         1.011
@@ -52,10 +52,10 @@
     },
     {
       "position": "ylide carbonyl carbon",
-      "iso": null,
+      "isotopologue": "ylide carbonyl carbon",
       "experimental": 0.997,
       "uncertainty": 0.002,
-      "note": "no prediction in the paper"
+      "note": "no prediction in the paper; SI Table S4: 4-TS 0.998, 6-TS 0.999"
     }
   ]
 }

@@ -10,6 +10,7 @@ s = 3.3, the combined KIEs of Figure 3d.
 """
 
 import importlib.util
+import json
 import os
 
 import pytest
@@ -104,3 +105,34 @@ def test_benchmark_runner_computes_the_case_from_its_job_file():
     case["scale"] = 0.975
     with pytest.raises(ValueError, match="scale"):
         module.run_case(case)
+
+
+def test_from_free_3_the_binding_isotope_effect_appears(tmp_path):
+    free_3 = os.path.join(CASE, "channels_free3.json")
+    results = dict(run_job(load_job(free_3), T))
+    complex_ = dict(run_job(load_job(os.path.join(CASE, "channels.json")), T))
+    # the equilibrium isotope effect of binding to Rh raises the alkene carbons, most of all the central C2
+    assert results["C2"].kie_tunnel_relative == pytest.approx(1.0060, abs=1e-4)
+    assert results["C2"].kie_tunnel_relative - complex_["C2"].kie_tunnel_relative > 0.01
+    # the spherical-d and Cartesian-d jobs for free 3 give the same KIEs
+    with open(free_3) as handle:
+        job = json.load(handle)
+    for channel in job["channels"]:
+        channel["reactants"] = [os.path.join(CASE, "allyl_chloride_3.log")]
+        channel["transition_structure"] = [os.path.join(CASE, f) for f in channel["transition_structure"]]
+    cartesian = tmp_path / "cartesian_free3.json"
+    cartesian.write_text(json.dumps(job))
+    results_6d = dict(run_job(load_job(str(cartesian)), T))
+    for name, result in results.items():
+        assert results_6d[name].kie_tunnel_relative == pytest.approx(result.kie_tunnel_relative, abs=2e-4), name
+
+
+def test_benchmark_runner_reports_the_free_3_route_as_an_alternative():
+    spec = importlib.util.spec_from_file_location("bench_run", os.path.join(CASE, "..", "run.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    (case,) = module.load_cases(["dykat_allyl_arylation_free3"])
+    rows = module.run_case(case)
+    assert [round(r["computed"], 4) for r in rows] == [1.0147, 1.0060, 1.0292, 1.0041, 1.0038]
+    assert case["alternative_to"] == "dykat_allyl_arylation"
+    assert "left out of the overall mean" in module.format_case(case, rows)

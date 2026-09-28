@@ -1,0 +1,148 @@
+{
+  "description": "The DYKAT channels of channels.json computed from free 3 instead of the Rh-bound reactant complexes: free 3 (pseudo-axial, spherical d functions like the Rh jobs) to each anti-oxidative-addition transition structure, relative to C5, with s = k(S)/k(R) = 3.3, unscaled. Labels per channel: free 3, then the transition structure; the same product carbon is a different atom of 3 in each channel.",
+  "temperature": 313.15,
+  "scale": 1.0,
+  "tunneling": "bell",
+  "project": false,
+  "channels": [
+    {
+      "name": "(R)-3",
+      "reactants": [
+        "allyl_chloride_3_5d.log"
+      ],
+      "transition_structure": [
+        "r3_anti_oa_ts.log"
+      ]
+    },
+    {
+      "name": "(S)-3",
+      "reactants": [
+        "allyl_chloride_3_5d.log"
+      ],
+      "transition_structure": [
+        "s3_anti_oa_ts.log"
+      ]
+    }
+  ],
+  "shares": [
+    1,
+    3.3
+  ],
+  "isotopologues": [
+    {
+      "name": "C1",
+      "iso": [
+        [
+          "3",
+          "118"
+        ],
+        [
+          "1",
+          "118"
+        ]
+      ],
+      "reference": [
+        [
+          "5",
+          "120"
+        ],
+        [
+          "5",
+          "120"
+        ]
+      ]
+    },
+    {
+      "name": "C2",
+      "iso": [
+        [
+          "2",
+          "117"
+        ],
+        [
+          "2",
+          "117"
+        ]
+      ],
+      "reference": [
+        [
+          "5",
+          "120"
+        ],
+        [
+          "5",
+          "120"
+        ]
+      ]
+    },
+    {
+      "name": "C3",
+      "iso": [
+        [
+          "1",
+          "122"
+        ],
+        [
+          "3",
+          "122"
+        ]
+      ],
+      "reference": [
+        [
+          "5",
+          "120"
+        ],
+        [
+          "5",
+          "120"
+        ]
+      ]
+    },
+    {
+      "name": "C4",
+      "iso": [
+        [
+          "6",
+          "121"
+        ],
+        [
+          "4",
+          "121"
+        ]
+      ],
+      "reference": [
+        [
+          "5",
+          "120"
+        ],
+        [
+          "5",
+          "120"
+        ]
+      ]
+    },
+    {
+      "name": "C6",
+      "iso": [
+        [
+          "4",
+          "119"
+        ],
+        [
+          "6",
+          "119"
+        ]
+      ],
+      "reference": [
+        [
+          "5",
+          "120"
+        ],
+        [
+          "5",
+          "120"
+        ]
+      ]
+    }
+  ]
+}

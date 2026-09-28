@@ -485,8 +485,14 @@ channels enter the report. DyKAT is done that way (2026-09-28): the Gaussian
 16 jobs at the paper's geometries reproduce SI Tables 24 and 25 and Figure 3d
 within 6 × 10⁻⁴, unscaled as the paper's Kinisot was, and all five combined
 KIEs lie within 1.1 standard errors of experiment (`tests/test_dykat.py`).
-Still to do: the Wittig series once the 6-TS job is in, and the DyKAT KIEs
-from free 3 once its spherical-d job is in.
+The Wittig series followed the same day: 4‡ and 6‡ reproduce SI Table S4
+within 5 × 10⁻⁴, and weighted by the paper's trajectories the three ¹³C
+KIEs match experiment (mean absolute deviation 0.0004), while the
+free-energy weighting misses by 0.005 (`tests/test_wittig.py`). Computed
+from free 3 instead of the Rh-bound complex, the DyKAT KIEs include the
+equilibrium isotope effect of binding (1.008–1.012 at the alkene carbons)
+and miss the central carbon by 0.011, so the measurement supports the
+paper's model from the complex.
 
 **Goal (requested 2026-09-27):** KIEs and EQEs from several conformers of
 each reactant, transition structure and product, given with the same atom
@@ -788,8 +794,10 @@ dependency.
         KIEs (Figure 3d) to within the rounding of its inputs, for example
         1.0266 at C3 against 1.027.
       - The paper computes each channel from the Rh-bound substrate
-        complex. Computing from free 3 as well shows the size of the
-        complexation equilibrium isotope effect.
+        complex. Computed from free 3 instead, the KIEs include the
+        complexation equilibrium isotope effect (1.008–1.012 at the alkene
+        carbons) and miss the central carbon C2 by 0.011, so the data
+        support the paper's choice.
     - **Series: the Wittig reaction** (Chen, Nieves-Quinones, Waas and
       Singleton, J. Am. Chem. Soc. 2014, 136, 13122;
       `benchmarks/wittig_anisaldehyde`). Table 1 already tests the formula
