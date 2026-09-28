@@ -35,6 +35,9 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SHI = os.path.join(ROOT, "benchmarks", "shi_epoxidation")
 T, SCALE = 273.15, 0.9614
 OPTIONS = dict(temperature=T, scale=SCALE, project=True)
+# Two routes through computed free energies agree only to round-off: the channel and series code subtracts
+# absolute free energies of about 1e4 kcal/mol, which loses about 1e-12 kcal/mol (1e-13 in a KIE on some platforms)
+ROUTES = 1e-11
 
 
 @pytest.fixture(scope="module")
@@ -171,7 +174,7 @@ def test_series_from_files(shi):
     ensemble = quiet(compute_kie, rct=reactant, ts=[[ts["A"], ts["G"]]], iso=["2", "8"], **OPTIONS)
     gap = ensemble.rows("transition structure")[1].free_energy
     w = np.array([1.0 / kappa[0], np.exp(gap / rt) / kappa[1]])
-    assert computed.kie_tunnel == pytest.approx(np.dot(w / w.sum(), [a.kie_tunnel, g.kie_tunnel]), abs=1e-12)
+    assert computed.kie_tunnel == pytest.approx(np.dot(w / w.sum(), [a.kie_tunnel, g.kie_tunnel]), abs=ROUTES)
     assert computed.weight_source == "qrrho"
 
     # a commitment factor, its inverse and the limits
@@ -254,17 +257,17 @@ def test_channels_from_files(shi):
     # computed shares from one reactant: the transition structures as a conformer ensemble, exactly
     computed = quiet(channels, jobs, **OPTIONS)
     ensemble = quiet(compute_kie, rct=reactant, ts=[[ts["A"], ts["G"]]], iso=["2", "8"], **OPTIONS)
-    assert computed.kie_tunnel == pytest.approx(ensemble.kie_tunnel, abs=1e-13)
-    assert computed.kie == pytest.approx(ensemble.kie, abs=1e-13)
-    assert computed.shares == pytest.approx([r.population for r in ensemble.rows("transition structure")], abs=1e-12)
+    assert computed.kie_tunnel == pytest.approx(ensemble.kie_tunnel, abs=ROUTES)
+    assert computed.kie == pytest.approx(ensemble.kie, abs=ROUTES)
+    assert computed.shares == pytest.approx([r.population for r in ensemble.rows("transition structure")], abs=ROUTES)
     three = quiet(channels, [dict(rct=reactant, ts=[[ts["A"], ts["B"]]], iso=["2", "8"]), jobs[1]], **OPTIONS)
     everything = quiet(compute_kie, rct=reactant, ts=[[ts["A"], ts["B"], ts["G"]]], iso=["2", "8"], **OPTIONS)
-    assert three.kie_tunnel == pytest.approx(everything.kie_tunnel, abs=1e-13)
+    assert three.kie_tunnel == pytest.approx(everything.kie_tunnel, abs=ROUTES)
 
     # barriers equal to the computed free energies give the computed shares; amounts scale them
     gap = ensemble.rows("transition structure")[1].free_energy
     by_barrier = quiet(channels, jobs, barriers=[0.0, gap], **OPTIONS)
-    assert by_barrier.kie_tunnel == pytest.approx(computed.kie_tunnel, abs=1e-13)
+    assert by_barrier.kie_tunnel == pytest.approx(computed.kie_tunnel, abs=ROUTES)
     assert by_barrier.share_source == "barriers"
     doubled = quiet(channels, jobs, barriers=[0.0, gap], amounts=[1, 2], **OPTIONS)
     assert doubled.shares[1] / doubled.shares[0] == pytest.approx(2 * computed.shares[1] / computed.shares[0])
