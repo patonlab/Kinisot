@@ -177,6 +177,14 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 - The calculator registry records which keyword receives the `:model` part
   of a `--calc` specification (`method` for tblite, `model` elsewhere).
+- The benchmark runner averages equivalent positions (`iso_average`,
+  `reference_average`) exactly: the isotope ratios are averaged over the
+  placements of the label on each side, which for a difference on one side
+  is the harmonic mean of the separate KIEs. It took the geometric mean
+  before. Two reported values move: the Diels–Alder H3 KIE by 1 × 10⁻⁴
+  (0.9904 to 0.9905) and the singly labelled TS1B nitroarene KIE by
+  1 × 10⁻⁴ (1.0305 to 1.0304; 1.0321 to 1.0319 with Bell tunnelling). The
+  mean absolute deviation over the 34 measured positions stays 0.0058.
 
 ## [2.5.0] - 2026-09-25
 

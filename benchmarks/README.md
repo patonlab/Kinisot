@@ -50,7 +50,10 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   for that entry (13C and 2H KIEs are often measured against different
   positions). `reference_average` gives several labels instead, for a
   reference group whose positions interconvert (the three hydrogens of a
-  rotating methyl group); the KIE is divided by the geometric mean of theirs.
+  rotating methyl group); the KIE is divided by their average. `iso_average`
+  does the same for the measured position. Both average the isotope ratios
+  over the placements on each side (`kinisot.equivalent_positions`), which is
+  exact: the placements are conformers of equal weight.
   `reference` at the top may be a list of sources; `notes` is printed under
   the source line.
 - Optional: `imag_cutoff` (cm⁻¹, default 50) for a transition structure whose
