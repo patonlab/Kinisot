@@ -139,12 +139,16 @@ def test_conformer_and_eqe_jobs(tmp_path, monkeypatch):
 def test_job_errors(tmp_path, monkeypatch):
     base = dict(SETTINGS, reactants=[rel(tmp_path, REACTANT)], transition_structure=[rel(tmp_path, TS["A"])],
                 iso=["2", "8"])  # fmt: skip
+    no_iso = {k: v for k, v in base.items() if k != "iso"}
     for broken, message in (
         (dict(base, temprature=300), "unknown key"),
         (dict(base, product=[rel(tmp_path, TS["A"])]), "exactly one of"),
-        ({k: v for k, v in base.items() if k != "iso"}, "\"iso\""),
+        (no_iso, "\"iso\""),
         (dict(base, shares=[1, 2]), "belongs to a job with \"channels\""),
         (dict(base, isotopologues=[{"iso": ["2", "8"]}]), "one of them"),
+        (dict(no_iso, isotopologues=[{"name": "C2", "iso": ["2", "8"]}, {"name": "C2", "iso": ["1", "7"]}]),
+         "already used"),
+        (dict(no_iso, isotopologues=[{"iso": ["2", "8"]}, {"iso": ["2", "8"]}]), "already used"),
         (dict(base, temperature=-5), "positive"),
         (dict(base, transition_structure=[{"file": "x"}]), "unknown key"),
         ({"channels": [{"reactants": ["a"], "transition_structure": ["b"]}], "iso": [["1", "2"], ["1", "2"]]},

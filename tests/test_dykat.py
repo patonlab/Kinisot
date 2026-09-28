@@ -97,6 +97,9 @@ def test_benchmark_runner_computes_the_case_from_its_job_file():
     assert [round(r["computed"], 4) for r in rows] == [1.0055, 0.9955, 1.0264, 1.0053, 1.0035]
     assert all(r["deviation"] is not None for r in rows)
     assert "from the job file `channels.json`" in module.format_case(case, rows)
+    # the report states the job file's settings, which the rows were computed with, when case.json leaves them out
+    bare = {k: v for k, v in case.items() if k not in ("scale", "tunneling")}
+    assert "scale 1.0, tunnelling bell, from the job file" in module.format_case(bare, module.run_case(bare))
     # the settings case.json states must agree with the job file's
     case["scale"] = 0.975
     with pytest.raises(ValueError, match="scale"):

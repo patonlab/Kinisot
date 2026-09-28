@@ -175,11 +175,13 @@ def format_case(case, rows):
         for r in references
     )
     if has_structures(case):
+        # a job file's own settings are the ones its rows were computed with
+        settings = load_job(os.path.join(case["_dir"], case["job"]))["settings"] if case.get("job") else case
         source += " Computed at %s, %s K, scale %s, tunnelling %s%s." % (
             case.get("level_of_theory", "?"),
             case["temperature"],
-            case.get("scale") if case.get("scale") is not None else "none",
-            case.get("tunneling", "bell"),
+            settings.get("scale") if settings.get("scale") is not None else "none",
+            settings.get("tunneling", "bell"),
             ", relative to isotopologue %s" % case["reference_isotopologue"]
             if case.get("reference_isotopologue")
             else "",
@@ -211,7 +213,8 @@ def format_case(case, rows):
         if case.get("alternative_to"):
             lines += ["", "An alternative to `%s`, left out of the overall mean." % case["alternative_to"]]
     elif all(r["computed"] is None for r in rows):
-        lines += ["", "No structures yet: add the frequency calculations and their paths to `case.json`."]
+        generic = "No structures yet: add the frequency calculations and their paths to `case.json`."
+        lines += ["", case.get("status") or generic]
     else:
         lines += ["", "No experimental values entered yet: enter them in `case.json` from the paper."]
     return "\n".join(lines) + "\n"

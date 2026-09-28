@@ -173,6 +173,10 @@ def load_job(path):
         name = entry.get("name") or (
             " | ".join(_label_text(x) for x in entry["iso"]) if kind == "channels" else _label_text(entry["iso"])
         )
+        if any(other["name"] == str(name) for other in job["isotopologues"]):
+            raise KinisotInputError(
+                'isotopologues[%d]: the name "%s" is already used; each isotopologue needs its own name' % (i, name)
+            )
         job["isotopologues"].append({"name": str(name), "iso": entry["iso"], "reference": entry.get("reference")})
     return job
 

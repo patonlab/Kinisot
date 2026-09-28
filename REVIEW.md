@@ -423,8 +423,9 @@ changelog so users know what to expect (expected 10⁻⁵–10⁻⁴ relative).
 `pip install kinisot[ase]` (ASE pulls SciPy and Matplotlib, so keep it
 optional). Tests use ASE's built-in EMT calculator, which needs no model
 download; an optional MACE test is skipped unless `mace-torch` is installed.
-Ship `examples/mlip_claisen/` reproducing the DFT Claisen KIEs with
-MACE-MP-0 or UMA and stating the discrepancy honestly.
+The recommendation was to ship `examples/mlip_claisen/` reproducing the
+DFT Claisen KIEs with MACE-MP-0 or UMA and stating the discrepancy
+honestly.
 
 *Outcome (2026-09):* the example could not reproduce the KIEs with MACE.
 MACE-MP-0 and three MACE-OFF23 models were run, and none has the concerted

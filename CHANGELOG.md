@@ -71,7 +71,7 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   settings, for series, channels, conformer ensembles with free energies,
   and several isotopologues in one run (docs/job_files.md). The results
   file prints the steps or channels with their shares, and `--json` and
-  `--csv` carry an `isotopologue` key.
+  `--csv` carry an `isotopologue` key. Each isotopologue needs its own name.
 - The benchmark runner computes a case from a job file (`"job"` in
   case.json, the format of `kinisot --job`), so transition structures in
   series and parallel channels enter the report. Each `kies` entry names its

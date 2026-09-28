@@ -75,7 +75,9 @@ python benchmarks/run.py --json     # also benchmarks/report.json
   rows are reported but left out of the overall mean absolute deviation.
 - A case whose structures do not exist yet sets `reactants` and
   `transition_structure` to `null` and each `iso` to `null`; the report
-  lists its measurements and marks it "Not computed yet".
+  lists its measurements and marks it "Not computed yet". An optional
+  `status` replaces the report's generic "No structures yet" line with
+  what remains to be done.
 
 ## Status
 

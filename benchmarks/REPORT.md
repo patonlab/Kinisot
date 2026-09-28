@@ -228,6 +228,6 @@ Two transition structures in series (IMPLEMENTATION_PLAN.md, Phase 10): C-C bond
 | ylide CH carbon | – | – | 1.011 ± 0.002, 1.011 ± 0.004 |  | Table 1: 4-TS 1.022, 6-TS 0.994; weighted 1.008 (free energies), 1.012 (trajectories) |
 | ylide carbonyl carbon | – | – | 0.997 ± 0.002 |  | no prediction in the paper |
 
-No structures yet: add the frequency calculations and their paths to `case.json`.
+Not computed yet: the jobs for 1, 2 and 4-TS are in the case directory (tests/test_wittig.py checks them against SI Table S4); the 6-TS job is still to be run, and then a job file with the two steps in series computes the case.
 
 Overall mean absolute deviation over 39 measured positions: 0.0055
