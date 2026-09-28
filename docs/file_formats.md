@@ -27,6 +27,10 @@ Atom numbering is the order of the atoms in the Gaussian input, starting at
 
 ## ORCA (supported)
 
+Atom numbers for `--iso` count from 1 in the order of the input geometry,
+as for Gaussian. ORCA's own output numbers atoms from 0, so the atom listed
+as 11 in its coordinate tables is `--iso 12`.
+
 ORCA writes the Hessian to `name.hess` next to `name.out`; give Kinisot
 either path and it finds the other by name (the `.hess` file alone is
 enough for the numbers; the `.out` supplies the level of theory from the
