@@ -4,19 +4,46 @@
 [![PyPI version](https://badge.fury.io/py/kinisot.svg)](https://badge.fury.io/py/kinisot)
 [![CI](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml/badge.svg)](https://github.com/patonlab/Kinisot/actions/workflows/ci.yml)
 
-**Kinisot** computes kinetic (KIE) and equilibrium (EQE) isotope effects
-from Gaussian or ORCA frequency calculations, or from Hessians computed with
-any ASE calculator, machine-learned potentials included. Give it the output files of a
-reactant and a transition structure (or a product), say which atoms carry
-the heavy isotope, and it re-mass-weights the Hessians, diagonalizes them,
-and evaluates the Bigeleisen–Mayer equation with a Bell tunnelling
-correction at any temperature. No new frequency job is needed for each
-isotopologue. Kinisot is developed in the
-[Paton group](https://patonlab.colostate.edu) at Colorado State University
-and is a rewrite of the Fortran Kinisot by
+**Kinisot** predicts kinetic and equilibrium isotope effects from the
+frequency calculations you already have. Give it the Gaussian or ORCA
+output for a reactant and a transition structure (or a product), say which
+atoms carry the heavy isotope, and it returns the KIE, k(light)/k(heavy),
+at any temperature. That works for ¹³C, ²H, ¹⁵N, ¹⁷O, ¹⁸O or any other
+label, at every position, from one frequency job per structure. Kinisot
+evaluates the Bigeleisen–Mayer equation with Bell's tunnelling correction,
+the treatment used to test transition structures against natural-abundance
+KIE measurements. It also handles conformer ensembles, transition
+structures in series, and parallel pathways. It reads Hessians from xTB and
+machine-learned potentials too, through ASE.
+
+Kinisot is developed in the [Paton group](https://patonlab.colostate.edu)
+at Colorado State University and is a rewrite of the Fortran Kinisot by
 [Henry Rzepa](https://en.wikipedia.org/wiki/Henry_Rzepa).
 
+## What you need
+
+- **A frequency calculation on the reactant and on the transition
+  structure**, at the same level of theory. That means a Gaussian `freq` (or
+  `opt freq`) output, or an ORCA frequency job with its `.hess` file. The
+  reactant must be a minimum, with no imaginary frequency. The transition
+  structure must have exactly one, and it must describe the bond changes of
+  the step you are testing.
+- **Each labelled reactant.** For a bimolecular reaction, give each reactant
+  (or a reactant complex). A reactant that carries no label can be left out,
+  because it cancels.
+- **The atom number of each labelled position, in each file.** This is the
+  atom's place in the input geometry, counting from 1, as GaussView numbers
+  atoms. ORCA prints atoms from 0 in its output, so add 1 to ORCA's numbers.
+- **The temperature of the experiment.**
+
+For a competition KIE, the transition structure is the one of the first
+irreversible step. If no single step is irreversible, for example because
+an intermediate can return to the reactant, see
+[Several conformers or transition structures](#several-conformers-or-transition-structures).
+
 ## Quick start
+
+Kinisot needs Python 3.9 or later. The example files come with the source:
 
 ```
 pip install kinisot            # or: conda install -c conda-forge kinisot
@@ -56,27 +83,120 @@ The number to report is **corr-KIE = 1.015** (the semiclassical KIE of
 
 ## Reading the output
 
+**The convention.** KIE = k(light)/k(heavy): above 1 is a normal isotope
+effect, below 1 an inverse one. For an equilibrium isotope effect (EIE,
+labelled `EQE` in the output) of reactant ⇌ product, the value is
+K(light)/K(heavy). Above 1, the heavy isotope accumulates in the reactant,
+the side with the stiffer vibrations.
+
+**The number to report** is the last column, `corr-KIE`: the KIE with the
+tunnelling correction. The other columns show where it comes from.
+
 - **Species rows** show, for the reactant and the transition structure,
-  the imaginary frequency of each isotopologue (cm⁻¹) and the three
-  Bigeleisen–Mayer factors of that species as light/heavy ratios:
-  the zero-point energy term (`ZPE`), the excitation term (`EXC`) and the
-  Teller–Redlich product of frequencies (`TRPF`, heavy/light). Their
-  product is the reduced isotopic partition function ratio (s/s′)f.
-- **`KIE @ T`** is the ratio reactant/transition structure of every column:
-  `V-ratio` = ν‡(light)/ν‡(heavy); `ZPE`, `EXC`, `TRPF` as above;
-  `KIE` = V-ratio × ZPE × EXC × TRPF (semiclassical); `1D-tunn` = Bell
-  infinite-parabola tunnelling correction; `corr-KIE` = KIE × 1D-tunn.
-- **Vibrational modes**: how many modes entered each partition function
-  and which six (five for a linear molecule, plus the reaction coordinate)
-  were discarded as translations and rotations. On a converged geometry
-  the discarded values are within a few tens of cm⁻¹ of zero; a genuine
-  vibration in that list means the geometry needs tightening.
-- For an EQE the line is labelled `EQE @ T`, `V-ratio` is empty and
+  the imaginary frequency of each isotopologue (cm⁻¹) and three factors as
+  light/heavy ratios:
+  - `ZPE`, the zero-point energy term;
+  - `EXC`, the excitation term (thermally populated vibrational levels);
+  - `TRPF`, the Teller–Redlich product of frequencies (heavy/light), which
+    stands in for the translational and rotational terms.
+
+  Their product is the reduced isotopic partition function ratio (s/s′)f
+  of that species.
+- **`KIE @ T`** gives, for every column, the reactant's value divided by
+  the transition structure's:
+  - `V-ratio` = ν‡(light)/ν‡(heavy), the ratio of the imaginary
+    frequencies;
+  - `ZPE`, `EXC` and `TRPF` as above;
+  - `KIE` = V-ratio × ZPE × EXC × TRPF, the semiclassical KIE;
+  - `1D-tunn`, Bell's tunnelling correction;
+  - `corr-KIE` = KIE × 1D-tunn.
+- **Vibrational modes** lists how many modes entered each partition
+  function, and the six lowest (five for a linear molecule) that were
+  discarded as overall translations and rotations. On a well-converged
+  geometry the discarded values are within a few tens of cm⁻¹ of zero. A
+  real vibration in that list means the geometry needs tightening.
+- For an EIE the line is labelled `EQE @ T`, `V-ratio` is empty and
   `1D-tunn` is 1.
 
 The equations behind every column are in [docs/theory.md](docs/theory.md).
 
+## Comparing with experiment
+
+- **Use the temperature of the experiment** (`-t`). The frequency job does
+  not need to have been run at that temperature.
+- **Use the same reference.** Natural-abundance NMR measurements give KIEs
+  relative to an internal standard assumed to have no isotope effect.
+  `--reference ATOMS` computes that position as well and prints a
+  `relative to` line. Compare that line with the measured values.
+- **Average positions that give one signal.** Examples are the two ortho
+  carbons of a phenyl ring, the three hydrogens of a methyl group, and the
+  two oxygens of a nitro group. These are distinct in the transition
+  structure but give one signal, so compute each placement of the label and
+  average them. `kinisot.equivalent_positions()` in Python does this
+  exactly. When the positions are equivalent in the reactant, the average
+  is the harmonic mean of the separate KIEs, not their arithmetic mean.
+- **Keep the tunnelling correction.** A one-dimensional tunnelling
+  correction brings predicted heavy-atom KIEs to about the experimental
+  uncertainty (Meyer, DelMonte, Singleton, J. Am. Chem. Soc. 1999, 121,
+  10865). At the two bond-forming carbons of isoprene in its Diels–Alder
+  reaction, Singleton and Thomas measured 1.022(3) and 1.017(2). B3LYP gives
+  1.018 and 1.014 without tunnelling, and 1.022 and 1.017 with Bell's
+  correction. For primary hydrogen KIEs with a large tunnelling
+  contribution, any one-dimensional correction is only approximate.
+- **Expect about 0.001 to 0.003 for heavy atoms.** At B3LYP/6-31G(d), with
+  scaling and Bell tunnelling, the [benchmarks](benchmarks/README.md)
+  reproduce measured ¹³C and ¹⁷O KIEs with mean absolute deviations of
+  0.0009 (Claisen rearrangement), 0.0012 (Shi epoxidation) and 0.003
+  (Diels–Alder, including ²H).
+- **When prediction and experiment disagree, look at the transition
+  structure first.** Bigeleisen–Mayer predictions for heavy atoms are
+  accurate as long as the calculation has the right mechanism and
+  transition-state geometry. Hirschi, Takeya, Hang and Singleton found a
+  theory-independent relation between forming-bond distances and ¹³C KIEs
+  (J. Am. Chem. Soc. 2009, 131, 2397), so calculations that reproduce the
+  measured KIEs share nearly the same transition-state geometry. Then
+  check the mechanism: other conformers, a step that is not rate-limiting
+  alone, or competing pathways.
+  [examples/mlip_claisen](examples/mlip_claisen/README.md) shows an extreme
+  case: potentials whose saddle point is a different reaction.
+
 ## Usage
+
+**Common cases**
+
+| Case | Command | Labels |
+| --- | --- | --- |
+| KIE, one reactant | `kinisot --rct gs.out --ts ts.out --iso 5` | one `--iso` when the atom numbering is the same in both files |
+| KIE, bimolecular | `kinisot --rct dienophile.out --rct diene.out --ts ts.out --iso 0 --iso 6 --iso 15` | one `--iso` per file, `--rct` files first, `0` for a file without a labelled atom |
+| EIE | `kinisot --rct conf_a.out --prd conf_b.out --iso 24,25,26 --iso 28,29,30` | the same, with the product instead of a transition structure |
+| Relative to a standard | `kinisot --rct gs.out --ts ts.out --iso 4 --reference 5` | the KIE of position 4 divided by that of position 5 |
+| Conformers | `kinisot --rct gs_1.out gs_2.out --ts ts_*.out --iso 5` | several files after one flag are conformers of one species, with the same atom numbering |
+
+**Everyday options**
+
+| Flag | Meaning |
+| --- | --- |
+| `--iso ATOMS` | atom number(s) to label, comma separated (`7,8` labels two hydrogens). Numbers follow the order of the atoms in the input geometry, from 1. Kinisot checks that the atoms exist and that both sides of the reaction are labelled with the same isotopes. |
+| `-t`, `--temperature` | temperature in K (default 298.15). A list (`273,298,323`) or a range (`250:350:10`) gives one result line per temperature. |
+| `--reference ATOMS` | a reference position; the KIE is also reported divided by its KIE, as natural-abundance measurements are. |
+| `-s`, `--scale` | vibrational scaling factor. By default Kinisot looks up the ZPE factor for the level of theory it detects in the files ([Truhlar database](https://comp.chem.umn.edu/freqscale/), version 5), or uses 1.0 with a message if the level is not listed. |
+| `--tunneling` | `bell` (default), `wigner`, `skodje` (Skodje–Truhlar, which also uses the barrier height: `--barrier KCAL`, or the electronic energies in the files) or `none`. |
+| `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
+
+**More options**
+
+| Flag | Meaning |
+| --- | --- |
+| `--scale-type` | `harm` or `fund` picks the harmonic or fundamental scaling factor instead of the ZPE one. |
+| `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
+| `--project` | remove overall translations and rotations exactly before computing frequencies, instead of discarding the six lowest. On by default for xTB and machine-learned-potential inputs. On converged Gaussian and ORCA geometries it changes KIEs by less than 10⁻⁵ (`--no-project` forces it off). |
+| `--weights`, `--energies`, `--weight-uncertainty` | how conformers are weighted; see [Several conformers or transition structures](#several-conformers-or-transition-structures). |
+| `--job FILE` | a JSON file with the structures, labels and settings, for transition structures in series, parallel pathways and several labelled positions in one run ([docs/job_files.md](docs/job_files.md)). The other flags then give only the outputs. |
+| `--calc SPEC`, `--delta` | compute the Hessians of geometry files with an ASE calculator (`xtb`, `mace_mp:medium`, ...); finite-difference step in Å. |
+| `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
+| `--version` | print the version. |
+
+The full syntax (`python -m kinisot` is equivalent to `kinisot`):
 
 ```
 kinisot --rct FILE [FILE ...] [--rct FILE ...] (--ts FILE [FILE ...] | --prd FILE [FILE ...])
@@ -87,52 +207,52 @@ kinisot --rct FILE [FILE ...] [--rct FILE ...] (--ts FILE [FILE ...] | --prd FIL
 kinisot --job job.json [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
 ```
 
-`python -m kinisot` is equivalent to `kinisot`.
+Invalid input stops the run with a message and exit code 1: an atom number
+out of range, a reactant with an imaginary frequency, a file that is not a
+completed frequency job, and so on.
 
-**Three ways to describe a reaction**
-
-| Case | Command | Labels |
-| --- | --- | --- |
-| KIE, one reactant | `kinisot --rct gs.out --ts ts.out --iso 5` | one `--iso` when the atom numbering is the same in both files |
-| KIE, bimolecular | `kinisot --rct dienophile.out --rct diene.out --ts ts.out --iso 0 --iso 6 --iso 15` | one `--iso` per file, `--rct` files first, `0` for a file without a substituted atom |
-| EQE | `kinisot --rct conf_a.out --prd conf_b.out --iso 24,25,26 --iso 28,29,30` | the same, with the product instead of a TS |
-| Conformers | `kinisot --rct gs_1.out gs_2.out --ts ts_*.out --iso 5` | several files after one flag are conformers of one species, with the same atom numbering; one `--iso` per flag |
-
-**Options**
-
-| Flag | Meaning |
-| --- | --- |
-| `--iso ATOMS` | atom number(s) to replace with the heavy isotope, comma separated (`7,8` substitutes two hydrogens). Atom numbers follow the order of the atoms in the quantum-chemistry input. Kinisot checks that the atoms exist, can be substituted, still carry the light isotope, and that both sides of the reaction substitute the same elements. |
-| `-t`, `--temperature` | temperature in K at which the partition functions are evaluated (default 298.15). It need not match the frequency job. A list (`273,298,323`) or range (`250:350:10`) gives one result line per temperature. |
-| `-s`, `--scale` | vibrational scaling factor. Default: the ZPE factor of the [Truhlar database](https://comp.chem.umn.edu/freqscale/) (version 5, via GoodVibes) for the level of theory detected in the files, or 1.0 with a message if it is not listed. `--scale-type harm` or `fund` picks the harmonic or fundamental factor instead. |
-| `--imag-cutoff` | a mode below −CUTOFF cm⁻¹ is the reaction coordinate (default 50). Reactants and products must have none. |
-| `--tunneling` | `bell` (default), `wigner`, `skodje` (Skodje–Truhlar, needs the barrier: `--barrier KCAL` or the electronic energies in the files) or `none`. |
-| `--project` | project translations and rotations out of the Hessian (Eckart) instead of discarding the six lowest modes. On by default for `--calc`/ASE inputs, off for Gaussian and ORCA (`--no-project` forces it off). |
-| `--calc SPEC`, `--delta` | compute the Hessians of geometry inputs with an ASE calculator (`xtb`, `mace_mp:medium`, `module:callable`, ...); finite-difference step in Å. |
-| `--reference ATOMS` | a second isotopologue; the KIE is also reported divided by its KIE (natural-abundance NMR style). |
-| `--weights` | how conformers are weighted: `qrrho` (default; quasi-harmonic free energies of the light isotopologue), `rrho`, `user`, `lowest` or `equal` ([theory, section 7](docs/theory.md#7-conformer-ensembles)). |
-| `--energies TABLE` | free energies of conformers, one line per file: name, G (any zero; `-` to let Kinisot compute it) and optionally a degeneracy. `--energy-unit` is `kcal/mol` (default), `kJ/mol` or `hartree`. |
-| `--weight-uncertainty` | the ensemble result gives the range of the KIE when each conformer free energy moves by this much (default 0.5 kcal/mol). |
-| `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
-| `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
-| `--job FILE` | a JSON job file with the structures, labels and settings: transition structures in series, parallel channels, several isotopologues in one run ([docs/job_files.md](docs/job_files.md)). The other flags then give only the outputs. |
-| `--version` | print the version. |
-
-Invalid input (an atom number out of range, a reactant with an imaginary
-frequency, a file that is not a completed frequency job, ...) stops the run
-with a message and exit code 1.
-
-**Isotopes.** A bare atom number substitutes the usual heavy label:
+**Isotopes.** A bare atom number gives the usual heavy label:
 ¹H → ²H, ¹²C → ¹³C, ¹⁴N → ¹⁵N, ¹⁶O → ¹⁸O, ³²S → ³⁴S, ³⁵Cl → ³⁷Cl,
-⁷⁹Br → ⁸¹Br, ²⁸Si → ²⁹Si. Any isotope in the table can be asked for
-explicitly: `--iso 3:17O`, `--iso 7:D` (or `7:T`), `--iso 5:14C`, or an
-explicit mass `--iso 5:13.5`. Masses are AME 2020 values for every
-naturally occurring isotope of 83 elements plus the common radioactive
-labels; both isotopologues are built from this table (the light one from
-the most abundant isotope, as Gaussian does), so Gaussian, ORCA and other
-programs give the same numbers for the same Hessian. Note that Kinisot
-≤ 2.3 substituted ¹⁷O for a bare oxygen index; 2.4 warns once when it sees
-one.
+⁷⁹Br → ⁸¹Br, ²⁸Si → ²⁹Si. Any other isotope can be asked for explicitly:
+`--iso 3:17O`, `--iso 7:D` (or `7:T`), `--iso 5:14C`, or an explicit mass
+`--iso 5:13.5`. Masses are AME 2020 values for every naturally occurring
+isotope of 83 elements plus the common radioactive labels. The light
+isotopologue is built from the most abundant isotopes, as Gaussian does,
+so Gaussian, ORCA and other programs give the same numbers for the same
+Hessian. Kinisot 2.3 and earlier used ¹⁷O for a bare oxygen number; 2.4 and
+later use ¹⁸O and print a note once.
+
+## Several conformers or transition structures
+
+One reactant and one transition structure are often enough. When they are
+not, Kinisot combines several structures, weighting each by its free
+energy (for the light isotopologue, which is exact).
+
+- **Conformers.** Give several files after one flag, all with the same atom
+  numbering: `kinisot --rct gs_*.out --ts ts_chair.out ts_boat.out --iso 5`.
+  The result is not the Boltzmann average of the pairwise KIEs, but a
+  ratio of population-weighted averages. The output lists each conformer's
+  population and its own KIE. It also gives the KIE of the lowest
+  conformers alone, and how much the result moves if each free energy moves
+  by 0.5 kcal/mol. `--weights` chooses quasi-harmonic free energies
+  (default), harmonic ones, your own (`--energies`), the lowest conformer,
+  or equal weights. [examples/conformers](examples/conformers/README.md)
+  works through allyl vinyl ether, where a secondary ²H KIE moves by 0.010
+  between the lowest conformer and the ensemble.
+- **Transition structures in series.** When an intermediate can go on or
+  return, no single step commits the substrate, and the KIE is a weighted
+  mean of the steps' KIEs. It depends on the partitioning of the
+  intermediate (the commitment factor), which can come from free energies
+  or from trajectories.
+- **Parallel pathways.** When the substrate is consumed by several routes
+  (for example two enantiomers through diastereomeric transition
+  structures), each with its own labels, their KIEs combine according to
+  each route's share, which can be a measured selectivity.
+
+Series and pathways are set up in a JSON job file
+([docs/job_files.md](docs/job_files.md)). The equations, with worked cases
+from the Wittig reaction and a Rh-catalysed dynamic kinetic asymmetric
+arylation, are in [docs/theory.md, section 7](docs/theory.md#7-conformer-ensembles).
 
 ## Input files
 
@@ -142,108 +262,78 @@ one.
 | ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
 | ASE: machine-learned potentials, GFN2-xTB, any ASE calculator | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (`xtb`, `mace_mp`, `mace_off`, `orb`, `sevennet`, `aimnet2`, `module:callable`); the Hessian is computed and cached next to the geometry, external modes are projected out |
 
-Details and pitfalls: [docs/file_formats.md](docs/file_formats.md).
+Atom numbers always count from 1, whatever the program: ORCA's own output
+numbers atoms from 0. Details and pitfalls:
+[docs/file_formats.md](docs/file_formats.md).
 
 ## Why the Bigeleisen–Mayer equation rather than free energies
 
 A KIE can also be taken from the free energies a quantum chemistry program
 prints for each isotopologue, as exp(ΔΔG‡/RT). With exact harmonic
-frequencies at an exact stationary point the two routes give the same
-number. In practice the Bigeleisen–Mayer equation, which Kinisot evaluates
-directly (as QUIVER and PyQuiver do), is the more reliable one.
+frequencies the two routes give the same number, and in practice they
+often agree to a few 10⁻⁴. Rzepa's Baeyer–Villiger KIEs came out 1.023
+(free energies) against 1.0226 (Bigeleisen–Mayer) for ¹³C, and 0.928
+against 0.92831 for ²H
+([Henry Rzepa's blog, 2015](https://www.ch.ic.ac.uk/rzepa/blog/?p=14255)).
+Against natural-abundance measurements, differences of 10⁻³ matter, and
+there the Bigeleisen–Mayer route (used by QUIVER, PyQuiver and Kinisot) is
+the more reliable one.
+
+- **Soft vibrations cannot spoil it.** It uses only ratios of the two
+  isotopologues' frequencies, and a low-frequency mode contributes a
+  factor close to 1 however poorly it is computed. Through free energies
+  the same mode's isotope shift enters in full. A 0.1 cm⁻¹ error in the
+  isotope shift of one torsion of the Claisen reactant moves the ¹³C KIEs
+  by up to 1.5 × 10⁻³ through free energies, and by less than 10⁻⁵ through
+  Bigeleisen–Mayer.
+- **Printed free energies are too coarse.** Gaussian prints six decimals of
+  a hartree. At 393 K, an error of 10⁻⁶ hartree in one of the four free
+  energies changes a KIE by 8 × 10⁻⁴.
+- **Quasi-harmonic free energies distort it.** Raising soft modes to
+  100 cm⁻¹, as quasi-harmonic thermochemistry does, moves the Claisen ¹⁸O
+  KIE from 1.037 to 1.018 through free energies. The Bigeleisen–Mayer value
+  moves by 10⁻⁴.
+- **There are no translational terms to get wrong.** Leaving them out of a
+  free-energy or enthalpy–entropy treatment costs 1.3% for
+  Cl⁻ + CH₃Br.
+- **It is less work.** One frequency calculation per structure gives every
+  label at every temperature in seconds.
+
 [docs/theory.md](docs/theory.md) (section 6) has the derivation and the
-full comparison; `scripts/compare_free_energy_route.py` reproduces it.
-
-- **It cancels errors in small numbers, not large ones.** Bigeleisen and
-  Mayer replace the translational and rotational partition-function ratios
-  by the product of vibrational frequency ratios (the Teller–Redlich
-  product rule). Every vibration then enters only as a ratio of the two
-  isotopologues' frequencies. A soft mode (hν ≪ kT) contributes a factor
-  that tends to exactly 1, however poorly its frequency is computed. In a
-  free-energy difference the same mode's isotope shift enters in full, and
-  it has to cancel against rotational terms computed from moments of
-  inertia.
-- **Computed frequencies obey the product rule only approximately.** On the
-  converged B3LYP Claisen files in this repository, the free-energy KIEs
-  differ from Bigeleisen–Mayer by up to 8 × 10⁻⁴. A 0.1 cm⁻¹ error in the
-  isotope shift of the reactant's 70.5 cm⁻¹ torsion moves the ¹³C KIEs by
-  1.4 × 10⁻³ to 1.5 × 10⁻³ through free energies and by less than 10⁻⁵
-  through Bigeleisen–Mayer.
-- **Printed free energies are not precise enough.** Gaussian prints six
-  decimals of a hartree. At 393 K an error of 10⁻⁶ hartree in one of the
-  four free energies changes a KIE by 8 × 10⁻⁴, and rounding alone moves
-  the Claisen C6 ¹³C KIE by 6.5 × 10⁻⁴. That is comparable to the
-  uncertainty of natural-abundance ¹³C measurements.
-- **Quasi-harmonic free energies are unusable for isotope effects.**
-  Raising soft modes to 100 cm⁻¹, as quasi-harmonic thermochemistry does
-  (GoodVibes included), removes their isotope shifts from the vibrational
-  term but not from the rotational one. The Claisen ¹⁸O KIE drops from
-  1.037 to 1.018 through free energies; the Bigeleisen–Mayer value moves by
-  10⁻⁴.
-- **Tunnelling belongs in heavy-atom KIEs.** A one-dimensional tunnelling
-  correction improves KIE predictions. With it, predicted and measured
-  heavy-atom KIEs agree to about the experimental uncertainty (Meyer,
-  DelMonte, Singleton, J. Am. Chem. Soc. 1999, 121, 10865). The Diels–Alder
-  benchmark in this repository shows it. At the two bond-forming carbons of
-  isoprene, Singleton and Thomas measured 1.022(3) and 1.017(2). The B3LYP
-  KIEs are 1.018 and 1.014 without tunnelling, and 1.022 and 1.017 with
-  Bell's correction. Kinisot applies Bell's correction by default and prints
-  the uncorrected KIE alongside.
-- **No translational terms to get wrong.** Bigeleisen–Mayer uses no
-  translational partition functions, and an unlabelled reactant has a
-  reduced ratio of exactly 1, so it can be left out of the input (the
-  chloride of an SN2 reaction, say). A free-energy or
-  enthalpy–entropy treatment can drop the chloride's own terms, which
-  cancel, but must keep the translational terms of methyl bromide and the
-  transition structure, whose masses differ by the chloride's. Dropping
-  them costs 1.3% for Cl⁻ + CH₃Br: the enthalpy–entropy KIE
-  PyQuiverHS reports is 0.877 at 300 K, against 0.888 from Bigeleisen–Mayer
-  ([docs/theory.md](docs/theory.md), section 6;
-  [benchmarks/sn2_chloride_methyl_bromide](benchmarks/sn2_chloride_methyl_bromide/case.json)).
-- **It is less work.** One frequency calculation per species gives every
-  isotopologue at every temperature in seconds. The free-energy route needs
-  a thermochemistry run for each set of isotopes and each temperature.
-
-The two routes often agree to a few 10⁻⁴. Rzepa's Baeyer–Villiger KIEs came
-out 1.023 (free energies) against 1.0226 (Bigeleisen–Mayer) for ¹³C, and
-0.928 against 0.92831 for ²H
-([Henry Rzepa's blog, 2015](https://www.ch.ic.ac.uk/rzepa/blog/?p=14255)). The
-differences above are at the 10⁻³ level, which is what matters when a
-prediction is held against a natural-abundance measurement.
-
-When a predicted KIE disagrees with experiment, look first at the
-transition structure. Bigeleisen–Mayer KIE predictions for heavy atoms are
-accurate as long as the calculation gets the mechanism and the
-transition-state geometry right. Hirschi, Takeya, Hang and Singleton found
-a theory-independent relation between forming-bond distances and ¹³C KIEs
-(J. Am. Chem. Soc. 2009, 131, 2397). So the calculations that reproduce the
-measured KIEs share nearly the same transition-state geometry.
-[examples/mlip_claisen](examples/mlip_claisen/README.md) shows an extreme
-case: potentials whose saddle point is a different reaction.
+full comparison, and `scripts/compare_free_energy_route.py` reproduces it.
 
 ## What Kinisot assumes
 
-- Harmonic frequencies from the program's Hessian; the scaling factor is
-  applied to all modes, including the imaginary one. Kinisot checks that it
-  reproduces the frequencies the program printed and warns if not.
-- Translations and rotations are removed by discarding the lowest 5/6
-  eigenvalues; `--project` removes them by Eckart projection instead. On
-  converged Gaussian geometries the two agree to better than 4 × 10⁻⁷ in
-  the KIE; projection matters for noisy (finite-difference) Hessians.
-- One imaginary mode per transition structure; a second one triggers a
-  warning.
-- Tunnelling by Bell's one-dimensional infinite-parabola model (default), the
-  Wigner correction, the Skodje–Truhlar correction (which also uses the
-  barrier height), or none; Bell is refused below the crossover
-  temperature h c |ν‡| / 2π k.
-- Rigid rotor / harmonic oscillator and no solvent corrections: compute
-  those outside Kinisot if you need them.
-- Conformers given together are in fast equilibrium (Curtin–Hammett) and
-  weighted by free energies of the light isotopologue, which is exact.
-  Transition structures in series are combined at steady state, and
-  parallel channels at low conversion.
+- **Harmonic vibrations and rigid rotors.** There is no anharmonic
+  correction. One scaling factor multiplies every frequency, the imaginary
+  one included. Kinisot checks that it reproduces the frequencies the
+  program printed and warns if not.
+- **Transition-state theory.** Each transition structure has one imaginary
+  frequency; a second one triggers a warning. Recrossing and dynamic effects
+  are outside the model, except through a commitment factor you supply for
+  steps in series.
+- **One-dimensional tunnelling.** Bell's model is the default; Wigner and
+  Skodje–Truhlar corrections are options. Bell's correction is not defined
+  below the crossover temperature hc|ν‡|/2πk (229 K for a 1000i cm⁻¹ mode),
+  and Kinisot refuses it there. Multidimensional tunnelling, which primary
+  hydrogen KIEs can need, is outside Kinisot.
+- **Solvent** enters only through the frequency calculation. An
+  implicit-solvent frequency job is used as it is.
+- **Overall translations and rotations** are removed by discarding the six
+  lowest modes (five for a linear molecule), or by projecting them out with
+  `--project`. For converged Gaussian geometries the two differ by less
+  than 4 × 10⁻⁷ in the KIE. Projection matters for the noisier Hessians of
+  finite-difference calculations.
+- **Symmetry numbers are left out.** The reduced partition function ratio
+  excludes them. If a substitution changes a symmetry number (CH₃ → CH₂D,
+  for example), multiply by the ratio yourself.
+- **Several structures.** Conformers given together are in fast
+  equilibrium (Curtin–Hammett). Transition structures in series are
+  combined at steady state, and parallel pathways at low conversion.
 
 ## Python API
+
+For scripting and notebooks; everything above is also available from Python.
 
 ```python
 from kinisot import compute_kie, parse_gaussian
