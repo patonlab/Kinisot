@@ -84,6 +84,7 @@ kinisot --rct FILE [FILE ...] [--rct FILE ...] (--ts FILE [FILE ...] | --prd FIL
         [--barrier KCAL] [--project] [--reference ATOMS] [--calc SPEC]
         [--weights SCHEME] [--energies TABLE] [--weight-uncertainty KCAL]
         [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
+kinisot --job job.json [-o FILE] [--overwrite] [-q] [--json FILE] [--csv FILE]
 ```
 
 `python -m kinisot` is equivalent to `kinisot`.
@@ -114,6 +115,7 @@ kinisot --rct FILE [FILE ...] [--rct FILE ...] (--ts FILE [FILE ...] | --prd FIL
 | `--weight-uncertainty` | the ensemble result gives the range of the KIE when each conformer free energy moves by this much (default 0.5 kcal/mol). |
 | `-o`, `--output` | results file (default `Kinisot_output.dat`); results are appended. `--overwrite` starts afresh, `-q` keeps the terminal quiet. |
 | `--json FILE`, `--csv FILE` | also write the full result as JSON, or append one summary row to a CSV file. |
+| `--job FILE` | a JSON job file with the structures, labels and settings: transition structures in series, parallel channels, several isotopologues in one run ([docs/job_files.md](docs/job_files.md)). The other flags then give only the outputs. |
 | `--version` | print the version. |
 
 Invalid input (an atom number out of range, a reactant with an imaginary
@@ -238,8 +240,8 @@ case: potentials whose saddle point is a different reaction.
   those outside Kinisot if you need them.
 - Conformers given together are in fast equilibrium (Curtin–Hammett) and
   weighted by free energies of the light isotopologue, which is exact.
-  Transition structures in series and parallel channels to different
-  products are not handled yet.
+  Transition structures in series are combined at steady state, and
+  parallel channels at low conversion.
 
 ## Python API
 
@@ -296,6 +298,26 @@ hydrogens of a rotating methyl group) from one result per placement of the
 label. [docs/theory.md, section 7](docs/theory.md#7-conformer-ensembles)
 has the equations.
 
+**Transition structures in series and parallel channels.**
+
+```python
+from kinisot import Series, channels, compute_kie, series_kie
+
+# (atom numbers illustrative) steps none of which alone commits the substrate: one label per reactant, then per step
+r = compute_kie(rct=["aldehyde.out", "ylide.out"], ts=Series(["ts_4.out", "ts_6.out"], commitment=128 / 76),
+                iso=["8", "0", "20", "20"], temperature=340.15)
+r.kie_tunnel, r.shares, r.commitment, r.commitment_for(1.033)
+# parallel routes with their own files and labels; shares from a measured selectivity
+r = channels([dict(rct="3.out", ts="ts_S.out", iso=["1", "40"]), dict(rct="3.out", ts="ts_R.out", iso=["3", "38"])],
+             shares=[3.3, 1], temperature=313.15)
+r.kie_tunnel, r.selectivity_for(1.0244)
+series_kie([1.043, 1.015], free_energies=[25.9, 26.0], temperature=340.15)   # 1.0280, from KIEs you have
+```
+
+On the command line these come from a JSON job file, `kinisot --job
+job.json` ([docs/job_files.md](docs/job_files.md)), which also runs several
+isotopologues at once.
+
 Machine-readable output from the command line: `--json run.json` (the
 full result of one run) and `--csv runs.csv` (one row per run, appended).
 
@@ -308,6 +330,7 @@ full result of one run) and `--csv runs.csv` (one row per run, appended).
   potential workflow), and a conformational EQE, each with the commands, the
   expected numbers and the literature background.
 - [docs/theory.md](docs/theory.md), [docs/file_formats.md](docs/file_formats.md),
+  [docs/job_files.md](docs/job_files.md),
   [docs/faq.md](docs/faq.md), [docs/comparison.md](docs/comparison.md)
   (PyQuiver, PyQuiverHS, Gaussian's `readisotopes`, GoodVibes).
 - [benchmarks/](benchmarks/README.md): computed versus experimental KIEs,

@@ -12,12 +12,15 @@ from . import __version__
 from .api import compute_kie
 from .ensemble import WEIGHTS, Conformers, EnsembleIsotopeEffect
 from .exceptions import KinisotError, KinisotInputError, KinisotWarning
+from .pathways import ChannelIsotopeEffect, SeriesIsotopeEffect
 
 __all__ = [
     "Logger",
     "build_parser",
     "write_results",
     "write_ensemble_results",
+    "write_series_results",
+    "write_channel_results",
     "read_energies",
     "write_json",
     "append_csv",
@@ -270,6 +273,128 @@ def write_ensemble_results(log, results):
     )
 
 
+def _part_name(result):
+    """A short description of one step or channel: its transition structure(s)."""
+    if isinstance(result, EnsembleIsotopeEffect):
+        rows = result.rows("transition structure")
+        return rows[0].name + (" (+%d conformers)" % (len(rows) - 1) if len(rows) > 1 else "")
+    if isinstance(result, SeriesIsotopeEffect):
+        return " -> ".join(_part_name(step) for step in result.steps)
+    return result.other.name
+
+
+def _part_labels(result):
+    if isinstance(result, SeriesIsotopeEffect):
+        return " | ".join(" / ".join(labels) for labels in result.labels)
+    if isinstance(result, EnsembleIsotopeEffect):
+        return " / ".join(result.labels)
+    return " / ".join(result.reactant.heavy.labels + result.other.heavy.labels)
+
+
+def _combined_header(log, result, how):
+    log.Write(
+        "\n\n"
+        + (SPACE * 17)
+        + "  Temp = "
+        + str(result.temperature)
+        + "K / Vib. scale factor = "
+        + str(result.scale_factor)
+        + " / conformer weights: "
+        + result.weights
+        + " / "
+        + how
+    )
+    if result.tunneling != "bell":
+        log.Write(" / tunnelling: " + result.tunneling)
+    if result.project:
+        log.Write(" / external modes projected")
+
+
+def _combined_lines(log, results, label, extra_name, extra):
+    """The KIE lines of a series or channels, one per temperature, with the reference line."""
+    result = results[0]
+    log.Write("\n\n" + ("  ").ljust(50))
+    log.Write(
+        " {:>10} {:>10} {:>10} {:>21} {:>8}\n".format(
+            "KIE", "1D-tunn", "corr-KIE", "range (+/-%.1f)" % result.weight_uncertainty, extra_name
+        )
+    )
+    log.Write(DASH_LINE)
+    for r in results:
+        log.Write(("\n  KIE (" + label + ") @ " + str(r.temperature) + " K").ljust(50))
+        spread = (
+            "{:10.6f}-{:<10.6f}".format(*r.kie_tunnel_range)
+            if r.kie_tunnel_range and r.kie_tunnel_range[0] != r.kie_tunnel_range[1]
+            else "{:>21}".format("-")
+        )
+        value = extra(r)
+        log.Write(
+            " {:10.6f} {:10.6f} {:10.6f} {} {:>8}".format(
+                r.kie, r.tunnel_corr, r.kie_tunnel, spread, "%.4g" % value if value is not None else "-"
+            )
+        )
+        if r.reference is not None:
+            log.Write(("\n  relative to its reference:").ljust(50))
+            log.Write(" {:10.6f} {:>10} {:10.6f}".format(r.kie_relative, "", r.kie_tunnel_relative))
+    log.Write("\n" + DASH_LINE + "\n")
+
+
+def write_series_results(log, results):
+    """Write the steps of a series and its combined KIE (one line per temperature) to the log."""
+    results = list(results)
+    result = results[0]
+    how = {"commitment": "steps weighted by a commitment factor", "user": "steps weighted by given free energies"}
+    _combined_header(log, result, how.get(result.weight_source, "steps weighted by computed free energies"))
+    log.Write("\n\n  Steps in series at %s K:" % result.temperature)
+    log.Write("\n  " + "{:<44} {:>8} {:>8} {:>10} {:>10}".format("", "G", "share %", "KIE", "corr-KIE"))
+    for n, step in enumerate(result.steps):
+        log.Write("\no step %d: %s" % (n + 1, _part_name(step)))
+        log.Write(
+            "\n    " + ("iso @ " + _part_labels(step))[:42].ljust(42)
+            + " {:8.2f} {:8.2f} {:10.6f} {:10.6f}".format(
+                result.free_energies[n], 100 * result.shares[n], step.kie, step.kie_tunnel
+            )
+        )  # fmt: skip
+    log.Write(
+        "\n\n  G: effective free energy of the step's transition structure above the lowest (kcal/mol, with "
+        "tunnelling); share: of 1/k for the light isotopologue, so the highest transition structure counts most"
+    )
+    _combined_lines(log, results, "series", "C_f", lambda r: r.commitment)
+    if len(result.steps) == 2:
+        log.Write("\n  C_f = k2 / k-1, the commitment of the intermediate to going on\n")
+
+
+def write_channel_results(log, results):
+    """Write the channels and their combined KIE (one line per temperature) to the log."""
+    results = list(results)
+    result = results[0]
+    how = {"given": "shares given", "barriers": "shares from given barriers"}
+    _combined_header(log, result, how.get(result.share_source, "shares from computed free energies"))
+    log.Write("\n\n  Parallel channels at %s K:" % result.temperature)
+    log.Write("\n  " + "{:<44} {:>8} {:>10} {:>10}".format("", "share %", "KIE", "corr-KIE"))
+    for name, channel, share in zip(result.names, result.channels, result.shares):
+        log.Write("\no %s: %s" % (name, _part_name(channel)))
+        log.Write(
+            "\n    " + ("iso @ " + _part_labels(channel))[:42].ljust(42)
+            + " {:8.2f} {:10.6f} {:10.6f}".format(100 * share, channel.kie, channel.kie_tunnel)
+        )  # fmt: skip
+    log.Write("\n\n  share: of the light isotopologue's rate; 1 / KIE = sum(share / KIE)")
+    _combined_lines(log, results, "channels", "s", lambda r: r.selectivity)
+    if len(result.channels) == 2:
+        log.Write("\n  s = share 2 / share 1, the selectivity between the channels\n")
+
+
+def write_any(log, results):
+    """The results table for whichever kind of result this is."""
+    kind = type(results[0])
+    writer = {
+        EnsembleIsotopeEffect: write_ensemble_results,
+        SeriesIsotopeEffect: write_series_results,
+        ChannelIsotopeEffect: write_channel_results,
+    }.get(kind, write_results)
+    writer(log, results)
+
+
 def read_energies(path):
     """Free energies (and degeneracies) of conformers from a table: file, G or dG, and optionally g.
 
@@ -344,9 +469,11 @@ def write_json(path, result):
         handle.write("\n")
 
 
-def append_csv(path, result):
+def append_csv(path, result, name=None):
     """Append one row per run to a CSV file (header written when the file is new)."""
     row = result.summary_row()
+    if name is not None:
+        row = dict(isotopologue=name, **row)
     new_file = not os.path.exists(path) or os.path.getsize(path) == 0
     with open(path, "a", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(row))
@@ -367,7 +494,6 @@ def build_parser():
         dest="rct",
         action="append",
         nargs="+",
-        required=True,
         metavar="FILE",
         help="reactant frequency output (Gaussian .log/.out, ORCA .out/.hess, VibrationsData .json, or a geometry "
         "with --calc); repeat for bimolecular reactions. Several files after one --rct are conformers of that "
@@ -393,7 +519,6 @@ def build_parser():
         "--iso",
         dest="label",
         action="append",
-        required=True,
         metavar="ATOMS",
         help="atom number(s) to replace with the heavy isotope (2H, 13C, 17O), comma separated, e.g. 7,8. "
         "Give one --iso per file in the order of the --rct then --ts/--prd files, or a single --iso when the "
@@ -403,7 +528,7 @@ def build_parser():
         "-t",
         "--temperature",
         dest="temperature",
-        default="298.15",
+        default=None,
         metavar="K",
         help="temperature in Kelvin (default 298.15); a list (273,298,323) or a range (250:350:10) gives one "
         "result line per temperature",
@@ -514,6 +639,13 @@ def build_parser():
         "(default 0.5 kcal/mol)",
     )
     parser.add_argument(
+        "--job",
+        dest="job",
+        metavar="FILE",
+        help="a JSON job file with the structures, labels and settings, for transition structures in series, "
+        "parallel channels or several isotopologues (docs/job_files.md); the other flags then give only the outputs",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         dest="output",
@@ -540,13 +672,16 @@ def main(argv=None):
     """Command-line entry point. Returns the process exit code."""
     parser = build_parser()
     options = parser.parse_args(argv)
-
+    if options.job:
+        return _main_job(parser, options)
+    if not options.rct or not options.label:
+        parser.error("--rct and --iso are required (or --job)")
     if options.ts is None and options.prd is None:
         parser.error("either --ts (for a KIE) or --prd (for an EQE) is required")
     if options.ts is not None and options.prd is not None:
         parser.error("--ts and --prd cannot be combined: use --ts for a KIE or --prd for an EQE")
     try:
-        temperatures = parse_temperatures(options.temperature)
+        temperatures = parse_temperatures(options.temperature or "298.15")
     except ValueError as err:
         parser.error(str(err))
     if min(temperatures) <= 0:
@@ -627,15 +762,77 @@ def main(argv=None):
                 if str(warning.message) not in seen:
                     seen.add(str(warning.message))
                     log.Write("\n  WARNING: " + str(warning.message))
-            if isinstance(results[0], EnsembleIsotopeEffect):
-                write_ensemble_results(log, results)
-            else:
-                write_results(log, results)
+            write_any(log, results)
             if options.json_path:
                 write_json(options.json_path, results[0] if len(results) == 1 else results)
             if options.csv_path:
                 for result in results:
                     append_csv(options.csv_path, result)
+        except KinisotError as err:
+            log.Writeonlyfile("o  ERROR: " + str(err))
+            print("\no  ERROR: " + str(err) + "\n", file=sys.stderr)
+            return 1
+        if not options.quiet:
+            print("\n  Results appended to " + options.output)
+    return 0
+
+
+# the flags a job file replaces (dest names)
+JOB_REPLACES = (
+    "rct", "ts", "prd", "label", "temperature", "freq_scale_factor", "freq_cutoff", "scale_type", "tunneling",
+    "barrier", "project", "calc", "delta", "reference", "weights", "energies", "energy_unit", "weight_uncertainty",
+)  # fmt: skip
+
+
+def _main_job(parser, options):
+    """kinisot --job FILE: every isotopologue of the job at every temperature."""
+    from .jobs import load_job, run_job
+
+    defaults = vars(parser.parse_args(["--job", options.job]))
+    given = [name for name in JOB_REPLACES if getattr(options, name) != defaults[name]]
+    if given:
+        parser.error(
+            "with --job, the job file gives the structures, labels and settings; the command line gives only the "
+            "outputs (-o, --overwrite, -q, --json, --csv). Move these to the job file: %s" % ", ".join(given)
+        )
+    try:
+        job = load_job(options.job)
+    except KinisotInputError as err:
+        parser.error(str(err))
+    try:
+        log = Logger(options.output, quiet=options.quiet, overwrite=options.overwrite)
+    except OSError as err:
+        print(
+            "\no  ERROR: cannot open the results file %s: %s\n" % (options.output, err.strerror or err), file=sys.stderr
+        )
+        return 1
+    with log:
+        log.Write("\n  " + "KINISOT.py v " + __version__ + ": " + time.strftime("%Y-%m-%d %H:%M") + "\n")
+        log.Write("  Job: {} ({})\n".format(options.job, job["kind"].replace("_", " ")))
+        try:
+            by_name = {}
+            seen = set()
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always", KinisotWarning)
+                for temperature in job["temperatures"]:
+                    for name, result in run_job(job, temperature):
+                        by_name.setdefault(name, []).append(result)
+            for warning in caught:
+                if str(warning.message) not in seen:
+                    seen.add(str(warning.message))
+                    log.Write("\n  WARNING: " + str(warning.message))
+            for name, results in by_name.items():
+                log.Write("\n\n  Isotopologue: " + name)
+                write_any(log, results)
+            if options.json_path:
+                payload = [dict(r.to_dict(), isotopologue=name) for name, rs in by_name.items() for r in rs]
+                with open(options.json_path, "w") as handle:
+                    json.dump(payload[0] if len(payload) == 1 else payload, handle, indent=2)
+                    handle.write("\n")
+            if options.csv_path:
+                for name, results in by_name.items():
+                    for result in results:
+                        append_csv(options.csv_path, result, name)
         except KinisotError as err:
             log.Writeonlyfile("o  ERROR: " + str(err))
             print("\no  ERROR: " + str(err) + "\n", file=sys.stderr)

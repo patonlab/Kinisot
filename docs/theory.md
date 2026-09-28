@@ -345,9 +345,73 @@ their arithmetic or geometric mean. `kinisot.equivalent_positions` computes
 it from one result per placement, and the benchmark runner uses it.
 
 **Limits.** The conformers must interconvert faster than they react.
-Transition structures in series (an intermediate that can return) and
-parallel channels to different products need different formulas, planned
-in IMPLEMENTATION_PLAN.md, Phase 10.
+
+### 7a. Transition structures in series
+
+A reaction may pass several transition structures in turn,
+R ⇌ I₁ ⇌ I₂ … → P, none of which alone commits the substrate: an
+intermediate can go on or return. At steady state the inverse rate
+constants add like resistances in series,
+
+    1/k_obs = Σ_n 1/k_n,   k_n = κ_n (k T / h) exp(−ΔG‡_n / RT)
+
+where ΔG‡_n is the free energy of transition structure n above the
+starting material (Paneth, J. Am. Chem. Soc. 1985, 107, 7070; Dale, Leach,
+Lloyd-Jones, J. Am. Chem. Soc. 2021, 143, 21079, eq 25). Hence
+
+    KIE = Σ_n w_n KIE_n,   w_n ∝ 1/k_n^L ∝ exp(+ΔG‡_n / RT) / κ_L,n
+
+- **KIE_n is an ordinary KIE**, from the starting material to transition
+  structure n, so the intermediates need no frequencies.
+- **The weights are those of the light isotopologue**, which is exact for
+  the same reason as for conformers.
+- **The highest transition structure counts most**: the opposite of a
+  conformer ensemble, where the lowest does.
+- **Two steps** give KIE = (KIE₂ + C_f · KIE₁)/(1 + C_f), with the
+  commitment factor C_f = k₂/k₋₁ = exp[(ΔG‡₁ − ΔG‡₂)/RT] (without
+  tunnelling). A large C_f gives KIE₁, a small one KIE₂.
+- **The free-energy gap no longer cancels.** The result depends directly on
+  ΔG‡₁ − ΔG‡₂, so Kinisot reports the range of the KIE when each step's
+  free energy moves by ±0.5 kcal/mol. C_f can also be given directly, for
+  example from trajectories, and `commitment_for()` gives the C_f that
+  reproduces a measured value.
+- **A step may be a conformer ensemble.** Its free energy is then its
+  effective one, G_lowest − RT ln Σ_j g_j κ_j exp(−ΔG_j / RT).
+
+For the Wittig reaction of Chen et al. (J. Am. Chem. Soc. 2014, 136, 13122),
+the carbonyl-carbon KIE is 1.043 through the C–C bond formation alone and
+1.015 through the P–O bond formation alone. The free energies (25.9 and
+26.0 kcal/mol) give C_f = 0.862 and 1.028; the trajectories (128 on, 76
+back) give C_f = 1.68 and 1.033, the measured value.
+
+### 7b. Parallel channels
+
+Parallel routes with their own reactants, transition structures or labels
+combine as
+
+    1/KIE = Σ_c y_c / KIE_c
+
+where y_c is channel c's share of the light isotopologue's rate. In the
+Rh-catalysed arylation of racemic 3-chlorocyclohexene (van Dijk et al.,
+Nat. Catal. 2021, 4, 284), the two enantiomers react through diastereomeric
+transition structures to one η³-allyl intermediate, so a product carbon
+comes from C-1 of one enantiomer and from C-3 of the other: each channel
+has its own label. For two channels with selectivity s = y₂/y₁,
+KIE = (1 + s) KIE₁ KIE₂ / (KIE₂ + s KIE₁) (Dale et al., eq S111), and
+`selectivity_for()` gives the s that reproduces a measured value.
+
+- **The shares** can be given (a measured selectivity is often better known
+  than a computed one), built from barriers, or computed. They are
+  y_c ∝ amount_c exp(−ΔG‡_eff,c / RT), with ΔG‡_eff the barrier between the
+  effective free energies of the channel's reactants and transition
+  structures (conformer sums and κ included), and amount_c the relative
+  amount of a reactant that does not interconvert with the others.
+- **With one reactant, channels are a conformer ensemble.** Computed shares
+  then give exactly the ensemble of the channels' transition structures.
+- **Equivalent positions are channels of equal share** with permuted
+  labels: the harmonic mean of section 7.
+- **Low conversion only.** Shares that drift as the faster reactant is
+  used up are left out.
 
 ## 8. Constants (CODATA 2018)
 

@@ -36,6 +36,34 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
     reproduces the prototype ensemble (`benchmarks/shi_epoxidation/ensemble`)
     to 2 × 10⁻⁶ at every site. Benchmark cases may list conformers per
     species.
+- Transition structures in series and parallel channels (Phase 10;
+  docs/theory.md, sections 7a and 7b).
+  - `compute_kie(rct, ts=Series([ts_1, ts_2, ...]), iso=...)` combines
+    steps none of which alone commits the substrate:
+    KIE = Σ w_n KIE_n with w_n ∝ exp(+G_n/RT)/κ_L,n. The weights come from a
+    commitment factor (two steps), the steps' free energies, or computed
+    free energies. The result gives each step's KIE and share, C_f, a
+    sensitivity range, `kie_at(C_f)` and `commitment_for(measured)`.
+  - `channels([dict(rct=..., ts=..., iso=...), ...])` combines parallel
+    routes with their own reactants, transition structures or labels:
+    1/KIE = Σ y_c/KIE_c. The shares are given (a measured selectivity),
+    built from barriers, or computed; `amounts` covers reactants that do not
+    interconvert, and `selectivity_for(measured)` inverts two channels.
+  - A step or a channel may be a conformer ensemble, and a channel may be a
+    series.
+  - `series_kie()` and `channel_kie()` apply the formulas to KIEs from
+    anywhere. They reproduce the Wittig predictions of Chen et al. (JACS
+    2014; 1.028 from the free energies, 1.033 from the trajectories) and
+    Figure 3d of van Dijk et al. (Nat. Catal. 2021; s = 3.3).
+  - Checks: the series formula matches the slowest eigenvalue of a
+    three-step rate matrix to 7 × 10⁻⁸, and channels computed from one
+    reactant reproduce the conformer ensemble of their transition
+    structures to 10⁻¹³.
+- `kinisot --job job.json`: a JSON job file with the structures, labels and
+  settings, for series, channels, conformer ensembles with free energies,
+  and several isotopologues in one run (docs/job_files.md). The results
+  file prints the steps or channels with their shares, and `--json` and
+  `--csv` carry an `isotopologue` key.
 - Five benchmark cases from the SI of the PyQuiverHS paper (Grazioli, Ly,
   Sabetnejad, Mattapalli, Nguyen and O'Leary, ChemRxiv 2026), included with
   the authors' agreement. Each has its Gaussian files, the PyQuiverHS input

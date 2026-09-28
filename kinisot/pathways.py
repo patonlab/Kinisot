@@ -698,11 +698,13 @@ def channels(
                 % (", ".join(k for k in CHANNEL_KEYS[3:]), ", ".join(sorted(job)))
             )
     if amounts is not None:
-        amounts = _normalized(amounts, len(jobs), "amounts") * len(jobs)
+        amounts = np.asarray(_as_list(amounts), dtype=float)
+        if len(amounts) != len(jobs):
+            raise KinisotInputError("%d channels but %d amounts" % (len(jobs), len(amounts)))
     else:
         amounts = np.array([float(job.get("amount", 1.0)) for job in jobs])
-        if (amounts <= 0).any():
-            raise KinisotInputError("amounts must be positive")
+    if (amounts <= 0).any():
+        raise KinisotInputError("amounts must be positive")
     if barriers is not None:
         barriers = np.asarray(_as_list(barriers), dtype=float) * _unit(energy_unit)
         if len(barriers) != len(jobs):
