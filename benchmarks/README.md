@@ -59,6 +59,14 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 - A species may be a list of files instead of one file: its conformers,
   weighted as `compute_kie` does (`weights`: `qrrho` by default, or `rrho`,
   `lowest`, `equal`).
+- Transition structures in series or parallel channels: `job` names a job
+  file in the case directory, in the format of `kinisot --job`
+  ([docs/job_files.md](../docs/job_files.md)), which holds the structures,
+  the labels and the settings. Each `kies` entry names its isotopologue
+  (`"isotopologue": "C3"`) instead of giving `iso`. The runner uses the
+  case's `temperature`, and `scale`, `tunneling` and `project`, when the
+  case states them, must agree with the job file's. The same file runs from
+  the command line, so a reader can reproduce the rows directly.
 - Optional: `imag_cutoff` (cm⁻¹, default 50) for a transition structure whose
   reaction-coordinate frequency is small, as in some conformational
   processes.
@@ -86,8 +94,8 @@ python benchmarks/run.py --json     # also benchmarks/report.json
 | tetramethylcyclohexane_eie | in repo (PyQuiverHS SI; B3LYP/6-311G(d)) | as quoted in their Table 8 (Anet et al., JACS 1980): EQE 1.042 ± 0.001 at 290.15 K (deviation 0.0003) |
 | nitroarene_phosphetane | in repo (ORCA 6.1.0 M06-2X/6-31G(d,p) at the SI geometries; external modes projected) | entered: Kang, Radosevich, Tetrahedron 2025, 186, 134892, Tables 1 and 2: 18O KIEs 1.033 ± 0.003 (one oxygen) and 1.066 ± 0.003 (both); transition structure TS2 (deviations +0.0016 and +0.0049 with Bell tunnelling) |
 | nitroarene_phosphetane_ts1b | in repo (the same jobs) | same measurements against the monotopic TS1B the paper rejects (`alternative_to`, left out of the overall mean): −0.0009 and −0.0007 |
-| wittig_anisaldehyde | needed (Gaussian inputs at the SI geometries in the case directory: anisaldehyde, ylide, two transition structures in series; M06-2X/6-31+G**/PCM) and Phase 10's series treatment | entered: Chen, Nieves-Quinones, Waas, Singleton, JACS 2014, 136, 13122, Figure 1 (three positions); Table 1's predictions in the notes |
-| dykat_allyl_arylation | needed (Gaussian inputs at the paper's geometries in the case directory: free 3, both reactant complexes, both anti-oxidative-addition transition structures) and Phase 10's channel treatment | entered: van Dijk et al., Nat. Catal. 2021, 4, 284, SI Table 4 (five allyl positions); the paper's combined predictions in the notes |
+| wittig_anisaldehyde | partly in repo (Gaussian 16 M06-2X/6-31+G**/PCM jobs for anisaldehyde, the ylide and 4-TS, which reproduce SI Table S4; the 6-TS job is still to be run, and then a `series` job file computes the case) | entered: Chen, Nieves-Quinones, Waas, Singleton, JACS 2014, 136, 13122, Figure 1 (three positions); Table 1's predictions in the notes |
+| dykat_allyl_arylation | in repo (Gaussian 16 ωB97X-D/6-31G(d), LANL2DZ(f) jobs at the paper's geometries; two channels in `channels.json`, which reproduce SI Tables 24 and 25 and Figure 3d; the free-3 job with spherical d functions is still to be run) | entered: van Dijk et al., Nat. Catal. 2021, 4, 284, SI Table 4 (five allyl positions; mean absolute deviation 0.0030) |
 
 The five cases from the PyQuiverHS SI also keep PyQuiverHS's input and its
 outputs for the same files (`pyquiverhs/`), from 10 to 1000 K;

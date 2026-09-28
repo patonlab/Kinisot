@@ -72,6 +72,19 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   and several isotopologues in one run (docs/job_files.md). The results
   file prints the steps or channels with their shares, and `--json` and
   `--csv` carry an `isotopologue` key.
+- The benchmark runner computes a case from a job file (`"job"` in
+  case.json, the format of `kinisot --job`), so transition structures in
+  series and parallel channels enter the report. Each `kies` entry names its
+  isotopologue in the job file.
+- The DYKAT case (`benchmarks/dykat_allyl_arylation`) is computed from
+  Gaussian 16 frequency jobs at the paper's geometries, as two channels in
+  `channels.json`. The transition structures and free 3 reproduce SI Table
+  20 to the printed digits. The per-enantiomer KIEs reproduce SI Tables 24
+  and 25, and the combined KIEs Figure 3d, within 6 × 10⁻⁴
+  (`tests/test_dykat.py`), with unscaled frequencies as in the paper. The
+  five combined ¹³C KIEs lie within 1.1 standard errors of experiment (mean
+  absolute deviation 0.0030). The overall mean absolute deviation of the
+  benchmarks moves from 0.0058 (34 positions) to 0.0055 (39).
 - The results file names every labelled atom in each file, with its
   element and isotope: `Labelled atoms: claisen_gs C1 -> 13C; claisen_ts
   C1 -> 13C`, and a `Reference atoms` line with `--reference`. Ensembles,
