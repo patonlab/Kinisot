@@ -96,6 +96,10 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   five combined ¹³C KIEs lie within 1.1 standard errors of experiment (mean
   absolute deviation 0.0030). The overall mean absolute deviation of the
   benchmarks moves from 0.0058 (34 positions) to 0.0055 (39).
+  `dykat_allyl_arylation_free3` computes the same channels from free 3,
+  which adds the equilibrium isotope effect of binding to Rh (1.008–1.012
+  at the alkene carbons). It misses the central carbon by 0.011 and is left
+  out of the overall mean.
 - The results file names every labelled atom in each file, with its
   element and isotope: `Labelled atoms: claisen_gs C1 -> 13C; claisen_ts
   C1 -> 13C`, and a `Reference atoms` line with `--reference`. Ensembles,

@@ -43,6 +43,33 @@ the differences.
   `Labelled atoms` lines of the output show the substrate position it
   comes from in each.
 
+## From free 3 instead of the reactant complex
+
+In an intermolecular competition, free 3 is the reactant in the flask. If
+its binding to Rh were a fast equilibrium ahead of oxidative addition, the
+measured KIE would include the equilibrium isotope effect of that binding.
+`channels_free3.json` computes the same channels from free 3:
+
+| Product carbon | From the complex (paper) | From free 3 | Binding EIE, (R)-3 / (S)-3 | Measured |
+| --- | --- | --- | --- | --- |
+| C1 | 1.0055 | 1.0147 | 1.0000 / 1.0118 | 1.0097 ± 0.0044 |
+| C2 | 0.9955 | 1.0060 | 1.0077 / 1.0114 | 0.9952 ± 0.0016 |
+| C3 | 1.0264 | 1.0292 | 1.0105 / 1.0004 | 1.0244 ± 0.0027 |
+| C4 | 1.0053 | 1.0041 | 0.9996 / 0.9987 | 1.0084 ± 0.0040 |
+| C6 | 1.0035 | 1.0038 | 0.9987 / 1.0008 | 0.9983 ± 0.0048 |
+
+- **The binding EIE** (free 3 → complex, per substrate position) is 1.008
+  to 1.012 at the alkene carbons that bind to Rh, and near 1 elsewhere.
+- **The measurement does not show it.** From free 3, C2 is 1.0060 against
+  the measured 0.9952 ± 0.0016, and the mean absolute deviation doubles
+  (0.0061 against 0.0030). The paper's model, from the complex, is the one
+  the data support.
+- **The d functions do not matter here.** Free 3 with Cartesian d functions
+  (`allyl_chloride_3.log`) gives the same KIEs within 1 × 10⁻⁴.
+
+The benchmark report lists this as `dykat_allyl_arylation_free3`, an
+alternative left out of the overall mean.
+
 ## Jobs
 
 Gaussian frequency jobs at the paper's geometries (Supplementary Data 1),
@@ -65,18 +92,20 @@ Each title line carries these values. The Gaussian 16 C.01 jobs (the
 | Job | E (hartree) | ZPE | Imaginary mode |
 | --- | --- | --- | --- |
 | `allyl_chloride_3.log` | −694.160144 | 0.139852 | none |
+| `allyl_chloride_3_5d.log` | −694.154046 | 0.139856 | none |
 | `r3_reactant_complex.log` | −3910.736867 | 1.104806 | none |
 | `s3_reactant_complex.log` | −3910.739041 | 1.105368 | none |
 | `r3_anti_oa_ts.log` | −3910.712464 | 1.105016 | 176i |
 | `s3_anti_oa_ts.log` | −3910.702421 | 1.104971 | 183i |
 
 Free 3 and both transition structures reproduce Table 20 to the last
-printed digit, which
-settles the (R)/(S) labels and the d functions below. The reactant
-complexes are 2 × 10⁻⁵ hartree off, with residual forces of 10⁻³
-hartree/bohr, because the SI prints their coordinates to three decimals
-(the transition structures have five). The job for `allyl_chloride_3_5d.gjf`
-is still to be run.
+printed digit, which settles the (R)/(S) labels and the d functions below.
+The reactant complexes are 2 × 10⁻⁵ hartree off, with residual forces of
+10⁻³ hartree/bohr, because the SI prints their coordinates to three
+decimals (the transition structures have five). The spherical-d job for
+free 3 has no SI value. It lies 6 millihartree above the Cartesian one, as
+a different basis should, with residual forces of 4 × 10⁻⁴ because the
+geometry was optimized with Cartesian d functions.
 
 - **Basis functions.** The four Rh inputs give 6-31G(d) through general
   basis input (`genecp`) without `5D` or `6D`, so Gaussian uses its default
@@ -84,9 +113,6 @@ is still to be run.
   rather than 1179). The `6-31G(d)` keyword alone uses Cartesian ones, as
   in `allyl_chloride_3.gjf`. Both reproduce Table 20, so the paper mixed
   the two conventions.
-- **Free 3.** A KIE from free 3 needs the same functions as the transition
-  structures, so it needs the spherical-d job, `allyl_chloride_3_5d.gjf`.
-  The paper computed each channel from the reactant complex. For an
-  intermolecular KIE measured on the product, the reactant in the flask is
-  free 3, and the difference between the two is the equilibrium isotope
-  effect of binding.
+- **Free 3.** For KIEs from free 3 with the same functions as the
+  transition structures, `allyl_chloride_3_5d.gjf` repeats the job with
+  spherical d functions. It turned out not to matter (see above).

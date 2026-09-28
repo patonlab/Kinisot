@@ -1,0 +1,64 @@
+{
+  "name": "Rh-catalysed arylation of racemic 3-chlorocyclohexene (DYKAT): the two channels computed from free 3",
+  "reference": [
+    {
+      "citation": "L. van Dijk, R. Ardkhean, M. Sidera, S. Karabiyikoglu, O. Sari, T. D. W. Claridge, G. C. Lloyd-Jones, R. S. Paton, S. P. Fletcher, Nat. Catal. 2021, 4, 284-292",
+      "doi": "10.1038/s41929-021-00589-y",
+      "method": "13C KIEs at natural abundance by quantitative 13C NMR of product 4 (3-phenylcyclohexene) from three reactions at 40 C in THF stopped at 10, 11 and 17% conversion, against fully converted product; relative to C5; averages and standard errors from Supplementary Table 4 (Figure 3a prints them to three decimals). Computed KIEs (Kinisot, 313.15 K, Bell) for the anti-oxidative addition of each enantiomer from Supplementary Tables 24 and 25; structures from Supplementary Data 1"
+    },
+    {
+      "citation": "H. J. A. Dale, A. G. Leach, G. C. Lloyd-Jones, J. Am. Chem. Soc. 2021, 143, 21079-21099 (Case Study IV; SI eqs S103-S112)",
+      "doi": "10.1021/jacs.1c07351",
+      "method": "the same data as an example of two channels converging on one product"
+    }
+  ],
+  "alternative_to": "dykat_allyl_arylation",
+  "notes": "The channels of dykat_allyl_arylation computed from free 3 (pseudo-axial, with spherical d functions like the Rh jobs) instead of from each Rh-bound reactant complex, as the paper computes them. For an intermolecular competition on the product, free 3 is the reactant in the flask when its binding to Rh is a fast equilibrium, and the KIE then includes the equilibrium isotope effect of binding: 1.008-1.012 at the alkene carbons that bind Rh, near 1 elsewhere. That puts the central carbon C2 at 1.0060 against the measured 0.9952 +/- 0.0016, and the mean absolute deviation doubles (0.0061 against 0.0030). The measured KIEs do not show the binding isotope effect. The d-function convention does not matter here: free 3 with Cartesian d functions (allyl_chloride_3.log) gives the same KIEs within 1e-4. Left out of the overall mean absolute deviation.",
+  "temperature": 313.15,
+  "scale": 1.0,
+  "level_of_theory": "wB97X-D/6-31G(d), LANL2DZ(f) on Rh (Gaussian 16 C.01 frequency jobs at the SI geometries; unscaled, as in the paper)",
+  "tunneling": "bell",
+  "project": false,
+  "job": "../dykat_allyl_arylation/channels_free3.json",
+  "reactants": null,
+  "transition_structure": null,
+  "product": null,
+  "reference_isotopologue": null,
+  "kies": [
+    {
+      "position": "C1 (bears Ph)",
+      "isotopologue": "C1",
+      "experimental": 1.0097,
+      "uncertainty": 0.0044,
+      "note": "Fig. 3d 1.006 (s = 3.3)"
+    },
+    {
+      "position": "C2",
+      "isotopologue": "C2",
+      "experimental": 0.9952,
+      "uncertainty": 0.0016,
+      "note": "Fig. 3d 0.995"
+    },
+    {
+      "position": "C3",
+      "isotopologue": "C3",
+      "experimental": 1.0244,
+      "uncertainty": 0.0027,
+      "note": "Fig. 3d 1.027"
+    },
+    {
+      "position": "C4",
+      "isotopologue": "C4",
+      "experimental": 1.0084,
+      "uncertainty": 0.004,
+      "note": "Fig. 3d 1.005"
+    },
+    {
+      "position": "C6",
+      "isotopologue": "C6",
+      "experimental": 0.9983,
+      "uncertainty": 0.0048,
+      "note": "Fig. 3d 1.003"
+    }
+  ]
+}
