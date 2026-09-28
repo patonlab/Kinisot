@@ -38,8 +38,9 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 - Benchmark case `dykat_allyl_arylation` holds the ¹³C KIEs of van Dijk et
   al. (Nat. Catal. 2021, 4, 284) for the Rh-catalysed arylation of racemic
   3-chlorocyclohexene. Both enantiomers react, through different
-  transition structures, and converge on one product. The case includes the
-  paper's coordinates for the five structures involved. The Phase 10
+  transition structures, and converge on one product. The case includes
+  Gaussian frequency inputs at the paper's geometries for the five
+  structures involved. The Phase 10
   channel formula reproduces the paper's combined KIEs from its
   per-enantiomer values.
 - IMPLEMENTATION_PLAN.md, Phase 10: transition structures in series

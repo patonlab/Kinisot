@@ -750,7 +750,8 @@ dependency.
       `benchmarks/dykat_allyl_arylation`). This is a real 23:77 split
       (s = 3.3), which Shi cannot provide. The measured KIEs (SI Table 4),
       the per-enantiomer KIEs (SI Tables 24 and 25, computed with Kinisot)
-      and the coordinates are in hand; the frequency jobs are not.
+      and Gaussian inputs at the paper's geometries are in hand; the
+      frequency jobs are still to be run.
       - The channel formula with s = 3.3 reproduces the paper's combined
         KIEs (Figure 3d) to within the rounding of its inputs, for example
         1.0266 at C3 against 1.027.
