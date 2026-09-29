@@ -4,6 +4,8 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-09-29
+
 ### Added
 
 - Conformer ensembles (IMPLEMENTATION_PLAN.md, Phase 10). A species given
