@@ -272,12 +272,12 @@ def test_aimnet2_calculator_uses_aimnet_or_the_old_aimnet2calc(monkeypatch):
 
     aimnet2ase = types.ModuleType("aimnet.calculators.aimnet2ase")
     aimnet2ase.AIMNet2ASE = AIMNet2ASE
-    for name, module in (
-        ("aimnet", types.ModuleType("aimnet")),
-        ("aimnet.calculators", types.ModuleType("aimnet.calculators")),
-        ("aimnet.calculators.aimnet2ase", aimnet2ase),
-    ):
+    packages = types.ModuleType("aimnet"), types.ModuleType("aimnet.calculators")
+    for package in packages:
+        package.__path__ = []
+    for name, module in (("aimnet", packages[0]), ("aimnet.calculators", packages[1])):
         monkeypatch.setitem(sys.modules, name, module)
+    monkeypatch.setitem(sys.modules, "aimnet.calculators.aimnet2ase", aimnet2ase)
     assert build_calculator("aimnet2").base_calc == "aimnet2"
     assert build_calculator("aimnet2:aimnet2-rxn").base_calc == "aimnet2-rxn"
     with pytest.raises(KinisotInputError, match="cannot load the AIMNet2 model missing"):
@@ -290,6 +290,47 @@ def test_aimnet2_calculator_uses_aimnet_or_the_old_aimnet2calc(monkeypatch):
     assert build_calculator("aimnet2:aimnet2-rxn").base_calc == "aimnet2-rxn"
     monkeypatch.setitem(sys.modules, "aimnet2calc", None)
     with pytest.raises(KinisotInputError, match="install aimnet"):
+        build_calculator("aimnet2")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        ModuleNotFoundError("No module named 'torch_cluster'", name="torch_cluster"),
+        ImportError("cannot import name 'segment_coo' from 'torch_scatter'", name="torch_scatter"),
+    ],
+)
+def test_aimnet2_calculator_reports_a_broken_aimnet(monkeypatch, error):
+    # aimnet installed but failing to import (a missing or incompatible dependency) must be reported as such,
+    # not hidden by falling back to aimnet2calc, even when aimnet2calc is installed too
+    import importlib.abc
+    import importlib.util
+    import sys
+    import types
+
+    class BrokenAimnet(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+        def find_spec(self, fullname, path=None, target=None):
+            if fullname == "aimnet.calculators.aimnet2ase":
+                return importlib.util.spec_from_loader(fullname, self)
+            return None
+
+        def create_module(self, spec):
+            return None
+
+        def exec_module(self, module):
+            raise error
+
+    packages = types.ModuleType("aimnet"), types.ModuleType("aimnet.calculators")
+    for package in packages:
+        package.__path__ = []
+    for name, module in (("aimnet", packages[0]), ("aimnet.calculators", packages[1])):
+        monkeypatch.setitem(sys.modules, name, module)
+    monkeypatch.delitem(sys.modules, "aimnet.calculators.aimnet2ase", raising=False)
+    monkeypatch.setattr(sys, "meta_path", [BrokenAimnet()] + sys.meta_path)
+    old = types.ModuleType("aimnet2calc")
+    old.AIMNet2ASE = lambda model: model
+    monkeypatch.setitem(sys.modules, "aimnet2calc", old)
+    with pytest.raises(KinisotInputError, match="aimnet is installed but cannot be imported .*torch_"):
         build_calculator("aimnet2")
 
 

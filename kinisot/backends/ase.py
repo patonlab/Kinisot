@@ -183,6 +183,9 @@ def sevennet_calculator(model="7net-0", modal=None, device="auto"):
         raise KinisotInputError("--calc sevennet:%s: %s%s" % (model, err, hint)) from None
 
 
+_AIMNET_MODULES = ("aimnet", "aimnet.calculators", "aimnet.calculators.aimnet2ase")
+
+
 def aimnet2_calculator(model="aimnet2"):
     """AIMNet2 calculator for ``--calc aimnet2[:model]``; ``model`` is a name from aimnet's model
     registry (``aimnet2``, the wB97M-D3 model; ``aimnet2-rxn``, the model for reactive chemistry; ...)
@@ -193,7 +196,12 @@ def aimnet2_calculator(model="aimnet2"):
     """
     try:
         from aimnet.calculators.aimnet2ase import AIMNet2ASE
-    except ImportError:
+    except ImportError as err:
+        # fall back to aimnet2calc only when aimnet itself is absent, not when aimnet fails to import
+        if not (isinstance(err, ModuleNotFoundError) and err.name in _AIMNET_MODULES):
+            raise KinisotInputError(
+                "aimnet is installed but cannot be imported for --calc aimnet2 (%s: %s)" % (type(err).__name__, err)
+            ) from None
         try:
             from aimnet2calc import AIMNet2ASE
         except ImportError as err:
