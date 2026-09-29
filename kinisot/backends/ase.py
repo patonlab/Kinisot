@@ -99,7 +99,7 @@ def uma_calculator(model="uma-s-1p1", task="omol", precision="float64", device="
     or the path of a checkpoint file already downloaded.
 
     ``task`` selects UMA's head: ``omol`` for molecules, which reads the charge and spin multiplicity
-    from ``atoms.info`` (0 and 1 when absent). Hessians by finite differences need double precision,
+    from ``atoms.info`` (set to 0 and 1 when absent). Hessians by finite differences need double precision,
     and ``torch.compile`` gains nothing for one small molecule on a CPU, so neither default is kept.
     The checkpoints are gated on Hugging Face: accept the licence at https://huggingface.co/facebook/UMA
     and set HF_TOKEN.
@@ -130,7 +130,17 @@ def uma_calculator(model="uma-s-1p1", task="omol", precision="float64", device="
             "https://huggingface.co/facebook/UMA, set HF_TOKEN, and allow huggingface.co"
             % (model, type(err).__name__, err)
         ) from None
-    return FAIRChemCalculator(predictor, task_name=task)
+
+    class UMACalculator(FAIRChemCalculator):
+        """Sets the omol head's charge and spin (a neutral singlet) unless the atoms carry them."""
+
+        def calculate(self, atoms=None, *args, **kwargs):
+            if atoms is not None and task == "omol":
+                atoms.info.setdefault("charge", 0)
+                atoms.info.setdefault("spin", 1)
+            return super().calculate(atoms, *args, **kwargs)
+
+    return UMACalculator(predictor, task_name=task)
 
 
 def build_calculator(spec):
