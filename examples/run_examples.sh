@@ -64,6 +64,12 @@ cd "$HERE/../tests/data/xtb"
 for atoms in 1 4 6 7,8; do
     run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso "$atoms" -t 393
 done
+# And with Meta's UMA potential (uma-s-1p1, omol head, float64; tests/data/uma, made by
+# scripts/make_claisen_structures.py --calc uma), the first machine-learned potential to find the concerted transition structure.
+cd "$HERE/../tests/data/uma"
+for atoms in 1 4 6 7,8; do
+    run mlip_claisen --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso "$atoms" -t 393
+done
 cd "$DATA"
 
 # Conformer ensembles (examples/conformers, made by scripts/make_conformer_example.py): GFN2-xTB Hessians of eight

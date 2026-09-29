@@ -66,6 +66,23 @@ The KIEs are relative to C5, so they are computed relative to C5 (footnote 30 of
 
 Mean absolute deviation over 5 measured positions: 0.0009
 
+## Claisen rearrangement of allyl vinyl ether (UMA-s-1p1)
+
+M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874 (doi:[10.1021/ja992372h](https://doi.org/10.1021/ja992372h)); 13C and 17O KIEs by NMR at natural abundance, 120 C, two reactions taken to 86.5(8)% and 86.7(1.1)% completion; values and standard deviations from Table 4, relative to C5 (1.0 assumed). Computed at UMA-s-1p1, omol head, float64 (fairchem-core 2.23; geometries and Hessians from scripts/make_claisen_structures.py --calc uma), 393.0 K, scale none, tunnelling bell, relative to isotopologue 5.
+
+The KIEs are relative to C5, so they are computed relative to C5 (footnote 30 of the paper: the assumption of a negligible C5 KIE is doubtful, so predictions are normalized to it). Each position lists the two experiments; the deviation is taken from their mean. The paper's own B3LYP/6-31G* predictions (Table 4, also relative to C5) are given in the notes column. No 2H KIEs were measured for allyl vinyl ether in this work; the literature values in Table 2 are for C4-d2 and C6-d2 at 100 and 160 C, so the H7,H8 row has no experimental value.
+
+| Position | Semiclassical | With tunnelling | Experimental | Deviation | Note |
+| --- | --- | --- | --- | --- | --- |
+| C1 | 1.0096 | 1.0133 | 1.014 ± 0.002, 1.013 ± 0.001 | -0.0002 | bond-forming carbon; paper's B3LYP/6-31G* prediction 1.012 |
+| C2 | 0.9991 | 0.9992 | 1.000 ± 0.002, 1.001 ± 0.001 | -0.0013 | paper's B3LYP/6-31G* prediction 0.999 |
+| O3 (17O) | 1.0157 | 1.0187 | 1.017 ± 0.005, 1.021 ± 0.005 | -0.0003 | 17O measured by NMR; paper's B3LYP/6-31G* prediction 1.017 |
+| C4 | 1.0268 | 1.0322 | 1.035 ± 0.002, 1.033 ± 0.002 | -0.0018 | bond-breaking carbon; paper's B3LYP/6-31G* prediction 1.029 |
+| C6 | 1.0128 | 1.0166 | 1.015 ± 0.001, 1.015 ± 0.001 | +0.0016 | bond-forming carbon; paper's B3LYP/6-31G* prediction 1.014 |
+| H7,H8 (2H2) | 0.9632 | 0.9647 | no experimental value |  | secondary 2H KIE |
+
+Mean absolute deviation over 5 measured positions: 0.0011
+
 ## Claisen rearrangement of allyl vinyl ether (GFN2-xTB)
 
 M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874 (doi:[10.1021/ja992372h](https://doi.org/10.1021/ja992372h)); 13C and 17O KIEs by NMR at natural abundance, 120 C, two reactions taken to 86.5(8)% and 86.7(1.1)% completion; values and standard deviations from Table 4, relative to C5 (1.0 assumed). Computed at GFN2-xTB (geometries and Hessians from scripts/make_claisen_structures.py --calc xtb), 393.0 K, scale none, tunnelling bell, relative to isotopologue 5.
@@ -264,4 +281,4 @@ Mean absolute deviation over 3 measured positions: 0.0035
 
 An alternative to `wittig_anisaldehyde`, left out of the overall mean.
 
-Overall mean absolute deviation over 42 measured positions: 0.0051
+Overall mean absolute deviation over 47 measured positions: 0.0047

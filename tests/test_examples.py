@@ -32,7 +32,7 @@ def example_commands():
     for line in script.splitlines():
         line = line.strip()
         if line.startswith("cd "):
-            directory = next((d for d in ("orca", "xtb", "ase", "conformers") if "/" + d in line), "gaussian")
+            directory = next((d for d in ("orca", "xtb", "uma", "ase", "conformers") if "/" + d in line), "gaussian")
         elif line.startswith("for atoms in "):
             loop_values = line[len("for atoms in ") :].split(";")[0].split()
         elif line == "done":
@@ -48,9 +48,10 @@ COMMANDS = example_commands()
 
 
 def test_all_example_commands_found():
-    assert len(COMMANDS) == 35
+    assert len(COMMANDS) == 39
     assert sum(1 for case, _, _ in COMMANDS if case == "claisen") == 12
     assert sum(1 for _, directory, _ in COMMANDS if directory == "xtb") == 4
+    assert sum(1 for _, directory, _ in COMMANDS if directory == "uma") == 4
     assert sum(1 for _, directory, _ in COMMANDS if directory == "conformers") == 3
 
 
