@@ -641,8 +641,9 @@ def build_parser():
         dest="calc",
         metavar="SPEC",
         help="compute the Hessian of geometry inputs (xyz, extxyz, ... anything ASE reads) with this ASE calculator: "
-        "emt, mace_mp[:model], mace_off[:model], mace_omol, orb, sevennet, aimnet2, or module.path:callable. The "
-        "Hessian is cached next to the geometry as <name>.hessian.json (needs pip install kinisot[ase])",
+        "emt, xtb[:method], mace_mp[:model], mace_off[:model], mace_omol, orb[:model], uma[:model], "
+        "sevennet[:model[:task]], aimnet2[:model], or module.path:callable. The Hessian is cached next to the "
+        "geometry as <name>.hessian.json (needs pip install kinisot[ase])",
     )
     parser.add_argument(
         "--delta",

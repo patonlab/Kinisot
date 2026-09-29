@@ -350,7 +350,19 @@ imaginary mode) and refuses these. No MACE KIEs are reported; the
 diagnostics are in the example. UMA (`uma-s-1p1`, `--calc uma`, added
 2026-09-29) passes the checks, and its KIEs match experiment with a mean
 absolute deviation of 0.0011 (B3LYP 0.0009; `benchmarks/claisen_uma`).
-`mace_omol`, `orb`, `sevennet` and `aimnet2` have not been tried.
+**Update 2026-09-29 (other potentials):** MACE-OMOL-0, SevenNet-Omni
+(`sevennet:7net-omni:omol25_low`, new task syntax), AIMNet2 and
+AIMNet2-rxn (`--calc aimnet2` now uses the `aimnet` package), and the ORB
+OMol models (`orb-v3-conservative-omol`, `orbmol-v2`; `--calc orb` now sets
+their charge and spin) all find the concerted transition structure.
+MACE-OMOL-0 and SevenNet-Omni match experiment as well as UMA (mean
+absolute deviations 0.0009 and 0.0010). AIMNet2 and the ORB models miss by
+about 0.003 and AIMNet2-rxn by 0.0044. The ORB energies are not
+rotation-invariant (up to 24 meV over orientations), which makes their
+Hessians orientation-dependent (water EQE off by up to 9 × 10⁻⁴). Their
+transition structures are also 4–5% too soft, giving normal KIEs at C5
+and at the C1 hydrogens. Structures in `tests/data/mlip_claisen/`, details
+in `examples/mlip_claisen`.
 
 Design in REVIEW §6; prototypes verified 2026-09-25 (unit conversion to
 1.6e-6 cm⁻¹, `with_new_masses` isotopologues, EMT finite-difference failure

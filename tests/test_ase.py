@@ -184,6 +184,115 @@ def test_orb_calculator_wraps_the_model(monkeypatch, returns_adapter):
         build_calculator("orb:orb-v9")
 
 
+def test_orb_molecule_models_get_a_neutral_singlet(monkeypatch):
+    # OrbMol and orb-v3-*-omol refuse atoms without info["charge"] and info["spin"] (the multiplicity) and
+    # assert that both are Python numbers, which the numpy integers read back from extended XYZ are not
+    import sys
+    import types
+
+    from ase.build import molecule
+
+    seen = []
+
+    class ORBCalculator:
+        def __init__(self, network, atoms_adapter=None):
+            self.expects_charge_and_spin = network == "omol"
+
+        def calculate(self, atoms=None, properties=None, system_changes=None):
+            seen.append({k: v for k, v in atoms.info.items() if k in ("charge", "spin")})
+
+    def loader(name):
+        return lambda precision: name
+
+    models = {name: loader(name) for name in ("omol", "omat")}
+    forcefield = types.ModuleType("orb_models.forcefield")
+    forcefield.pretrained = types.SimpleNamespace(ORB_PRETRAINED_MODELS=models)
+    calculator = types.ModuleType("orb_models.forcefield.calculator")
+    calculator.ORBCalculator = ORBCalculator
+    for name, module in (
+        ("orb_models", types.ModuleType("orb_models")),
+        ("orb_models.forcefield", forcefield),
+        ("orb_models.forcefield.pretrained", forcefield.pretrained),
+        ("orb_models.forcefield.calculator", calculator),
+        ("orb_models.forcefield.inference", None),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+
+    omol, omat = build_calculator("orb:omol"), build_calculator("orb:omat")
+    water = molecule("H2O")
+    omol.calculate(water)
+    read_back = molecule("H2O")
+    read_back.info.update(charge=np.int64(0), spin=np.int64(3))
+    omol.calculate(read_back)
+    omat.calculate(molecule("H2O"))
+    assert seen == [{"charge": 0, "spin": 1}, {"charge": 0, "spin": 3}, {}]
+    assert all(type(v) is int for info in seen for v in info.values())
+
+
+def test_sevennet_calculator_takes_the_task_after_the_model(monkeypatch, tmp_path):
+    # multi-task models (7net-omni) need the task ("modal"): --calc sevennet:7net-omni:omol25_low
+    import sys
+    import types
+
+    class SevenNetCalculator:
+        def __init__(self, model="7net-0", modal=None, device="auto"):
+            if model == "7net-omni" and modal not in ("omol25_low", "mpa"):
+                raise ValueError("modal argument missing (avail: ['mpa', 'omol25_low'])")
+            if model == "7net-9":
+                raise ValueError("unknown pretrained model")
+            self.model, self.modal, self.device = model, modal, device
+
+    module = types.ModuleType("sevenn.calculator")
+    module.SevenNetCalculator = SevenNetCalculator
+    monkeypatch.setitem(sys.modules, "sevenn", types.ModuleType("sevenn"))
+    monkeypatch.setitem(sys.modules, "sevenn.calculator", module)
+
+    calc = build_calculator("sevennet")
+    assert (calc.model, calc.modal, calc.device) == ("7net-0", None, "auto")
+    calc = build_calculator("sevennet:7net-omni:omol25_low")
+    assert (calc.model, calc.modal) == ("7net-omni", "omol25_low")
+    with pytest.raises(KinisotInputError, match="sevennet:7net-omni:TASK"):
+        build_calculator("sevennet:7net-omni")
+    with pytest.raises(KinisotInputError, match="unknown pretrained model$"):  # no task hint for other errors
+        build_calculator("sevennet:7net-9")
+    checkpoint = tmp_path / "fine:tuned.pth"  # a checkpoint file is never split at a colon
+    checkpoint.write_bytes(b"")
+    assert build_calculator("sevennet:%s" % checkpoint).model == str(checkpoint)
+
+
+def test_aimnet2_calculator_uses_aimnet_or_the_old_aimnet2calc(monkeypatch):
+    import sys
+    import types
+
+    class AIMNet2ASE:
+        def __init__(self, base_calc="aimnet2", charge=0, mult=1):
+            if base_calc == "missing":
+                raise KeyError(base_calc)
+            self.base_calc = base_calc
+
+    aimnet2ase = types.ModuleType("aimnet.calculators.aimnet2ase")
+    aimnet2ase.AIMNet2ASE = AIMNet2ASE
+    for name, module in (
+        ("aimnet", types.ModuleType("aimnet")),
+        ("aimnet.calculators", types.ModuleType("aimnet.calculators")),
+        ("aimnet.calculators.aimnet2ase", aimnet2ase),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+    assert build_calculator("aimnet2").base_calc == "aimnet2"
+    assert build_calculator("aimnet2:aimnet2-rxn").base_calc == "aimnet2-rxn"
+    with pytest.raises(KinisotInputError, match="cannot load the AIMNet2 model missing"):
+        build_calculator("aimnet2:missing")
+
+    monkeypatch.setitem(sys.modules, "aimnet.calculators.aimnet2ase", None)  # an install from before aimnet
+    old = types.ModuleType("aimnet2calc")
+    old.AIMNet2ASE = AIMNet2ASE
+    monkeypatch.setitem(sys.modules, "aimnet2calc", old)
+    assert build_calculator("aimnet2:aimnet2-rxn").base_calc == "aimnet2-rxn"
+    monkeypatch.setitem(sys.modules, "aimnet2calc", None)
+    with pytest.raises(KinisotInputError, match="install aimnet"):
+        build_calculator("aimnet2")
+
+
 def test_uma_calculator_loads_a_double_precision_model(monkeypatch, tmp_path):
     # --calc uma must ask fairchem for float64 without torch.compile, use the omol (molecule) head, and turn
     # a failed download of the gated checkpoint into an input error. Fake modules stand in for fairchem and torch.
@@ -337,3 +446,42 @@ def test_claisen_structure_checks():
     problems = check(mace_ts, saddle=True)
     assert len(problems) == 2 and "breaking C4-O3 is 1.46 A" in problems[0]
     assert "dominated by C1-C6 (0.63), C2-C6 (0.37)" in problems[1]
+
+
+# Structures and Hessians from scripts/make_claisen_structures.py for the potentials whose saddle point is the
+# concerted Claisen transition structure (examples/mlip_claisen): directory, imaginary mode (cm-1), mean absolute
+# deviation from the five measured KIEs relative to C5, and the absolute 2H2 KIE at C1
+MLIP_CLAISEN = {
+    "uma": (611.2, 0.0011, 0.9688),
+    "mlip_claisen/mace_omol": (639.6, 0.0009, 1.0025),
+    "mlip_claisen/sevennet_omni": (651.7, 0.0010, 0.9499),
+    "mlip_claisen/aimnet2": (440.4, 0.0029, 0.8463),
+    "mlip_claisen/orb_v3_omol": (652.6, 0.0030, 1.1646),
+    "mlip_claisen/orbmol_v2": (648.9, 0.0031, 1.1241),
+    "mlip_claisen/aimnet2_rxn": (574.8, 0.0044, 0.9924),
+}
+
+
+@pytest.mark.parametrize("directory", sorted(MLIP_CLAISEN))
+def test_committed_mlip_claisen_structures(directory):
+    import importlib.util
+    import json
+
+    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    spec = importlib.util.spec_from_file_location(
+        "make_claisen_structures", os.path.join(root, "scripts", "make_claisen_structures.py")
+    )
+    script = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(script)
+    with open(os.path.join(root, "benchmarks", "claisen_uma", "case.json")) as handle:
+        measured = [(k["iso"], np.mean(k["experimental"])) for k in json.load(handle)["kies"] if k["experimental"]]
+
+    imaginary, deviation, deuterium = MLIP_CLAISEN[directory]
+    gs, ts = (load_hessian(datapath("%s/claisen_%s.hessian.json" % (directory, name))) for name in ("gs", "ts"))
+    assert script.check_structure(gs, saddle=False) == [] and script.check_structure(ts, saddle=True) == []
+    r = compute_kie(rct=gs, ts=ts, iso="7,8", temperature=393.0)
+    assert r.warnings == () and r.other.light.imaginary == pytest.approx(imaginary, abs=0.1)
+    assert r.kie_tunnel == pytest.approx(deuterium, abs=1e-4)
+    relative = [compute_kie(rct=gs, ts=ts, iso=iso, reference="5", temperature=393.0).kie_tunnel_relative
+                for iso, _ in measured]  # fmt: skip
+    assert np.mean([abs(k - m) for k, (_, m) in zip(relative, measured)]) == pytest.approx(deviation, abs=5e-5)

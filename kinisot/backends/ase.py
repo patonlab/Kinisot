@@ -53,8 +53,8 @@ CALCULATORS = {
     "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch", "model"),
     "orb": ("kinisot.backends.ase", "orb_calculator", {}, "orb-models", "model"),
     "uma": ("kinisot.backends.ase", "uma_calculator", {}, "fairchem-core", "model"),
-    "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn", "model"),
-    "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc", "model"),
+    "sevennet": ("kinisot.backends.ase", "sevennet_calculator", {}, "sevenn", "model"),
+    "aimnet2": ("kinisot.backends.ase", "aimnet2_calculator", {}, "aimnet", "model"),
 }
 
 
@@ -68,11 +68,23 @@ def _require_ase():
         ) from None
 
 
+def _set_charge_and_spin(atoms):
+    """Default ``atoms.info`` charge and spin multiplicity to a neutral singlet, as Python numbers.
+
+    Geometries read back from extended XYZ carry them as numpy integers, which orb-models rejects.
+    """
+    for key, default in (("charge", 0), ("spin", 1)):
+        value = atoms.info.get(key, default)
+        atoms.info[key] = value.item() if isinstance(value, np.generic) else value
+
+
 def orb_calculator(model="orb-v3-conservative-inf-omat", precision="float64"):
     """ORB calculator for ``--calc orb[:model]``; ``model`` is a key of ORB_PRETRAINED_MODELS.
 
     orb-models' loaders return the network (0.5) or the network and an atoms
     adapter (0.6 and later), not an ASE calculator, so wrap them in ORBCalculator.
+    The molecular models (OrbMol, ``orb-v3-*-omol``) need the total charge and
+    spin multiplicity in ``atoms.info``; they are set to 0 and 1 when absent.
     """
     try:
         from orb_models.forcefield import pretrained
@@ -87,11 +99,20 @@ def orb_calculator(model="orb-v3-conservative-inf-omat", precision="float64"):
         raise KinisotInputError(
             "unknown ORB model %r: use one of %s" % (model, ", ".join(pretrained.ORB_PRETRAINED_MODELS))
         )
+
+    class MoleculeORBCalculator(ORBCalculator):
+        """Sets a neutral singlet unless the atoms carry a charge and spin, for the models that need them."""
+
+        def calculate(self, atoms=None, *args, **kwargs):
+            if atoms is not None and getattr(self, "expects_charge_and_spin", False):
+                _set_charge_and_spin(atoms)
+            return super().calculate(atoms, *args, **kwargs)
+
     loaded = pretrained.ORB_PRETRAINED_MODELS[model](precision=precision)
     if isinstance(loaded, tuple):
         network, adapter = loaded
-        return ORBCalculator(network, atoms_adapter=adapter)
-    return ORBCalculator(loaded)
+        return MoleculeORBCalculator(network, atoms_adapter=adapter)
+    return MoleculeORBCalculator(loaded)
 
 
 def uma_calculator(model="uma-s-1p1", task="omol", precision="float64", device="cpu"):
@@ -136,11 +157,53 @@ def uma_calculator(model="uma-s-1p1", task="omol", precision="float64", device="
 
         def calculate(self, atoms=None, *args, **kwargs):
             if atoms is not None and task == "omol":
-                atoms.info.setdefault("charge", 0)
-                atoms.info.setdefault("spin", 1)
+                _set_charge_and_spin(atoms)
             return super().calculate(atoms, *args, **kwargs)
 
     return UMACalculator(predictor, task_name=task)
+
+
+def sevennet_calculator(model="7net-0", modal=None, device="auto"):
+    """SevenNet calculator for ``--calc sevennet[:model[:task]]``, e.g. ``sevennet:7net-omni:omol25_low``.
+
+    Multi-task models (7net-omni, 7net-mf-ompa) need the task ("modal"), which selects the
+    training data and level of theory the model reproduces: ``omol25_low`` is SevenNet-Omni's
+    task for OMol25's wB97M-V/def2-TZVPD molecules. ``model`` may also be a checkpoint file.
+    """
+    try:
+        from sevenn.calculator import SevenNetCalculator
+    except ImportError as err:
+        raise KinisotInputError("cannot import sevenn for --calc sevennet (%s); install sevenn" % err) from None
+    if modal is None and not os.path.isfile(model) and ":" in model:
+        model, modal = model.rsplit(":", 1)
+    try:
+        return SevenNetCalculator(model=model, modal=modal or None, device=device)
+    except ValueError as err:  # a missing or unknown task: SevenNet lists the valid ones
+        hint = "; give the task as sevennet:%s:TASK" % model if "modal" in str(err) else ""
+        raise KinisotInputError("--calc sevennet:%s: %s%s" % (model, err, hint)) from None
+
+
+def aimnet2_calculator(model="aimnet2"):
+    """AIMNet2 calculator for ``--calc aimnet2[:model]``; ``model`` is a name from aimnet's model
+    registry (``aimnet2``, the wB97M-D3 model; ``aimnet2-rxn``, the model for reactive chemistry; ...)
+    or a model file.
+
+    The package is ``aimnet``; older installs provide the same calculator as ``aimnet2calc``.
+    The charge and spin multiplicity default to 0 and 1 (``atoms.info`` ``charge`` and ``mult``).
+    """
+    try:
+        from aimnet.calculators.aimnet2ase import AIMNet2ASE
+    except ImportError:
+        try:
+            from aimnet2calc import AIMNet2ASE
+        except ImportError as err:
+            raise KinisotInputError("cannot import aimnet for --calc aimnet2 (%s); install aimnet" % err) from None
+    try:
+        return AIMNet2ASE(model)
+    except Exception as err:  # an unknown name, a failed download or a bad file: say which model
+        raise KinisotInputError(
+            "cannot load the AIMNet2 model %s (%s: %s)" % (model, type(err).__name__, err)
+        ) from None
 
 
 def build_calculator(spec):

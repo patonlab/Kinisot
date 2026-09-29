@@ -437,7 +437,13 @@ transition structure and misses experiment by up to 0.018. UMA
 (`uma-s-1p1`, run 2026-09-29) does find the concerted transition structure,
 and its KIEs match experiment with a mean absolute deviation of 0.0011
 (B3LYP 0.0009), so the example now makes the comparison the recommendation
-asked for, with UMA.
+asked for, with UMA. Six more potentials followed: MACE-OMOL-0,
+SevenNet-Omni, AIMNet2, AIMNet2-rxn and two ORB OMol models. All find the
+concerted transition structure. MACE-OMOL-0 and SevenNet-Omni match
+experiment as well as UMA; the others miss by 0.003–0.004 on average. The
+ORB models also showed that a correct saddle point is not enough: their
+energies are not rotation-invariant and their transition structures are
+too soft, so the example now checks the Hessian as well.
 
 ## 7. Changes made to the implementation plan
 
