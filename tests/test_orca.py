@@ -142,3 +142,45 @@ def test_unsubstitutable_orca_element_keeps_program_mass(tmp_path):
 def test_synthetic_gaussian_without_frequencies_skips_check(tmp_path):
     data = parse_gaussian(write_minimum(tmp_path / "m.out"))
     assert data.program_frequencies is None
+
+
+# Real ORCA 6.1.0 outputs (tests/data/orca/README.md): n-pentane conformers and a hydrogen-atom transfer
+PENTANE_TT, PENTANE_GG = datapath("orca/pentane_TT.out"), datapath("orca/pentane_GG.out")
+HAT_GS, HAT_TS = datapath("orca/hat_gs_freq.out"), datapath("orca/hat_ts_freq.out")
+
+
+def test_real_orca_conformer_eqe():
+    # TT and GG n-pentane at r2SCAN-3c, which has no scaling factor: EQE for 2H at atom 6
+    tt = load_hessian(PENTANE_TT)
+    assert tt.program == "Orca" and tt.level_of_theory == "r2SCAN-3c/def2-mTZVPP" and len(tt.atomic_numbers) == 17
+    r = compute_kie(rct=PENTANE_TT, prd=PENTANE_GG, iso="6", temperature=298.15, scale=None)
+    assert r.scaling.factor == 1.0 and r.warnings == ()
+    # the value first pinned for these files, 1.007730117, came from slightly different isotope masses
+    assert r.kie == pytest.approx(1.0077302, abs=2e-7)
+    via_hess = compute_kie(
+        rct=PENTANE_TT.replace(".out", ".hess"), prd=PENTANE_GG.replace(".out", ".hess"), iso="6", temperature=298.15
+    )
+    assert via_hess.kie == pytest.approx(r.kie, abs=1e-12)
+
+
+def test_real_orca_deep_tunnelling_hat():
+    # Broken-symmetry M06-2X-D3(0)/6-31+G**, SMD(dichloromethane). H26 moves from C13 to C6 in the transition
+    # mode (1974.9i cm-1, 1911.7i with the detected factor 0.968), so the crossover temperature is 438 K
+    kw = dict(rct=HAT_GS, ts=HAT_TS, temperature=298.15, scale=None)
+    primary = compute_kie(iso="26", tunneling="wigner", **kw)
+    assert primary.scaling.factor == 0.968 and primary.warnings == ()
+    assert primary.other.light.imaginary == pytest.approx(1911.7, abs=0.1)
+    assert primary.kie == pytest.approx(3.18884, abs=1e-5) and primary.kie_tunnel == pytest.approx(4.46248, abs=1e-5)
+    tritium = compute_kie(iso="26:T", tunneling="none", **kw)
+    assert tritium.kie == pytest.approx(5.11494, abs=1e-5) and tritium.kie > primary.kie
+    assert compute_kie(iso="24", tunneling="none", **kw).kie == pytest.approx(1.037178, abs=1e-6)  # H24 on C13
+
+    # below the crossover temperature the Bell correction is undefined; the Skodje-Truhlar one is not
+    with pytest.raises(KinisotInputError, match="crossover temperature 437.8 K"):
+        compute_kie(iso="26", tunneling="bell", **kw)
+    assert np.isfinite(compute_kie(iso="26", tunneling="skodje", **kw).kie_tunnel)
+    # above it both are defined, and the truncated parabola tunnels less than the infinite one
+    hot = dict(kw, temperature=500.0)
+    bell = compute_kie(iso="26", tunneling="bell", **hot).kie_tunnel
+    skodje = compute_kie(iso="26", tunneling="skodje", **hot).kie_tunnel
+    assert bell == pytest.approx(5.67082, abs=1e-5) and skodje == pytest.approx(4.85377, abs=1e-5) and skodje < bell
