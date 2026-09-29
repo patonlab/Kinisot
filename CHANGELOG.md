@@ -326,8 +326,8 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   name from aimnet's registry, such as `aimnet2-rxn`, or a model file. A
   model that cannot be loaded is an input error. The fallback applies only
   when aimnet is not installed: an installed aimnet that fails to import
-  (a missing or incompatible dependency) is reported with its own error
-  rather than as a missing `aimnet2calc`.
+  (a missing submodule, or a missing or incompatible dependency) is
+  reported with its own error rather than as a missing `aimnet2calc`.
 - The calculator registry records which keyword receives the `:model` part
   of a `--calc` specification (`method` for tblite, `model` elsewhere).
 - The benchmark runner averages equivalent positions (`iso_average`,
