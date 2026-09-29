@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0: 2026-09-29 16:59
   Species: gs_1.hessian.json isotopologue: 10,11
   Species: ts_chair.hessian.json isotopologue: 10,11
 
@@ -24,7 +24,7 @@ o ts_chair.hessian: iso @ 10,11                       493.4  1.878e+02  1.239e+0
   ts_chair.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   ts_chair.hessian (iso @ 10,11): imaginary 493.4i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0: 2026-09-29 16:59
   Species: gs_1.hessian.json gs_2.hessian.json gs_3.hessian.json gs_4.hessian.json gs_5.hessian.json gs_6.hessian.json gs_7.hessian.json gs_8.hessian.json (8 conformers) isotopologue: 10,11
   Species: ts_chair.hessian.json ts_boat.hessian.json (2 conformers) isotopologue: 10,11
 
@@ -58,7 +58,7 @@ o transition structure 1, iso @ 10,11
 
   lowest: the lowest conformer of every species alone; range: each free energy moved by +/-0.5 kcal/mol in turn; N_eff: effective number of transition-structure conformers, 1 / sum(pop^2)
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0: 2026-09-29 16:59
   Job: ensemble.json (transition structure)
 
 

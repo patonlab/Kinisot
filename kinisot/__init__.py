@@ -20,7 +20,7 @@ Python::
                       shares=[1, 3.3])
 """
 
-__version__ = "2.6.0.dev0"
+__version__ = "2.6.0"
 
 from .api import IsotopeEffect, IsotopologueResult, SideResult, SpeciesResult, compute_kie
 from .backends import load_hessian
