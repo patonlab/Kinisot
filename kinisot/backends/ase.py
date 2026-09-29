@@ -52,6 +52,7 @@ CALCULATORS = {
     "mace_off": ("mace.calculators", "mace_off", {"default_dtype": "float64"}, "mace-torch", "model"),
     "mace_omol": ("mace.calculators", "mace_omol", {"default_dtype": "float64"}, "mace-torch", "model"),
     "orb": ("kinisot.backends.ase", "orb_calculator", {}, "orb-models", "model"),
+    "uma": ("kinisot.backends.ase", "uma_calculator", {}, "fairchem-core", "model"),
     "sevennet": ("sevenn.calculator", "SevenNetCalculator", {}, "sevenn", "model"),
     "aimnet2": ("aimnet2calc", "AIMNet2ASE", {}, "aimnet2calc", "model"),
 }
@@ -91,6 +92,45 @@ def orb_calculator(model="orb-v3-conservative-inf-omat", precision="float64"):
         network, adapter = loaded
         return ORBCalculator(network, atoms_adapter=adapter)
     return ORBCalculator(loaded)
+
+
+def uma_calculator(model="uma-s-1p1", task="omol", precision="float64", device="cpu"):
+    """UMA calculator (fairchem) for ``--calc uma[:model]``; ``model`` is a fairchem pretrained model name
+    or the path of a checkpoint file already downloaded.
+
+    ``task`` selects UMA's head: ``omol`` for molecules, which reads the charge and spin multiplicity
+    from ``atoms.info`` (0 and 1 when absent). Hessians by finite differences need double precision,
+    and ``torch.compile`` gains nothing for one small molecule on a CPU, so neither default is kept.
+    The checkpoints are gated on Hugging Face: accept the licence at https://huggingface.co/facebook/UMA
+    and set HF_TOKEN.
+    """
+    import dataclasses
+
+    try:
+        import torch
+        from fairchem.core import FAIRChemCalculator, pretrained_mlip
+        from fairchem.core.units.mlip_unit.api.inference import inference_settings_default
+    except ImportError as err:
+        raise KinisotInputError("cannot import fairchem for --calc uma (%s); install fairchem-core" % err) from None
+    local = os.path.isfile(model)
+    if not local and model not in pretrained_mlip.available_models:
+        raise KinisotInputError(
+            "unknown fairchem model %r: use one of %s, or a checkpoint file"
+            % (model, ", ".join(pretrained_mlip.available_models))
+        )
+    settings = dataclasses.replace(
+        inference_settings_default(), base_precision_dtype=getattr(torch, precision), compile=False
+    )
+    load = pretrained_mlip.load_predict_unit if local else pretrained_mlip.get_predict_unit
+    try:
+        predictor = load(model, inference_settings=settings, device=device)
+    except Exception as err:  # the download or the checkpoint: say what the user can do about it
+        raise KinisotInputError(
+            "cannot load the fairchem model %s (%s: %s). The UMA checkpoints are gated: accept the licence at "
+            "https://huggingface.co/facebook/UMA, set HF_TOKEN, and allow huggingface.co"
+            % (model, type(err).__name__, err)
+        ) from None
+    return FAIRChemCalculator(predictor, task_name=task)
 
 
 def build_calculator(spec):

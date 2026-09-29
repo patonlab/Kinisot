@@ -133,7 +133,7 @@ def test_build_calculator_specs():
     assert isinstance(build_calculator("emt"), EMT)
     assert isinstance(build_calculator("ase.calculators.emt:EMT"), EMT)
     assert isinstance(load_hessian(GS_J, calculator="emt"), type(parse_ase_json(GS_J)))  # JSON wins over --calc
-    for name in ("xtb", "mace_mp", "mace_off", "orb", "sevennet", "aimnet2"):
+    for name in ("xtb", "mace_mp", "mace_off", "orb", "uma", "sevennet", "aimnet2"):
         assert name in CALCULATORS and len(CALCULATORS[name]) == 5
     with pytest.raises(KinisotInputError, match="unknown calculator"):
         build_calculator("not-a-calculator")
@@ -182,6 +182,66 @@ def test_orb_calculator_wraps_the_model(monkeypatch, returns_adapter):
     assert isinstance(build_calculator("orb:other"), ORBCalculator)
     with pytest.raises(KinisotInputError, match="unknown ORB model"):
         build_calculator("orb:orb-v9")
+
+
+def test_uma_calculator_loads_a_double_precision_model(monkeypatch, tmp_path):
+    # --calc uma must ask fairchem for float64 without torch.compile, use the omol (molecule) head, and turn
+    # a failed download of the gated checkpoint into an input error. Fake modules stand in for fairchem and torch.
+    import dataclasses
+    import sys
+    import types
+
+    @dataclasses.dataclass
+    class Settings:
+        base_precision_dtype: str = "float32"
+        compile: bool = True
+
+    class Calculator:
+        def __init__(self, predictor, task_name=None):
+            self.predictor, self.task_name = predictor, task_name
+
+    requests = []
+
+    def get_predict_unit(model, inference_settings=None, device=None):
+        if model == "uma-m-1p1":
+            raise OSError("403 Forbidden")
+        requests.append((model, inference_settings, device))
+        return "predictor"
+
+    core = types.ModuleType("fairchem.core")
+    core.FAIRChemCalculator = Calculator
+    core.pretrained_mlip = types.SimpleNamespace(
+        available_models=("uma-s-1p1", "uma-m-1p1"),
+        get_predict_unit=get_predict_unit,
+        load_predict_unit=lambda path, **kwargs: get_predict_unit("file " + os.path.basename(path), **kwargs),
+    )
+    inference = types.ModuleType("fairchem.core.units.mlip_unit.api.inference")
+    inference.inference_settings_default = Settings
+    torch = types.ModuleType("torch")
+    torch.float64 = "float64"
+    for name, module in (
+        ("torch", torch),
+        ("fairchem", types.ModuleType("fairchem")),
+        ("fairchem.core", core),
+        ("fairchem.core.units", types.ModuleType("units")),
+        ("fairchem.core.units.mlip_unit", types.ModuleType("mlip_unit")),
+        ("fairchem.core.units.mlip_unit.api", types.ModuleType("api")),
+        ("fairchem.core.units.mlip_unit.api.inference", inference),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+
+    calc = build_calculator("uma")
+    assert isinstance(calc, Calculator) and calc.predictor == "predictor" and calc.task_name == "omol"
+    assert requests == [("uma-s-1p1", Settings(base_precision_dtype="float64", compile=False), "cpu")]
+    with pytest.raises(KinisotInputError, match="gated"):
+        build_calculator("uma:uma-m-1p1")
+    with pytest.raises(KinisotInputError, match="unknown fairchem model"):
+        build_calculator("uma:uma-x")
+    # a checkpoint file already downloaded (the --model-file route of scripts/make_claisen_structures.py)
+    checkpoint = tmp_path / "uma-s-1p1.pt"
+    checkpoint.write_bytes(b"")
+    assert build_calculator("uma:%s" % checkpoint).predictor == "predictor"
+    assert requests[-1][0] == "file uma-s-1p1.pt"
 
 
 def test_analytic_hessian_is_used_when_available():

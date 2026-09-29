@@ -212,7 +212,9 @@ different reaction. So before trusting isotope effects from a potential:
   foundation model cannot be assumed to know transition-structure regions.
   Fine-tuning on reaction-path data for the reaction class, or GFN2-xTB or
   DFT, is the safer route. `mace_omol`, `orb`, `sevennet`, `aimnet2` and UMA
-  were not tested here.
+  were not tested here. UMA is available as `--calc uma` (fairchem-core; its
+  weights are gated on Hugging Face):
+  `python scripts/make_claisen_structures.py --calc uma --out uma --label UMA-s-1p1`.
 
 To reproduce the rejections:
 

@@ -118,7 +118,7 @@ def main(argv=None):
     parser.add_argument("--calc", required=True, help="Kinisot --calc specification, e.g. xtb or mace_off:medium")
     parser.add_argument("--out", required=True, help="output directory")
     parser.add_argument("--label", help="level of theory stored in the files (default: from --calc)")
-    parser.add_argument("--model-file", help="local model weights to load instead of downloading (MACE)")
+    parser.add_argument("--model-file", help="local model weights to load instead of downloading (MACE, UMA)")
     parser.add_argument("--keep-invalid", action="store_true", help="write structures that fail the checks")
     options = parser.parse_args(argv)
     from sella import Sella

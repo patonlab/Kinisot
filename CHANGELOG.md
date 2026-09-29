@@ -76,6 +76,13 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   case.json, the format of `kinisot --job`), so transition structures in
   series and parallel channels enter the report. Each `kies` entry names its
   isotopologue in the job file.
+- `--calc uma[:model]`: Meta's UMA potentials through fairchem-core
+  (`pip install fairchem-core`), with the molecule (`omol`) head in double
+  precision and without `torch.compile`. `model` is a fairchem pretrained
+  name (default `uma-s-1p1`) or a checkpoint file already downloaded, so
+  `scripts/make_claisen_structures.py --model-file` works for UMA too. The
+  weights are gated on Hugging Face: accept the licence and set `HF_TOKEN`;
+  a failed download says so.
 - The Wittig case (`benchmarks/wittig_anisaldehyde`) is computed from
   Gaussian 16 frequency jobs at the SI geometries, as two transition
   structures in series (`series.json`). Both transition structures

@@ -88,9 +88,12 @@ imaginary modes below the cutoff are treated as real vibrations of the same
 magnitude with a warning. Calculator names: `emt` (ASE's test potential),
 `xtb[:method]` (GFN2-xTB through `tblite`, SCF accuracy tightened to 0.01),
 `mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb[:model]` (an orb-models
-`ORB_PRETRAINED_MODELS` name, default `orb-v3-conservative-inf-omat`), `sevennet`,
-`aimnet2`, or `module.path:callable`; each package must be installed
-separately.
+`ORB_PRETRAINED_MODELS` name, default `orb-v3-conservative-inf-omat`),
+`uma[:model]` (fairchem-core: a fairchem pretrained model name, default
+`uma-s-1p1`, or a checkpoint file; molecule head, float64; the UMA weights
+are gated on Hugging Face, so accept their licence and set `HF_TOKEN`),
+`sevennet`, `aimnet2`, or `module.path:callable`; each package must be
+installed separately.
 
 **Finite-difference Hessians need a tightly converged energy.** Noise in
 the forces becomes noise in the Hessian and then in the isotope effect:

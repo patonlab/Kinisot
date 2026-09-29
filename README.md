@@ -269,7 +269,7 @@ arylation, are in [docs/theory.md, section 7](docs/theory.md#7-conformer-ensembl
 | --- | --- | --- |
 | Gaussian 09/16 | supported | a normally terminated `freq` job: atom masses and the force constants in the archive entry (`opt freq` jobs are fine) |
 | ORCA 5/6 | supported | `name.out` plus the `name.hess` file ORCA writes next to it (give either path); level of theory from the `!` line |
-| ASE: machine-learned potentials, GFN2-xTB, any ASE calculator | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (`xtb`, `mace_mp`, `mace_off`, `orb`, `sevennet`, `aimnet2`, `module:callable`); the Hessian is computed and cached next to the geometry, external modes are projected out |
+| ASE: machine-learned potentials, GFN2-xTB, any ASE calculator | supported (`pip install kinisot[ase]`) | a `VibrationsData` JSON file, or a geometry plus `--calc` (`xtb`, `mace_mp`, `mace_off`, `orb`, `uma`, `sevennet`, `aimnet2`, `module:callable`); the Hessian is computed and cached next to the geometry, external modes are projected out |
 
 Atom numbers count from 1 in the order of the input geometry, whatever
 the program. Details and pitfalls:
