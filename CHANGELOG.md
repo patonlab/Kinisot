@@ -4,6 +4,19 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
 
 ## [Unreleased]
 
+### Added
+
+- Real ORCA 6.1.0 test data (`tests/data/orca/`, from the
+  `feat/goodvibes-integration` branch): the TT and GG conformers of
+  n-pentane at r2SCAN-3c, and the reactant and transition structure of a
+  hydrogen-atom transfer at broken-symmetry M06-2X-D3/6-31+G** with SMD
+  (1974.9i cm⁻¹). `tests/test_orca.py` pins the conformer EQE and the HAT
+  KIEs (primary and secondary ²H, ³H, Wigner, Skodje–Truhlar, and Bell
+  above 438 K), checks that the Bell correction is refused below that
+  crossover temperature, and checks the scaling factor detected from the
+  ORCA input line. Kinisot reproduces the values first computed for these
+  files on that branch within 1.5 × 10⁻⁵ (relative).
+
 ## [2.6.0] - 2026-09-29
 
 ### Added

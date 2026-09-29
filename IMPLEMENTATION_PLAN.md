@@ -212,8 +212,10 @@ Delivered with two deviations from the text below:
 - Item 6: no real ORCA output was available, so the fixtures in
   `tests/data/orca/` are the Claisen Gaussian Hessians rewritten in ORCA's
   `.hess` layout with a minimal `.out` (documented there). They exercise the
-  reader end to end against the Gaussian goldens; **real ORCA fixtures (a
-  small reactant/TS pair and a linear molecule) are still wanted**, and so is
+  reader end to end against the Gaussian goldens. Real ORCA 6.1.0 fixtures
+  were added 2026-09-29 (`tests/data/orca/pentane_*`, a conformer EQE, and
+  `hat_*`, a hydrogen-atom-transfer reactant/TS pair below its crossover
+  temperature); **a linear molecule is still wanted**, and so is
   a `#p` Gaussian pair for the PyQuiver parity test, which PyQuiver
   requires and which the bundled outputs lack (the test skips until then).
 
