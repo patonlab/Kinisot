@@ -347,9 +347,10 @@ Claisen transition structure. MACE-OFF23 puts the pericyclic region 30 to
 a C1–C6 ring closure with C–O intact. The script now validates every
 structure (one imaginary mode, partial-bond windows, bonds dominating the
 imaginary mode) and refuses these. No MACE KIEs are reported; the
-diagnostics are in the example. **Still wanted:** a potential trained on
-reactive data that passes the checks. `mace_omol`, `orb`, `sevennet`,
-`aimnet2` and UMA have not been tried.
+diagnostics are in the example. UMA (`uma-s-1p1`, `--calc uma`, added
+2026-09-29) passes the checks, and its KIEs match experiment with a mean
+absolute deviation of 0.0011 (B3LYP 0.0009; `benchmarks/claisen_uma`).
+`mace_omol`, `orb`, `sevennet` and `aimnet2` have not been tried.
 
 Design in REVIEW §6; prototypes verified 2026-09-25 (unit conversion to
 1.6e-6 cm⁻¹, `with_new_masses` isotopologues, EMT finite-difference failure

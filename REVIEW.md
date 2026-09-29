@@ -433,9 +433,11 @@ Claisen transition structure: their saddle points describe C–O cleavage or
 ring closure. `examples/mlip_claisen/` reports that, with the rejected
 structures as a regression test (`tests/data/mace_mp0_rejected/`), and
 makes the KIE comparison with GFN2-xTB instead, which finds the concerted
-transition structure and misses experiment by up to 0.018. UMA was not
-tested; a comparison with it, or with a potential trained on reactive
-data, would still be worth adding.
+transition structure and misses experiment by up to 0.018. UMA
+(`uma-s-1p1`, run 2026-09-29) does find the concerted transition structure,
+and its KIEs match experiment with a mean absolute deviation of 0.0011
+(B3LYP 0.0009), so the example now makes the comparison the recommendation
+asked for, with UMA.
 
 ## 7. Changes made to the implementation plan
 

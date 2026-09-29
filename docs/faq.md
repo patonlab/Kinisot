@@ -157,10 +157,11 @@ KIE, so compare against a DFT reference where you can.
 Check that the saddle point is the reaction you mean. None of four MACE
 foundation models (MACE-OFF23 small, medium and large, and MACE-MP-0) has
 the concerted Claisen transition structure: their saddle points describe
-C–O cleavage or ring closure instead.
+C–O cleavage or ring closure instead. Meta's UMA (`--calc uma`) has it, and
+its KIEs match experiment almost as well as B3LYP's.
 
 [examples/mlip_claisen](../examples/mlip_claisen/README.md) compares
-GFN2-xTB and B3LYP for the Claisen rearrangement and gives the details, and
+GFN2-xTB, UMA and B3LYP for the Claisen rearrangement and gives the details, and
 `scripts/make_claisen_structures.py` shows the whole workflow, including
 the transition-structure search.
 

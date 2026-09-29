@@ -76,6 +76,22 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   case.json, the format of `kinisot --job`), so transition structures in
   series and parallel channels enter the report. Each `kies` entry names its
   isotopologue in the job file.
+- `--calc uma[:model]`: Meta's UMA potentials through fairchem-core
+  (`pip install fairchem-core`), with the molecule (`omol`) head in double
+  precision and without `torch.compile`. `model` is a fairchem pretrained
+  name (default `uma-s-1p1`) or a checkpoint file already downloaded, so
+  `scripts/make_claisen_structures.py --model-file` works for UMA too. The
+  weights are gated on Hugging Face: accept the licence and set `HF_TOKEN`;
+  a failed download says so. The charge and spin of the molecule head
+  default to a neutral singlet.
+- UMA Claisen structures and Hessians (`tests/data/uma/`, made by
+  `scripts/make_claisen_structures.py --calc uma`): UMA is the first
+  machine-learned potential tested that finds the concerted Claisen
+  transition structure (C1–C6 2.19 Å, C4–O3 1.85 Å, 611i cm⁻¹). Relative to
+  C5, its ¹³C and ¹⁷O KIEs match experiment with a mean absolute deviation
+  of 0.0011, against 0.0009 for B3LYP and 0.0089 for GFN2-xTB
+  (`benchmarks/claisen_uma`, `examples/mlip_claisen`). The overall mean
+  absolute deviation of the benchmarks moves to 0.0047 (47 positions).
 - The Wittig case (`benchmarks/wittig_anisaldehyde`) is computed from
   Gaussian 16 frequency jobs at the SI geometries, as two transition
   structures in series (`series.json`). Both transition structures

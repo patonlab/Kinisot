@@ -7,6 +7,8 @@ minutes, but their transition structures can differ from DFT's.
   0.018 (mean absolute deviation 0.0089, against 0.0009 for B3LYP).
 - None of four general-purpose MACE potentials finds the concerted
   transition structure at all.
+- Meta's UMA (`uma-s-1p1`) finds it, and its KIEs match experiment almost
+  as well as B3LYP's (mean absolute deviation 0.0011).
 
 Check the transition structure (its imaginary mode, and what it connects)
 before trusting its isotope effects.
@@ -112,6 +114,67 @@ on the stencil, against 1 ± 3 × 10⁻⁷ with `accuracy=0.01`, which is why
 the electronic structure well beyond what an optimization needs, and check
 a symmetric EQE like this one when in doubt.
 
+## A worked example with UMA
+
+Meta's UMA potential (`uma-s-1p1`, its molecule head, through fairchem-core
+2.23 in double precision) went through the same workflow. The weights are
+gated: accept the licence at huggingface.co/facebook/UMA and set `HF_TOKEN`.
+
+```
+pip install "kinisot[ase]" sella fairchem-core
+python scripts/make_claisen_structures.py --calc uma --out tests/data/uma --label UMA-s-1p1
+```
+
+It is the first machine-learned potential tested here that finds the
+concerted transition structure.
+- **The structures.** The reactant is a minimum (lowest mode 74 cm⁻¹). The
+  transition structure has one imaginary mode (611i cm⁻¹; B3LYP 483i
+  unscaled), with the forming C1–C6 bond at 2.19 Å and the breaking C4–O3
+  bond at 1.85 Å (B3LYP 2.31 and 1.90 Å). The barrier is 32.7 kcal/mol
+  (B3LYP 28.9).
+- **The Hessians.** UMA offers no analytic Hessian here, so they are central
+  differences (0.005 Å, four displacements per coordinate). The water check
+  above gives exactly 1, and projecting out the external modes changes the
+  KIEs by less than 10⁻⁷.
+
+The results are committed in `tests/data/uma/`:
+
+```
+cd tests/data/uma
+kinisot --rct claisen_gs.hessian.json --ts claisen_ts.hessian.json --iso 4 -t 393
+```
+
+Corrected KIEs at 393 K, first absolute (no scaling factor exists for UMA,
+so against unscaled B3LYP), then relative to C5 as measured by Meyer,
+DelMonte and Singleton:
+
+| Position | B3LYP, unscaled | UMA |
+| --- | --- | --- |
+| C1 | 1.0151 | 1.0175 |
+| C2 | 1.0020 | 1.0034 |
+| O3 (¹⁸O) | 1.0415 | 1.0441 |
+| O3 (¹⁷O) | 1.0216 | 1.0230 |
+| C4 | 1.0346 | 1.0366 |
+| C5 | 1.0020 | 1.0042 |
+| C6 | 1.0173 | 1.0209 |
+| H7,H8 (²H₂) | 0.9525 | 0.9688 |
+
+| Relative to C5 | B3LYP (s = 0.961) | GFN2-xTB | UMA | Measured |
+| --- | --- | --- | --- | --- |
+| C1 | 1.0128 | 1.0213 | 1.0133 | 1.014, 1.013 |
+| C2 | 1.0000 | 1.0015 | 0.9992 | 1.000, 1.001 |
+| O3 (¹⁷O) | 1.0186 | 1.0098 | 1.0187 | 1.017, 1.021 |
+| C4 | 1.0310 | 1.0163 | 1.0322 | 1.035, 1.033 |
+| C6 | 1.0149 | 1.0236 | 1.0166 | 1.015, 1.015 |
+| Mean absolute deviation | 0.0009 | 0.0089 | 0.0011 | |
+
+UMA's KIEs run 0.001–0.004 above B3LYP's, and relative to C5 they match
+the five measurements about as well. The secondary ²H₂ KIE at the
+hydrogens of C1 is less inverse (0.969 against 0.953); it was not
+measured. See `benchmarks/claisen_uma`. One reaction does not validate a
+potential, so check the transition structure of your own reaction as
+described below.
+
 ## With a machine-learned potential
 
 Give geometries (anything ASE reads: `.xyz`, `.extxyz`, ...) of the
@@ -166,7 +229,8 @@ any `--calc`. It was run with four MACE foundation models (mace-torch
 0.3.16, float64, analytic Hessians). With none of them does the saddle point
 search, started from the B3LYP transition structure, find the concerted
 Claisen transition structure. The script rejects every one of these saddle
-points, so the repository has no MACE structures or KIEs for this reaction:
+points, so the repository has no MACE structures or KIEs for this reaction.
+UMA's passes ([above](#a-worked-example-with-uma)):
 
 | Potential | ΔE at the B3LYP geometries (kcal/mol) | Saddle point reached | C1–C6 / C4–O3 (Å) | Imaginary modes (cm⁻¹) | Barrier (kcal/mol) |
 | --- | --- | --- | --- | --- | --- |
@@ -176,6 +240,7 @@ points, so the repository has no MACE structures or KIEs for this reaction:
 | MACE-OFF23 medium | 70.7 | C4–O3 cleavage, no C1–C6 bond | 3.56 / 2.16 | 158i | 59.3 |
 | MACE-OFF23 large | 65.6 | none (not converged, two imaginary modes) | 2.03 / 1.47 | 337i, 117i | – |
 | MACE-MP-0 medium | 25.1 | C1–C6 ring closure, C4–O3 intact | 2.42 / 1.46 | 355i | 9.2 |
+| UMA-s-1p1 | 33.2 | concerted [3,3] shift | 2.19 / 1.85 | 611i | 32.7 |
 
 "ΔE at the B3LYP geometries" is the energy of the B3LYP transition structure
 above the B3LYP reactant, both evaluated with the potential without
@@ -211,8 +276,8 @@ different reaction. So before trusting isotope effects from a potential:
 - **Prefer potentials trained on reactive data.** A general-purpose
   foundation model cannot be assumed to know transition-structure regions.
   Fine-tuning on reaction-path data for the reaction class, or GFN2-xTB or
-  DFT, is the safer route. `mace_omol`, `orb`, `sevennet`, `aimnet2` and UMA
-  were not tested here.
+  DFT, is the safer route. Of the potentials tried, only UMA passed.
+  `mace_omol`, `orb`, `sevennet` and `aimnet2` were not tested here.
 
 To reproduce the rejections:
 
@@ -227,6 +292,8 @@ are kept in `tests/data/mace_mp0_rejected/` as the regression test for
 these checks.
 
 MACE-MP-0 is MIT licensed. The MACE-OFF23 weights are distributed under the
-Academic Software License, which does not allow commercial use. Kinisot
-does not ship or download any weights itself. `mace-torch` fetches them on
-first use.
+Academic Software License, which does not allow commercial use. UMA's
+weights are gated on Hugging Face under the FAIR Chemistry License, which
+asks publications using results from UMA to acknowledge it. Kinisot does
+not ship or download any weights itself. `mace-torch` and `fairchem-core`
+fetch them on first use.

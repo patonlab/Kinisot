@@ -1,5 +1,5 @@
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
@@ -22,7 +22,7 @@ o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+0
   claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -9.7 -0.2 0.1 0.1 13.3 17.0
   claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -9.6 -0.2 0.1 0.1 13.3 16.9
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
@@ -45,7 +45,7 @@ o claisen_ts.hessian: iso @ 4                         458.1  1.141e+00  1.019e+0
   claisen_ts.hessian (light): imaginary 463.9i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 4): imaginary 458.1i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
   Species: claisen_gs.hessian.json isotopologue: 1
   Species: claisen_ts.hessian.json isotopologue: 1
 
@@ -69,7 +69,7 @@ o claisen_ts.hessian: iso @ 1                         486.6  1.143e+00  1.015e+0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 1): imaginary 486.6i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
   Species: claisen_gs.hessian.json isotopologue: 4
   Species: claisen_ts.hessian.json isotopologue: 4
 
@@ -93,7 +93,7 @@ o claisen_ts.hessian: iso @ 4                         491.7  1.148e+00  1.021e+0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 4): imaginary 491.7i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
   Species: claisen_gs.hessian.json isotopologue: 6
   Species: claisen_ts.hessian.json isotopologue: 6
 
@@ -117,7 +117,7 @@ o claisen_ts.hessian: iso @ 6                         486.6  1.142e+00  1.015e+0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 6): imaginary 486.6i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
 
-  KINISOT.py v 2.6.0.dev0: 2026-09-28 04:25
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
   Species: claisen_gs.hessian.json isotopologue: 7,8
   Species: claisen_ts.hessian.json isotopologue: 7,8
 
@@ -140,3 +140,99 @@ o claisen_ts.hessian: iso @ 7,8                       490.5  1.746e+02  1.260e+0
   claisen_gs.hessian (iso @ 7,8): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
   claisen_ts.hessian (light): imaginary 494.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
   claisen_ts.hessian (iso @ 7,8): imaginary 490.5i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 0.0 0.0
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
+  Species: claisen_gs.hessian.json isotopologue: 1
+  Species: claisen_ts.hessian.json isotopologue: 1
+
+  Unable to find vibrational scaling factor for UMA-s-1p1; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian C1 -> 13C; claisen_ts.hessian C1 -> 13C
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  611.2
+o claisen_gs.hessian: iso @ 1                                1.156e+00  1.023e+00  9.243e-01
+o claisen_ts.hessian: iso @ 1                         606.2  1.151e+00  1.019e+00  9.271e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.008293   1.003936   1.004513   0.996972   1.013752   1.003746   1.017550
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 1): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 611.2i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 1): imaginary 606.2i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
+  Species: claisen_gs.hessian.json isotopologue: 4
+  Species: claisen_ts.hessian.json isotopologue: 4
+
+  Unable to find vibrational scaling factor for UMA-s-1p1; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian C4 -> 13C; claisen_ts.hessian C4 -> 13C
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  611.2
+o claisen_gs.hessian: iso @ 4                                1.192e+00  1.020e+00  9.091e-01
+o claisen_ts.hessian: iso @ 4                         603.9  1.149e+00  1.018e+00  9.283e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.012060   1.037684   1.002393   0.979386   1.031011   1.005420   1.036599
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 4): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 611.2i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 4): imaginary 603.9i; 35 kept; discarded: -0.0 -0.0 -0.0 -0.0 -0.0 0.0
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
+  Species: claisen_gs.hessian.json isotopologue: 6
+  Species: claisen_ts.hessian.json isotopologue: 6
+
+  Unable to find vibrational scaling factor for UMA-s-1p1; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian C6 -> 13C; claisen_ts.hessian C6 -> 13C
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  611.2
+o claisen_gs.hessian: iso @ 6                                1.156e+00  1.024e+00  9.252e-01
+o claisen_ts.hessian: iso @ 6                         606.0  1.150e+00  1.019e+00  9.268e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.008706   1.005267   1.004637   0.998256   1.016946   1.003931   1.020943
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 6): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 611.2i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 6): imaginary 606.0i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+
+  KINISOT.py v 2.6.0.dev0: 2026-09-29 02:34
+  Species: claisen_gs.hessian.json isotopologue: 7,8
+  Species: claisen_ts.hessian.json isotopologue: 7,8
+
+  Unable to find vibrational scaling factor for UMA-s-1p1; using value of 1.0 (override with -s)
+
+                                                     Temp = 393.0K / Vib. scale factor = 1.0 / external modes projected
+  Labelled atoms: claisen_gs.hessian H7 -> 2H, H8 -> 2H; claisen_ts.hessian H7 -> 2H, H8 -> 2H
+                                                     V-ratio        ZPE        EXC       TRPF        KIE    1D-tunn   corr-KIE 
+
+o claisen_gs.hessian                                --------------------------------------------------------------------------
+o claisen_ts.hessian                                  611.2
+o claisen_gs.hessian: iso @ 7,8                              1.538e+02  1.388e+00  1.416e-01
+o claisen_ts.hessian: iso @ 7,8                       608.9  1.717e+02  1.301e+00  1.405e-01
+                                                    --------------------------------------------------------------------------
+  KIE @ 393.0 K                                    1.003876   0.896187   1.066466   1.007978   0.967112   1.001761   0.968815
+                                                    --------------------------------------------------------------------------
+
+  Vibrational modes (scaled, cm-1): kept in the partition function / projected out (residual values) as external modes
+  claisen_gs.hessian (light): 36 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_gs.hessian (iso @ 7,8): 36 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0
+  claisen_ts.hessian (light): imaginary 611.2i; 35 kept; discarded: -0.0 -0.0 -0.0 0.0 0.0 0.0
+  claisen_ts.hessian (iso @ 7,8): imaginary 608.9i; 35 kept; discarded: -0.0 -0.0 0.0 0.0 0.0 0.0

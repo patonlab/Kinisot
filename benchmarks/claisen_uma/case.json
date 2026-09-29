@@ -1,0 +1,96 @@
+{
+  "name": "Claisen rearrangement of allyl vinyl ether (UMA-s-1p1)",
+  "reference": {
+    "citation": "M. P. Meyer, A. J. DelMonte, D. A. Singleton, J. Am. Chem. Soc. 1999, 121, 10865-10874",
+    "doi": "10.1021/ja992372h",
+    "method": "13C and 17O KIEs by NMR at natural abundance, 120 C, two reactions taken to 86.5(8)% and 86.7(1.1)% completion; values and standard deviations from Table 4, relative to C5 (1.0 assumed)"
+  },
+  "temperature": 393.0,
+  "scale": null,
+  "level_of_theory": "UMA-s-1p1, omol head, float64 (fairchem-core 2.23; geometries and Hessians from scripts/make_claisen_structures.py --calc uma)",
+  "tunneling": "bell",
+  "project": null,
+  "reactants": [
+    "../../tests/data/uma/claisen_gs.hessian.json"
+  ],
+  "transition_structure": [
+    "../../tests/data/uma/claisen_ts.hessian.json"
+  ],
+  "product": null,
+  "reference_isotopologue": "5",
+  "kies": [
+    {
+      "position": "C1",
+      "iso": "1",
+      "experimental": [
+        1.014,
+        1.013
+      ],
+      "uncertainty": [
+        0.002,
+        0.001
+      ],
+      "note": "bond-forming carbon; paper's B3LYP/6-31G* prediction 1.012"
+    },
+    {
+      "position": "C2",
+      "iso": "2",
+      "experimental": [
+        1.0,
+        1.001
+      ],
+      "uncertainty": [
+        0.002,
+        0.001
+      ],
+      "note": "paper's B3LYP/6-31G* prediction 0.999"
+    },
+    {
+      "position": "O3 (17O)",
+      "iso": "3:17O",
+      "experimental": [
+        1.017,
+        1.021
+      ],
+      "uncertainty": [
+        0.005,
+        0.005
+      ],
+      "note": "17O measured by NMR; paper's B3LYP/6-31G* prediction 1.017"
+    },
+    {
+      "position": "C4",
+      "iso": "4",
+      "experimental": [
+        1.035,
+        1.033
+      ],
+      "uncertainty": [
+        0.002,
+        0.002
+      ],
+      "note": "bond-breaking carbon; paper's B3LYP/6-31G* prediction 1.029"
+    },
+    {
+      "position": "C6",
+      "iso": "6",
+      "experimental": [
+        1.015,
+        1.015
+      ],
+      "uncertainty": [
+        0.001,
+        0.001
+      ],
+      "note": "bond-forming carbon; paper's B3LYP/6-31G* prediction 1.014"
+    },
+    {
+      "position": "H7,H8 (2H2)",
+      "iso": "7,8",
+      "experimental": null,
+      "uncertainty": null,
+      "note": "secondary 2H KIE"
+    }
+  ],
+  "notes": "The KIEs are relative to C5, so they are computed relative to C5 (footnote 30 of the paper: the assumption of a negligible C5 KIE is doubtful, so predictions are normalized to it). Each position lists the two experiments; the deviation is taken from their mean. The paper's own B3LYP/6-31G* predictions (Table 4, also relative to C5) are given in the notes column. No 2H KIEs were measured for allyl vinyl ether in this work; the literature values in Table 2 are for C4-d2 and C6-d2 at 100 and 160 C, so the H7,H8 row has no experimental value."
+}
