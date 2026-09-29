@@ -193,7 +193,13 @@ def aimnet2_calculator(model="aimnet2"):
     """
     try:
         from aimnet.calculators.aimnet2ase import AIMNet2ASE
-    except ImportError:
+    except ImportError as err:
+        # fall back to aimnet2calc only when aimnet itself is absent, not when an installed aimnet fails
+        # to import (a missing submodule or dependency)
+        if not (isinstance(err, ModuleNotFoundError) and err.name == "aimnet"):
+            raise KinisotInputError(
+                "aimnet is installed but cannot be imported for --calc aimnet2 (%s: %s)" % (type(err).__name__, err)
+            ) from None
         try:
             from aimnet2calc import AIMNet2ASE
         except ImportError as err:
