@@ -5,13 +5,21 @@ minutes, but their transition structures can differ from DFT's.
 - For the Claisen rearrangement, GFN2-xTB finds the concerted transition
   structure but a tighter one. Its ¹³C and ¹⁷O KIEs miss experiment by up to
   0.018 (mean absolute deviation 0.0089, against 0.0009 for B3LYP).
-- None of four general-purpose MACE potentials finds the concerted
+- Four MACE foundation models (MACE-OFF23, trained on near-equilibrium
+  molecules, and MACE-MP-0, on materials) do not find the concerted
   transition structure at all.
-- Meta's UMA (`uma-s-1p1`) finds it, and its KIEs match experiment almost
-  as well as B3LYP's (mean absolute deviation 0.0011).
+- Seven other potentials find it. With three of them the KIEs match
+  experiment as well as B3LYP's (mean absolute deviation 0.0009–0.0011):
+  Meta's UMA (`uma-s-1p1`), MACE-OMOL-0 and SevenNet-Omni. With AIMNet2
+  and two ORB models they miss by 0.003 on average, and with AIMNet2-rxn
+  by 0.004.
+- The ORB models' energies change when the molecule is rotated, so their
+  Hessians depend on its orientation. Their transition structures are also
+  too soft, which puts normal KIEs on positions that do not react.
 
 Check the transition structure (its imaginary mode, and what it connects)
-before trusting its isotope effects.
+and the Hessian (a symmetric EQE, rotational invariance) before trusting
+the isotope effects.
 
 Kinisot reads Hessians saved in ASE's `VibrationsData` JSON form and can
 compute them itself with any ASE calculator (`--calc`). The fixture files
@@ -125,8 +133,8 @@ pip install "kinisot[ase]" sella fairchem-core
 python scripts/make_claisen_structures.py --calc uma --out tests/data/uma --label UMA-s-1p1
 ```
 
-It is the first machine-learned potential tested here that finds the
-concerted transition structure.
+It finds the concerted transition structure, as do the six potentials in
+the [next section](#other-potentials-trained-on-molecular-data).
 - **The structures.** The reactant is a minimum (lowest mode 74 cm⁻¹). The
   transition structure has one imaginary mode (611i cm⁻¹; B3LYP 483i
   unscaled), with the forming C1–C6 bond at 2.19 Å and the breaking C4–O3
@@ -175,6 +183,99 @@ measured. See `benchmarks/claisen_uma`. One reaction does not validate a
 potential, so check the transition structure of your own reaction as
 described below.
 
+## Other potentials trained on molecular data
+
+Six more potentials went through the same script:
+- MACE-OMOL-0, the `extra_large` model (mace-torch 0.3.16, analytic
+  Hessians);
+- SevenNet-Omni with its `omol25_low` task (sevenn 0.13.0; the task
+  reproduces OMol25's ωB97M-V molecules; single precision);
+- AIMNet2, the ωB97M-D3 model (`aimnet2`), and AIMNet2-rxn, the model for
+  reactive chemistry (`aimnet2-rxn`) (aimnet 0.2.0, analytic Hessians in
+  single precision);
+- ORB-v3 conservative OMol and OrbMol-v2 (orb-models 0.7.0, which needs
+  Python 3.12, in double precision).
+
+MACE-OMOL-0 and the ORB models were trained on OMol25, UMA and
+SevenNet-Omni on data that include it.
+
+```
+pip install "kinisot[ase]" sella mace-torch sevenn aimnet orb-models
+python scripts/make_claisen_structures.py --calc mace_omol --out mace_omol --label MACE-OMOL-0
+python scripts/make_claisen_structures.py --calc sevennet:7net-omni:omol25_low --out sevennet_omni --label SevenNet-Omni-omol25_low
+python scripts/make_claisen_structures.py --calc aimnet2 --out aimnet2 --label AIMNet2-wB97M-D3
+python scripts/make_claisen_structures.py --calc aimnet2:aimnet2-rxn --out aimnet2_rxn --label AIMNet2-rxn
+python scripts/make_claisen_structures.py --calc orb:orb-v3-conservative-omol --out orb_v3_omol --label ORB-v3-conservative-omol
+python scripts/make_claisen_structures.py --calc orb:orbmol-v2 --out orbmol_v2 --label OrbMol-v2
+```
+
+All six find the concerted transition structure and pass the script's
+checks (table [below](#machine-learned-potentials-check-the-transition-structure-first)).
+Their structures and Hessians are committed in `tests/data/mlip_claisen/`,
+and `tests/test_ase.py` checks the numbers here against them.
+
+Corrected KIEs at 393 K, relative to C5, against the measurements, with the
+absolute KIEs of C5 (measured as the reference, so not tested by
+experiment) and of the C1 hydrogens (not measured):
+
+| Potential | C1 | C2 | O3 (¹⁷O) | C4 | C6 | Mean absolute deviation | C5, absolute | H7,H8 (²H₂), absolute |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Measured | 1.014, 1.013 | 1.000, 1.001 | 1.017, 1.021 | 1.035, 1.033 | 1.015, 1.015 | | | |
+| B3LYP/6-31G(d), s = 0.961 | 1.0128 | 1.0000 | 1.0186 | 1.0310 | 1.0149 | 0.0009 | 1.0019 | 0.9566 |
+| GFN2-xTB | 1.0213 | 1.0015 | 1.0098 | 1.0163 | 1.0236 | 0.0089 | 1.0045 | 0.9010 |
+| MACE-OMOL-0 | 1.0124 | 1.0001 | 1.0206 | 1.0349 | 1.0155 | 0.0009 | 1.0046 | 1.0025 |
+| SevenNet-Omni (`omol25_low`) | 1.0139 | 1.0017 | 1.0199 | 1.0321 | 1.0158 | 0.0010 | 1.0036 | 0.9499 |
+| UMA-s-1p1 | 1.0133 | 0.9992 | 1.0187 | 1.0322 | 1.0166 | 0.0011 | 1.0042 | 0.9688 |
+| AIMNet2 (ωB97M-D3) | 1.0129 | 0.9983 | 1.0175 | 1.0295 | 1.0096 | 0.0029 | 1.0028 | 0.8463 |
+| ORB-v3 conservative OMol | 1.0084 | 0.9991 | 1.0131 | 1.0330 | 1.0135 | 0.0030 | 1.0126 | 1.1646 |
+| OrbMol-v2 | 1.0144 | 1.0004 | 1.0129 | 1.0285 | 1.0179 | 0.0031 | 1.0108 | 1.1241 |
+| AIMNet2-rxn | 1.0171 | 0.9998 | 1.0145 | 1.0288 | 1.0228 | 0.0044 | 1.0043 | 0.9924 |
+
+- **MACE-OMOL-0, SevenNet-Omni and UMA** reproduce the five measured KIEs
+  as well as B3LYP does. They still disagree on the secondary ²H₂ KIE:
+  1.003, 0.950 and 0.969 (B3LYP 0.957).
+- **AIMNet2** puts C6 and C4 too low (1.0096 and 1.0295). Its ²H₂ KIE is
+  strongly inverse (0.846). Its C–H stretches lie 30–110 cm⁻¹ above UMA's
+  in the transition structure but only 10–40 cm⁻¹ above in the reactant.
+- **AIMNet2-rxn** errs the way GFN2-xTB does, though less: the forming
+  bond's carbons C1 and C6 too high, the breaking bond's C4 and O3 too low.
+- **The ORB models** fail two checks that the others pass. First, their
+  energy is not invariant to rotating the molecule. Over 20 random
+  orientations of the Claisen transition structure it varies by 24 meV
+  (ORB-v3) and 15 meV (OrbMol-v2). UMA, MACE-OMOL-0 and SevenNet-Omni vary
+  by less than 0.001 meV, and AIMNet2 by 0.004 meV. So the Hessian depends
+  on the orientation:
+  - the water EQE (exactly 1 by symmetry, see above) comes out 0.9996 and
+    1.0009;
+  - rotating the Claisen structures moves the ORB-v3 KIEs by up to 0.0016
+    and the imaginary mode between 653i and 671i;
+  - Sella stops at forces of 3 × 10⁻⁴ and 8 × 10⁻⁴ eV/Å instead of 10⁻⁴.
+
+  Second, in every orientation, their transition structures are too soft.
+  The modes above 700 cm⁻¹ lie 4–5% below UMA's on average (2–6%; the C–H
+  stretches by about 100 cm⁻¹), although the C–H bonds are as long as
+  UMA's, and the reactants' frequencies agree with UMA's to 0.2% on
+  average. So C5, which does not react, gets an absolute KIE of
+  1.011–1.013, and the ²H₂ KIE is normal (1.12–1.16) where every other
+  method gives 0.85–1.00. Referencing to C5 cancels part of this: the
+  relative KIEs miss by 0.003 on average, as AIMNet2's do. The softening
+  is in the potential, not in the finite differences: the curvature of the
+  ORB energy along a C–H stretch matches the Hessians to 0.1%.
+
+The other Hessians pass the numerical checks:
+- **The water EQE.** It gives 1 within 2 × 10⁻⁷ for all the other
+  potentials, including those in single precision.
+- **AIMNet2's analytic Hessians.** They match central differences to
+  1.5 × 10⁻⁵ (relative), and the KIEs agree to 10⁻⁴.
+- **The stencil.** A 0.01 Å two-point stencil instead of 0.005 Å with four
+  points changes the ¹³C and ¹⁷O KIEs by less than 2 × 10⁻⁵. It changes
+  the ²H₂ KIE by 5–7 × 10⁻⁴ (UMA and SevenNet alike), from the
+  anharmonicity of the C–H stretches.
+
+The ²H₂ KIE spans 0.85 to 1.16 across these potentials. Hydrogen KIEs are
+the most sensitive to the Hessian, and with no measurement here the spread
+is a caution rather than a ranking.
+
 ## With a machine-learned potential
 
 Give geometries (anything ASE reads: `.xyz`, `.extxyz`, ...) of the
@@ -189,7 +290,7 @@ separate from real modes. No Truhlar scaling factor exists for a potential,
 so the factor is 1.0 unless `-s` is given.
 
 ```
-pip install "kinisot[ase]" mace-torch          # or orb-models, sevenn, aimnet2calc, ...
+pip install "kinisot[ase]" mace-torch          # or fairchem-core, orb-models, sevenn, aimnet, ...
 kinisot --rct claisen_gs.xyz --ts claisen_ts.xyz --iso 4 -t 393 --calc mace_mp:medium
 kinisot --rct claisen_gs.xyz --ts claisen_ts.xyz --iso 4 -t 393 --calc mace_off:medium --delta 0.005
 kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc my_package.calculators:make_calculator
@@ -198,9 +299,12 @@ kinisot --rct rct.xyz --ts ts.xyz --iso 4 --calc my_package.calculators:make_cal
 `--calc` accepts `emt` (ASE's built-in test potential, not for chemistry),
 `xtb[:method]` (GFN2-xTB by default, `xtb:GFN1-xTB` for GFN1; needs
 `tblite`), `mace_mp[:model]`, `mace_off[:model]`, `mace_omol`, `orb[:model]`,
-`sevennet`, `aimnet2`, or `module.path:callable` for anything else; the callable is
-called without arguments (plus `model=` when given) and must return an ASE
-calculator. The geometries must be stationary points **of the same
+`uma[:model]`, `sevennet[:model[:task]]` (`sevennet:7net-omni:omol25_low`),
+`aimnet2[:model]` (`aimnet2:aimnet2-rxn`), or `module.path:callable` for
+anything else; the callable is called without arguments (plus `model=` when
+given) and must return an ASE calculator. The molecular models of UMA and
+ORB get a neutral singlet unless `atoms.info` sets `charge` and `spin` (the
+multiplicity). The geometries must be stationary points **of the same
 potential**: optimize the reactant and locate the transition structure with
 the calculator you then pass to Kinisot, otherwise the Hessian has gradient
 contamination and spurious imaginary modes. Kinisot warns when a
@@ -229,8 +333,9 @@ any `--calc`. It was run with four MACE foundation models (mace-torch
 0.3.16, float64, analytic Hessians). With none of them does the saddle point
 search, started from the B3LYP transition structure, find the concerted
 Claisen transition structure. The script rejects every one of these saddle
-points, so the repository has no MACE structures or KIEs for this reaction.
-UMA's passes ([above](#a-worked-example-with-uma)):
+points, so the repository has no structures or KIEs from these four models
+for this reaction. UMA's passes ([above](#a-worked-example-with-uma)), as do
+those of the six potentials [above](#other-potentials-trained-on-molecular-data):
 
 | Potential | ΔE at the B3LYP geometries (kcal/mol) | Saddle point reached | C1–C6 / C4–O3 (Å) | Imaginary modes (cm⁻¹) | Barrier (kcal/mol) |
 | --- | --- | --- | --- | --- | --- |
@@ -241,6 +346,12 @@ UMA's passes ([above](#a-worked-example-with-uma)):
 | MACE-OFF23 large | 65.6 | none (not converged, two imaginary modes) | 2.03 / 1.47 | 337i, 117i | – |
 | MACE-MP-0 medium | 25.1 | C1–C6 ring closure, C4–O3 intact | 2.42 / 1.46 | 355i | 9.2 |
 | UMA-s-1p1 | 33.2 | concerted [3,3] shift | 2.19 / 1.85 | 611i | 32.7 |
+| MACE-OMOL-0 | 33.3 | concerted [3,3] shift | 2.23 / 1.89 | 640i | 33.1 |
+| SevenNet-Omni (`omol25_low`) | 39.1 | concerted [3,3] shift | 2.20 / 1.86 | 652i | 38.2 |
+| AIMNet2 (ωB97M-D3) | 32.0 | concerted [3,3] shift | 2.24 / 1.85 | 440i | 30.9 |
+| AIMNet2-rxn | 34.1 | concerted [3,3] shift | 2.23 / 1.90 | 575i | 33.8 |
+| ORB-v3 conservative OMol | 34.2 | concerted [3,3] shift | 2.13 / 1.82 | 653i | 33.4 |
+| OrbMol-v2 | 34.1 | concerted [3,3] shift | 2.14 / 1.82 | 649i | 33.6 |
 
 "ΔE at the B3LYP geometries" is the energy of the B3LYP transition structure
 above the B3LYP reactant, both evaluated with the potential without
@@ -276,8 +387,14 @@ different reaction. So before trusting isotope effects from a potential:
 - **Prefer potentials trained on reactive data.** A general-purpose
   foundation model cannot be assumed to know transition-structure regions.
   Fine-tuning on reaction-path data for the reaction class, or GFN2-xTB or
-  DFT, is the safer route. Of the potentials tried, only UMA passed.
-  `mace_omol`, `orb`, `sevennet` and `aimnet2` were not tested here.
+  DFT, is the safer route. Here the potentials trained on near-equilibrium
+  molecules (MACE-OFF23) or on materials (MACE-MP-0) missed the concerted
+  transition structure, and the seven others found it.
+- **Check the Hessian too.** A potential can find the right saddle point
+  and still get its curvature wrong, as the ORB models do. Compute a
+  symmetric EQE (water's two hydrogens), rotate the molecule and recompute
+  the energy, and compare the frequencies of groups that do not react
+  between the reactant and the transition structure.
 
 To reproduce the rejections:
 
@@ -294,6 +411,8 @@ these checks.
 MACE-MP-0 is MIT licensed. The MACE-OFF23 weights are distributed under the
 Academic Software License, which does not allow commercial use. UMA's
 weights are gated on Hugging Face under the FAIR Chemistry License, which
-asks publications using results from UMA to acknowledge it. Kinisot does
-not ship or download any weights itself. `mace-torch` and `fairchem-core`
-fetch them on first use.
+asks publications using results from UMA to acknowledge it. mace-torch
+distributes MACE-OMOL-0 under the Academic Software License as well. The
+orb-models package is Apache-2.0 licensed, and sevenn and aimnet are MIT
+licensed; check each model's own terms before using it. Kinisot does not
+ship or download any weights itself. The packages fetch them on first use.

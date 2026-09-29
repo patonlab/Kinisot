@@ -92,6 +92,27 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   of 0.0011, against 0.0009 for B3LYP and 0.0089 for GFN2-xTB
   (`benchmarks/claisen_uma`, `examples/mlip_claisen`). The overall mean
   absolute deviation of the benchmarks moves to 0.0047 (47 positions).
+- `--calc sevennet[:model[:task]]`: SevenNet's multi-task models need the
+  task, which selects the training data they reproduce, as in
+  `sevennet:7net-omni:omol25_low` (OMol25's ωB97M-V molecules). A missing
+  or unknown task is an input error that lists the valid ones.
+- Six more potentials through the Claisen check (`tests/data/mlip_claisen/`,
+  `examples/mlip_claisen`):
+  - MACE-OMOL-0, SevenNet-Omni (`omol25_low`), AIMNet2, AIMNet2-rxn,
+    ORB-v3 conservative OMol and OrbMol-v2 all find the concerted
+    transition structure.
+  - Relative to C5, MACE-OMOL-0 and SevenNet-Omni match the measured KIEs
+    as well as UMA and B3LYP (mean absolute deviations 0.0009 and 0.0010).
+    AIMNet2 and the two ORB models miss by about 0.003, and AIMNet2-rxn by
+    0.0044.
+  - The ORB models' energies change by up to 24 meV when the molecule is
+    rotated, so their Hessians depend on its orientation. Their
+    transition structures are also 4–5% too soft, which gives C5 a KIE of
+    1.011–1.013 and a normal ²H₂ KIE of 1.12–1.16 at C1.
+  - The example now also recommends checking the Hessian: a symmetric EQE
+    and the energy of the rotated molecule.
+  - These cases are not benchmark cases, so the overall mean absolute
+    deviation is unchanged.
 - The Wittig case (`benchmarks/wittig_anisaldehyde`) is computed from
   Gaussian 16 frequency jobs at the SI geometries, as two transition
   structures in series (`series.json`). Both transition structures
@@ -292,9 +313,18 @@ Notable changes to Kinisot. Format follows [Keep a Changelog](https://keepachang
   `--delta` changed. The cache now records the finite-difference step and
   the number of displacements and recomputes when either differs; caches
   written by 2.5.0 are recomputed once.
+- `--calc orb` with orb-models' molecular models (OrbMol,
+  `orb-v3-*-omol`) failed: they need the total charge and spin multiplicity
+  in `atoms.info`. Kinisot now sets a neutral singlet unless the atoms carry
+  their own. Charges and spins read back from extended XYZ files are numpy
+  integers, which orb-models rejects, so they are converted (for UMA too).
 
 ### Changed
 
+- `--calc aimnet2[:model]` uses the `aimnet` package (AIMNet2's current
+  distribution) and falls back to the older `aimnet2calc`. `model` is a
+  name from aimnet's registry, such as `aimnet2-rxn`, or a model file. A
+  model that cannot be loaded is an input error.
 - The calculator registry records which keyword receives the `:model` part
   of a `--calc` specification (`method` for tblite, `model` elsewhere).
 - The benchmark runner averages equivalent positions (`iso_average`,

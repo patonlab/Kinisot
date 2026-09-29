@@ -157,11 +157,20 @@ KIE, so compare against a DFT reference where you can.
 Check that the saddle point is the reaction you mean. None of four MACE
 foundation models (MACE-OFF23 small, medium and large, and MACE-MP-0) has
 the concerted Claisen transition structure: their saddle points describe
-C–O cleavage or ring closure instead. Meta's UMA (`--calc uma`) has it, and
-its KIEs match experiment almost as well as B3LYP's.
+C–O cleavage or ring closure instead. Seven others have it: UMA
+(`--calc uma`), MACE-OMOL-0, SevenNet-Omni, AIMNet2, AIMNet2-rxn and two
+ORB models. With UMA, MACE-OMOL-0 and SevenNet-Omni the KIEs match
+experiment as well as B3LYP's; with the others they miss by 0.003–0.004
+on average.
+
+Check the Hessian as well. The ORB models' energies change when the
+molecule is rotated, so their Hessians depend on its orientation, and their
+transition structures are too soft. An EQE between two equivalent atoms
+(exactly 1 by symmetry) and the energy of the rotated molecule are quick
+tests.
 
 [examples/mlip_claisen](../examples/mlip_claisen/README.md) compares
-GFN2-xTB, UMA and B3LYP for the Claisen rearrangement and gives the details, and
+these potentials with GFN2-xTB and B3LYP for the Claisen rearrangement and gives the details, and
 `scripts/make_claisen_structures.py` shows the whole workflow, including
 the transition-structure search.
 

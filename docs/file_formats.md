@@ -92,8 +92,13 @@ magnitude with a warning. Calculator names: `emt` (ASE's test potential),
 `uma[:model]` (fairchem-core: a fairchem pretrained model name, default
 `uma-s-1p1`, or a checkpoint file; molecule head, float64; the UMA weights
 are gated on Hugging Face, so accept their licence and set `HF_TOKEN`),
-`sevennet`, `aimnet2`, or `module.path:callable`; each package must be
-installed separately.
+`sevennet[:model[:task]]` (sevenn; a multi-task model needs its task, as in
+`sevennet:7net-omni:omol25_low`), `aimnet2[:model]` (aimnet, or the older
+aimnet2calc: an aimnet registry name such as `aimnet2-rxn`, or a model
+file), or `module.path:callable`; each package must be installed
+separately. The molecular models of UMA and ORB (OrbMol, `orb-v3-*-omol`)
+read the charge and spin multiplicity from `atoms.info` (`charge`, `spin`)
+and default to a neutral singlet.
 
 **Finite-difference Hessians need a tightly converged energy.** Noise in
 the forces becomes noise in the Hessian and then in the isotope effect:
