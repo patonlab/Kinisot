@@ -3,7 +3,7 @@
 # from the PyPI release first. Once a kinisot-feedstock exists, its bot
 # follows each PyPI release and this file is no longer needed.
 {% set name = "kinisot" %}
-{% set version = "2.5.0" %}
+{% set version = "2.6.0" %}
 {% set python_min = "3.9" %}
 
 package:
@@ -12,7 +12,7 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: 02c0080a95b31b96c0fc91d183624044e7a092b640f054d6043a9cc67479a802
+  sha256: a86e0c09253e25478b3635e5ff94cef0816ad768f5b9f66d47c2f51f8da230c8
 
 build:
   number: 0
